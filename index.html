@@ -57,6 +57,15 @@
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
+      touch-action: pan-y;
+    }
+    
+    html {
+      touch-action: manipulation;
+    }
+    
+    input, button, select, textarea {
+      touch-action: manipulation;
     }
     
     /* Animated background circles */
@@ -127,7 +136,7 @@
 
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
     label{display:block;font-size:13px;color:#f0f1f5;margin-bottom:6px;text-align:center;font-weight:600}
-    input[type=number], input[type=text], select{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,193,7,0.3);background:var(--card-light);color:var(--text);font-size:16px;transition:all 0.3s ease}
+    input[type=number], input[type=text], select{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,193,7,0.3);background:var(--card-light);color:var(--text);font-size:16px;transition:all 0.3s ease;touch-action:manipulation}
     input[type=text]:focus{outline:none;border-color:#ffc107;box-shadow:0 0 0 3px rgba(255,193,7,0.25);transform:scale(1.02)}
     input[type=text]::placeholder{color:#9a9dad;font-weight:400}
     
