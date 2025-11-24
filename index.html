@@ -215,18 +215,16 @@
     /* Countdown timer */
     .countdown-screen{
       position:absolute;
-      top:50%;
-      left:50%;
-      transform:translate(-50%, -50%);
-      width:90%;
-      height:auto;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
       background:rgba(0,0,0,0.95);
       z-index:100;
       display:flex;
       align-items:center;
       justify-content:center;
       border-radius:24px;
-      padding:60px 20px;
     }
     .countdown-number{
       font-family:'Fredoka One',cursive;
@@ -257,7 +255,6 @@
       header{flex-direction:column}
       .title-wrapper{align-items:center}
       .countdown-number{font-size:70px}
-      .countdown-screen{padding:40px 20px}
     }
   </style>
 </head>
