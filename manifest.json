@@ -2,15 +2,23 @@
   "name": "El Impostor",
   "short_name": "Impostor",
   "description": "Juego del impostor creado por Mike",
-  "start_url": "/?utm_source=homescreen",
-  "scope": "/",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f0c29",
+  "background_color": "#1a1635",
   "theme_color": "#ffc107",
+  "orientation": "portrait",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icons/icon-256.png", "sizes": "256x256", "type": "image/png" },
-    { "src": "/icons/icon-384.png", "sizes": "384x384", "type": "image/png" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "indiBola.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "indiBola.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
