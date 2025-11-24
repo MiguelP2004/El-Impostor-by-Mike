@@ -22,6 +22,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="El Impostor">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -204,6 +205,43 @@
     
     footer{margin-top:14px;display:flex;gap:8px;justify-content:center;color:#a0a3b5;text-align:center;font-weight:700}
 
+    /* Install prompt banner */
+    .install-prompt{
+      position:fixed;
+      bottom:20px;
+      left:20px;
+      right:20px;
+      background:linear-gradient(135deg,#ffc107,#ffb300);
+      color:#3e2723;
+      padding:16px 20px;
+      border-radius:16px;
+      box-shadow:0 8px 24px rgba(255,193,7,0.5);
+      z-index:9999;
+      display:none;
+      animation:slideUp 0.4s ease-out;
+      font-weight:600;
+    }
+    .install-prompt.show{display:block}
+    .install-prompt-text{margin-bottom:8px;font-size:14px}
+    .install-prompt-icon{font-size:20px;margin-right:8px}
+    .install-prompt-close{
+      position:absolute;
+      top:8px;
+      right:12px;
+      background:none;
+      border:none;
+      font-size:24px;
+      color:#3e2723;
+      cursor:pointer;
+      padding:4px;
+      line-height:1;
+    }
+    
+    @keyframes slideUp {
+      from{transform:translateY(100px);opacity:0}
+      to{transform:translateY(0);opacity:1}
+    }
+
     @media(max-width:720px){
       .grid{grid-template-columns:1fr}
       header{flex-direction:column}
@@ -212,6 +250,18 @@
   </style>
 </head>
 <body>
+  <!-- Install Prompt Banner -->
+  <div class="install-prompt" id="installPrompt">
+    <button class="install-prompt-close" id="closePrompt">×</button>
+    <div class="install-prompt-text">
+      <span class="install-prompt-icon">📱</span>
+      Para una mejor experiencia, agrega esta app a tu pantalla de inicio
+    </div>
+    <div style="font-size:12px;opacity:0.8">
+      Toca <strong>compartir</strong> <span style="font-size:16px">⎙</span> y luego <strong>"Añadir a pantalla de inicio"</strong>
+    </div>
+  </div>
+
   <div class="container">
     <header>
       <img src="indiBola.png" alt="Logo" class="dog-logo">
@@ -312,6 +362,32 @@
         });
       });
     }
+
+    // Detect if running in standalone mode (as installed PWA)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone || 
+                         document.referrer.includes('android-app://');
+
+    // Show install prompt only if NOT in standalone mode and on iOS/mobile
+    const installPrompt = document.getElementById('installPrompt');
+    const closePrompt = document.getElementById('closePrompt');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Check if user has dismissed the prompt before
+    const promptDismissed = localStorage.getItem('installPromptDismissed');
+
+    if (!isStandalone && isMobile && !promptDismissed) {
+      // Show prompt after 3 seconds
+      setTimeout(() => {
+        installPrompt.classList.add('show');
+      }, 3000);
+    }
+
+    closePrompt.addEventListener('click', () => {
+      installPrompt.classList.remove('show');
+      localStorage.setItem('installPromptDismissed', 'true');
+    });
 
     // Load dog image
     const dogLogo = document.getElementById('dogLogo');
