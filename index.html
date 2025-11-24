@@ -214,20 +214,23 @@
     
     /* Countdown timer */
     .countdown-screen{
-      position:fixed;
-      top:0;
-      left:0;
-      right:0;
-      bottom:0;
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      width:90%;
+      height:auto;
       background:rgba(0,0,0,0.95);
-      z-index:9999;
+      z-index:100;
       display:flex;
       align-items:center;
       justify-content:center;
+      border-radius:24px;
+      padding:60px 20px;
     }
     .countdown-number{
       font-family:'Fredoka One',cursive;
-      font-size:180px;
+      font-size:100px;
       color:#ffc107;
       text-shadow:0 10px 40px rgba(255,193,7,0.8);
       animation:countdownPulse 1s ease-out;
@@ -253,6 +256,8 @@
       .grid{grid-template-columns:1fr}
       header{flex-direction:column}
       .title-wrapper{align-items:center}
+      .countdown-number{font-size:70px}
+      .countdown-screen{padding:40px 20px}
     }
   </style>
 </head>
@@ -295,6 +300,41 @@
       <!-- NAMES SCREEN -->
       <section id="names" class="card" style="display:none;margin-top:12px">
         <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">Nombres de Jugadores</p>
+          <div id="namesList" style="display:grid;gap:10px;margin-bottom:16px"></div>
+          <button class="btn big" id="startBtn">Empezar partida</button>
+        </div>
+      </section>
+
+      <!-- PASS & REVEAL SCREEN -->
+      <section id="pass" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="player-indicator" id="playerIndicator">Mike</div>
+          <div class="player-number" id="playerNumber">Jugador 2 de 4</div>
+          <div style="height:8px"></div>
+          <button class="btn big secondary" id="revealBtn">🔍 Ver mi rol</button>
+        </div>
+        <div style="height:12px"></div>
+        <div id="roleArea" style="display:none;" class="role-card">
+          <!-- role revealed content injected here -->
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+          <button class="btn medium" id="nextBtn" style="display:none">Siguiente</button>
+        </div>
+      </section>
+
+      <!-- DISCUSSION / VOTING -->
+      <section id="discussion" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p class="muted">Hablad entre vosotros y decidid a quién votar!!</p>
+          <div style="height:8px"></div>
+          <p class="muted" style="font-weight:700">Selecciona al jugador que queréis expulsar:</p>
+          <div class="players-list" id="discussionVoteList" style="margin-top:10px"></div>
+          <div style="height:12px"></div>
+          <button class="btn big" id="submitGroupVoteBtn">Confirmar votación</button>
+        </div>
+      </section>
+
       <!-- RESULTS -->
       <section id="results" class="card" style="display:none;margin-top:12px">
         <div id="resultText" class="center"></div>
@@ -787,12 +827,49 @@
       if(revealIndex < players.length){
         updatePlayerIndicator();
       } else {
-        // all seen
+        // all seen - show countdown before discussion
         pass.style.display = 'none';
-        discussion.style.display = 'block';
-        buildDiscussionVoteList();
+        showCountdown();
       }
     });
+
+    function showCountdown() {
+      // Create countdown overlay inside container
+      const countdownScreen = document.createElement('div');
+      countdownScreen.className = 'countdown-screen';
+      document.querySelector('.container').appendChild(countdownScreen);
+
+      let count = 3;
+      
+      function displayNumber() {
+        countdownScreen.innerHTML = `<div class="countdown-number">${count}</div>`;
+        
+        // Play sound based on count
+        if(count === 3) playSound(600, 0.15, 0.25);
+        else if(count === 2) playSound(750, 0.15, 0.25);
+        else if(count === 1) playSound(900, 0.15, 0.25);
+        
+        count--;
+        
+        if(count >= 1) {
+          setTimeout(displayNumber, 1000);
+        } else {
+          setTimeout(() => {
+            countdownScreen.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
+            playSound(1200, 0.3, 0.3);
+            setTimeout(() => playSound(1400, 0.2, 0.25), 150);
+            
+            setTimeout(() => {
+              countdownScreen.remove();
+              discussion.style.display = 'block';
+              buildDiscussionVoteList();
+            }, 1500);
+          }, 1000);
+        }
+      }
+      
+      displayNumber();
+    }
 
     function buildDiscussionVoteList(){
       discussionVoteList.innerHTML = '';
