@@ -323,6 +323,79 @@
       });
     }
 
+    // --- AUDIO UNLOCK PATCH ---
+    let sharedAudioCtx = null;
+    let audioUnlocked = false;
+
+    function createSharedAudioContext(){
+      if(!sharedAudioCtx){
+        sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return sharedAudioCtx;
+    }
+
+    // Llamar esto desde el primer gesto del usuario (click/tap)
+    async function unlockAudioWithUserGesture(){
+      try {
+        const ctx = createSharedAudioContext();
+        // resume() devuelve una promesa en muchos navegadores
+        if(ctx.state === 'suspended') await ctx.resume();
+        // reproducir un buffer muy corto para "desbloquear" el sistema de audio
+        const buffer = ctx.createBuffer(1, 1, 22050); // 1 sample, inaudible
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        src.connect(ctx.destination);
+        src.start(0);
+        audioUnlocked = true;
+        return true;
+      } catch (err) {
+        console.warn('No se pudo desbloquear audio:', err);
+        return false;
+      }
+    }
+
+    // Reescribe playSound para usar audio compartido
+    function playSound(frequency, duration, volume = 0.3) {
+      try {
+        const ctx = createSharedAudioContext();
+        if(ctx.state === 'suspended'){
+          ctx.resume().catch(()=>{/* ignorar */});
+        }
+
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscillator.frequency.value = frequency;
+        oscillator.type = 'sine';
+
+        // volumen y ramp
+        gainNode.gain.setValueAtTime(volume, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + Math.max(0.01, duration));
+
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + duration + 0.01);
+      } catch (e) {
+        // Si algo falla, no rompas la UI
+      }
+    }
+
+    function playPopSound(){ playSound(800, 0.08, 0.22); }
+    function playClickSound(){ playSound(400, 0.05, 0.15); }
+    function playSuccessSound(){ 
+      playSound(600, 0.06, 0.12); 
+      setTimeout(()=>playSound(900,0.07,0.14),60); 
+    }
+    function playStartGameSound() {
+      playSound(500, 0.1, 0.2);
+      setTimeout(() => playSound(700, 0.1, 0.2), 80);
+      setTimeout(() => playSound(900, 0.1, 0.22), 160);
+      setTimeout(() => playSound(1200, 0.15, 0.25), 240);
+    }
+    // --- FIN PATCH ---
+
     // --- Animated background circles ---
     function createBackgroundCircle() {
       const circle = document.createElement('div');
@@ -645,7 +718,7 @@
         const b = document.createElement('div'); 
         b.className='impostor-badge'; 
         b.textContent='🤫 ¡Eres el IMPOSTOR! 🔥';
-        b.style.marginTop = '-20px';
+        b.style.marginTop = '-40px';
         roleArea.appendChild(b);
         
         const hint = document.createElement('div'); 
@@ -685,16 +758,19 @@
 
     // Event bindings
     continueBtn.addEventListener('click', ()=>{
+      unlockAudioWithUserGesture(); // desbloquea el audio
       playSuccessSound();
       showNamesScreen();
     });
 
     startBtn.addEventListener('click', ()=>{
+      unlockAudioWithUserGesture(); // desbloquea el audio
       playStartGameSound();
       startGame();
     });
 
     revealBtn.addEventListener('click', ()=>{
+      unlockAudioWithUserGesture(); // desbloquea el audio por si acaso
       playPopSound();
       showRoleFor(revealIndex);
     });
