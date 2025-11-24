@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <title>El Impostor</title>
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Apple -->
+  <link rel="apple-touch-icon" href="/apple-icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="El Impostor">
+
+  <!-- Theme color -->
+  <meta name="theme-color" content="#0f0c29">
+
+  <!-- Pinned tab (opcional) -->
+  <link rel="mask-icon" href="/icons/mask-icon.svg" color="#ffc107">
+
+  
+  <!-- PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="El Impostor">
+  <meta name="theme-color" content="#ffc107">
+  <meta name="description" content="Juego del impostor creado por Mike">
+  
+  <!-- Icons -->
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#1a1a2e;
+      --bg2:#16213e;
+      --accent:#ffc107;
+      --accent2:#ffeb3b;
+      --card:#2a2d3a;
+      --card-light:#353847;
+      --muted:#d0d3e1;
+      --text:#f0f1f5;
+      --round:20px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height:100vh;
+      min-height:-webkit-fill-available;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      padding-top:max(20px, env(safe-area-inset-top));
+      padding-bottom:max(20px, env(safe-area-inset-bottom));
+      position:relative;
+      overflow:hidden;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    /* Animated background circles */
+    .bg-circle{
+      position:fixed;
+      border-radius:50%;
+      background:rgba(255,255,255,0.03);
+      pointer-events:none;
+      z-index:0;
+    }
+    
+    @keyframes floatCircle1 {
+      0% { transform:translate(0, 0) scale(1); opacity:0; }
+      10% { opacity:1; }
+      90% { opacity:1; }
+      100% { transform:translate(100vw, -100vh) scale(1.5); opacity:0; }
+    }
+    
+    @keyframes floatCircle2 {
+      0% { transform:translate(0, 0) scale(1); opacity:0; }
+      10% { opacity:1; }
+      90% { opacity:1; }
+      100% { transform:translate(-100vw, 100vh) scale(1.2); opacity:0; }
+    }
+    
+    @keyframes floatCircle3 {
+      0% { transform:translate(0, 0) scale(1); opacity:0; }
+      10% { opacity:1; }
+      90% { opacity:1; }
+      100% { transform:translate(80vw, 90vh) scale(1.3); opacity:0; }
+    }
+    
+    .container{
+      width:100%;
+      max-width:550px;
+      background:linear-gradient(180deg, rgba(42,45,58,0.98), rgba(35,38,48,0.95));
+      border-radius:24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      padding:22px;
+      animation: float 6s ease-in-out infinite;
+      position:relative;
+      z-index:1;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    header{display:flex;gap:12px;align-items:center;margin-bottom:12px;justify-content:center;text-align:center;flex-direction:row}
+    .dog-logo{
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      object-fit:cover;
+      border:4px solid #ffc107;
+      box-shadow:0 6px 18px rgba(255,193,7,0.4);
+    }
+    
+    @keyframes wobble {
+      0%, 100% { transform:rotate(-3deg); }
+      50% { transform:rotate(3deg); }
+    }
+    
+    h1{font-family:'Fredoka One',cursive;margin:0;font-size:20px;text-align:center;color:#ffc107;text-shadow:0 2px 8px rgba(255,193,7,0.3)}
+    p.lead{margin:0;color:#d0d3e1;text-align:center}
+    .title-wrapper{display:flex;flex-direction:column;align-items:flex-start}
+
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    label{display:block;font-size:13px;color:#f0f1f5;margin-bottom:6px;text-align:center;font-weight:600}
+    input[type=number], input[type=text], select{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,193,7,0.3);background:var(--card-light);color:var(--text);font-size:16px;transition:all 0.3s ease}
+    input[type=text]:focus{outline:none;border-color:#ffc107;box-shadow:0 0 0 3px rgba(255,193,7,0.25);transform:scale(1.02)}
+    input[type=text]::placeholder{color:#9a9dad;font-weight:400}
+    
+    /* Name input styling */
+    .name-input-wrapper{position:relative;margin-bottom:8px}
+    .name-input-wrapper input{font-weight:500}
+    
+    /* Counter buttons */
+    .counter{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:4px}
+    .counter-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#ffc107,#ffb300);color:#3e2723;font-weight:700;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(255,193,7,0.4);transition:all 0.2s ease}
+    .counter-btn:hover{transform:scale(1.1);box-shadow:0 5px 16px rgba(255,193,7,0.6)}
+    .counter-btn:active{transform:scale(0.95);box-shadow:0 2px 6px rgba(255,193,7,0.5)}
+    .counter-value{font-size:28px;font-weight:700;color:#ffc107;min-width:50px;text-align:center;text-shadow:0 2px 4px rgba(255,193,7,0.2)}
+    
+    .btn{display:inline-block;padding:12px 16px;border-radius:14px;background:linear-gradient(180deg,#ffc107,#ffb300);color:#3e2723;font-weight:700;text-align:center;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(255,193,7,0.4);transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
+    .btn:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 10px 24px rgba(255,193,7,0.6)}
+    .btn:active{transform:translateY(-2px) scale(1.02);box-shadow:0 5px 12px rgba(255,193,7,0.5)}
+    .btn.big{padding:16px 32px;font-size:20px;font-family:'Fredoka One',cursive}
+    .btn.medium{padding:14px 24px;font-size:18px;font-family:'Fredoka One',cursive}
+    .btn.secondary{background:linear-gradient(180deg,#ffeb3b,#fff59d);color:#3e2723;box-shadow:0 6px 16px rgba(255,235,59,0.35)}
+    .btn.secondary:hover{box-shadow:0 10px 24px rgba(255,235,59,0.5)}
+    .btn.secondary:active{box-shadow:0 5px 12px rgba(255,235,59,0.4)}
+    .center{text-align:center}
+
+    .card{background:linear-gradient(180deg,rgba(42,45,58,0.95),rgba(35,38,48,0.92));border-radius:18px;padding:18px;box-shadow:0 8px 20px rgba(12,20,40,0.4);text-align:center;border:1px solid rgba(255,193,7,0.2)}
+
+    /* Role card */
+    .role-card{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:16px;padding:20px}
+    .player-indicator{font-size:24px;color:#ffc107;font-weight:700;margin-bottom:4px;text-shadow:0 2px 6px rgba(255,193,7,0.4);font-family:'Fredoka One',cursive}
+    .player-number{font-size:14px;color:#d0d3e1;font-weight:600;margin-bottom:12px}
+    .word{font-family:'Fredoka One',cursive;font-size:48px;color:#4fd1c5;margin-top:16px;animation:popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);text-shadow:0 4px 12px rgba(79,209,197,0.6)}
+    .impostor-badge{font-family:'Fredoka One',cursive;color:white;background:#ff3b3b;padding:10px 14px;border-radius:999px;font-size:20px;animation:shake 0.5s ease-in-out;box-shadow:0 4px 12px rgba(255,59,59,0.5)}
+    .civil-badge{font-family:'Fredoka One',cursive;color:white;background:#4fd1c5;padding:10px 14px;border-radius:999px;font-size:20px;animation:popIn 0.5s ease-in-out;box-shadow:0 4px 12px rgba(79,209,197,0.5)}
+    
+    @keyframes popIn {
+      0% { transform:scale(0); opacity:0; }
+      50% { transform:scale(1.1); }
+      100% { transform:scale(1); opacity:1; }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform:translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform:translateX(-5px); }
+      20%, 40%, 60%, 80% { transform:translateX(5px); }
+    }
+    
+    @keyframes slideIn {
+      from { transform:translateY(20px); opacity:0; }
+      to { transform:translateY(0); opacity:1; }
+    }
+    
+    .role-card > * {
+      animation:slideIn 0.3s ease-out forwards;
+    }
+    
+    .role-card > *:nth-child(2) {
+      animation-delay:0.1s;
+      opacity:0;
+    }
+
+    /* Voting list */
+    .players-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:10px}
+    .player-pill{padding:12px;border-radius:12px;background:linear-gradient(180deg,var(--card-light),var(--card));color:#f0f1f5;text-align:center;border:1px solid rgba(255,193,7,0.2);cursor:pointer;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);font-weight:600;position:relative;overflow:hidden}
+    .player-pill::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,193,7,0.2);transition:width 0.3s ease, height 0.3s ease;transform:translate(-50%,-50%)}
+    .player-pill:hover{border-color:rgba(255,193,7,0.6);transform:translateY(-4px) scale(1.05);box-shadow:0 6px 18px rgba(255,193,7,0.3)}
+    .player-pill:hover::before{width:200%;height:200%}
+    .player-pill.selected{outline:4px solid rgba(255,193,7,0.7);background:linear-gradient(180deg,rgba(255,193,7,0.3),rgba(255,193,7,0.2));border-color:#ffc107;transform:translateY(-2px) scale(1.03);box-shadow:0 8px 20px rgba(255,193,7,0.4)}
+    .muted{color:#d0d3e1}
+    .impostor-reveal{display:inline-block;background:linear-gradient(135deg,#ff3b3b,#ff6b6b);color:#2a2d3a;padding:8px 16px;border-radius:999px;font-family:'Fredoka One',cursive;font-size:16px;margin-top:8px;margin-left:4px;margin-right:4px;box-shadow:0 4px 12px rgba(255,59,59,0.4);animation:popIn 0.5s ease-out}
+    
+    footer{margin-top:14px;display:flex;gap:8px;justify-content:center;color:#a0a3b5;text-align:center;font-weight:700}
+
+    @media(max-width:720px){
+      .grid{grid-template-columns:1fr}
+      header{flex-direction:column}
+      .title-wrapper{align-items:center}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="indiBola.png" alt="Logo" class="dog-logo">
+      <div class="title-wrapper">
+        <h1>El Impostor</h1>
+        <p class="lead">creado por Mike</p>
+      </div>
+    </header>
+
+    <main id="app">
+      <!-- SETUP SCREEN -->
+      <section id="setup" class="card">
+        <div class="grid">
+          <div>
+            <label>Jugadores</label>
+            <div class="counter">
+              <button class="counter-btn" id="decPlayers">−</button>
+              <div class="counter-value" id="playersDisplay">4</div>
+              <button class="counter-btn" id="incPlayers">+</button>
+            </div>
+          </div>
+          <div>
+            <label>Impostores</label>
+            <div class="counter">
+              <button class="counter-btn" id="decImpostors">−</button>
+              <div class="counter-value" id="impostorsDisplay">1</div>
+              <button class="counter-btn" id="incImpostors">+</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px" class="center">
+          <button class="btn big" id="continueBtn">Continuar</button>
+        </div>
+      </section>
+
+      <!-- NAMES SCREEN -->
+      <section id="names" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">Nombres de Jugadores</p>
+          <div id="namesList" style="display:grid;gap:10px;margin-bottom:16px"></div>
+          <button class="btn big" id="startBtn">Empezar partida</button>
+        </div>
+      </section>
+
+      <!-- PASS & REVEAL SCREEN -->
+      <section id="pass" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="player-indicator" id="playerIndicator">Nuni</div>
+          <div class="player-number" id="playerNumber">Jugador 2 de 4</div>
+          <div style="height:8px"></div>
+          <button class="btn big secondary" id="revealBtn">🔍 Ver mi rol</button>
+        </div>
+        <div style="height:12px"></div>
+        <div id="roleArea" style="display:none;" class="role-card">
+          <!-- role revealed content injected here -->
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+          <button class="btn medium" id="nextBtn" style="display:none">Siguiente</button>
+        </div>
+      </section>
+
+      <!-- DISCUSSION / VOTING -->
+      <section id="discussion" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p class="muted">Hablad entre vosotros y decidid a quién votar!!</p>
+          <div style="height:8px"></div>
+          <p class="muted" style="font-weight:700">Selecciona al jugador que queréis expulsar:</p>
+          <div class="players-list" id="discussionVoteList" style="margin-top:10px"></div>
+          <div style="height:12px"></div>
+          <button class="btn big" id="submitGroupVoteBtn">Confirmar votación</button>
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section id="results" class="card" style="display:none;margin-top:12px">
+        <div id="resultText" class="center"></div>
+        <div style="height:12px"></div>
+        <div id="impostorsReveal" class="center muted" style="font-weight:700"></div>
+        <div style="height:12px"></div>
+        <div class="center" id="newGameContainer">
+          <button class="btn big secondary" id="newGame">Reiniciar partida</button>
+        </div>
+      </section>
+
+    </main>
+
+    <footer style="margin-top:12px">He hecho este juego porque me aburría la verdad...</footer>
+  </div>
+
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').then(function(registration) {
+          console.log('ServiceWorker registrado con éxito:', registration.scope);
+        }, function(err) {
+          console.log('ServiceWorker registro fallido:', err);
+        });
+      });
+    }
+
+    // Load dog image
+    const dogLogo = document.getElementById('dogLogo');
+    
+    // --- Animated background circles ---
+    function createBackgroundCircle() {
+      const circle = document.createElement('div');
+      circle.className = 'bg-circle';
+      
+      const size = Math.random() * 300 + 100;
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+      
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight;
+      circle.style.left = startX + 'px';
+      circle.style.top = startY + 'px';
+      
+      const animations = ['floatCircle1', 'floatCircle2', 'floatCircle3'];
+      const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+      const duration = Math.random() * 20 + 15; // 15-35 seconds
+      
+      circle.style.animation = `${randomAnim} ${duration}s linear forwards`;
+      
+      document.body.appendChild(circle);
+      
+      setTimeout(() => {
+        circle.remove();
+      }, duration * 1000);
+    }
+
+    // Create initial circles
+    for(let i = 0; i < 5; i++) {
+      setTimeout(() => createBackgroundCircle(), i * 2000);
+    }
+
+    // Continuously create new circles
+    setInterval(() => {
+      createBackgroundCircle();
+    }, 5000);
+
+    // --- Datos y estado ---
+    const continueBtn = document.getElementById('continueBtn');
+    const startBtn = document.getElementById('startBtn');
+    const setup = document.getElementById('setup');
+    const namesSection = document.getElementById('names');
+    const namesList = document.getElementById('namesList');
+    const pass = document.getElementById('pass');
+    const revealBtn = document.getElementById('revealBtn');
+    const roleArea = document.getElementById('roleArea');
+    const nextBtn = document.getElementById('nextBtn');
+    const playerIndicator = document.getElementById('playerIndicator');
+    const playerNumber = document.getElementById('playerNumber');
+
+    // Counter elements
+    const decPlayers = document.getElementById('decPlayers');
+    const incPlayers = document.getElementById('incPlayers');
+    const playersDisplay = document.getElementById('playersDisplay');
+    const decImpostors = document.getElementById('decImpostors');
+    const incImpostors = document.getElementById('incImpostors');
+    const impostorsDisplay = document.getElementById('impostorsDisplay');
+
+    const discussion = document.getElementById('discussion');
+    const discussionVoteList = document.getElementById('discussionVoteList');
+    const submitGroupVoteBtn = document.getElementById('submitGroupVoteBtn');
+
+    const results = document.getElementById('results');
+    const resultText = document.getElementById('resultText');
+    const impostorsReveal = document.getElementById('impostorsReveal');
+    const newGame = document.getElementById('newGame');
+    const newGameContainer = document.getElementById('newGameContainer');
+
+    const defaultWords = [
+      // Objetos comunes
+      'manzana','gato','cohete','reloj','café','camión','playa','libro','estrella','árbol','zapato','lobo','pelota','puerta','silla','mesa','lápiz','teléfono','guitarra','piano','bicicleta','coche','avión','barco','paraguas','gafas','maleta','ordenador','teclado','ratón','cámara','micrófono','auriculares','ventana','espejo','cuchillo','tenedor','cuchara','plato','vaso','botella','cepillo','toalla','almohada','manta','sofá','lámpara','televisión',
+      
+      // Comidas y bebidas
+      'pizza','hamburguesa','sushi','paella','tacos','pasta','arroz','pollo','pescado','carne','ensalada','sopa','pan','queso','huevo','chocolate','helado','galleta','pastel','donut','zumo','agua','leche','té','cerveza','vino','naranja','plátano','fresa','sandía','melón','uva','piña','mango','aguacate','tomate','lechuga','zanahoria','patata','cebolla',
+      
+      // Personas famosas internacionales
+      'Lionel Messi','Cristiano Ronaldo','Rafael Nadal','LeBron James','Michael Jordan','Tom Brady','Usain Bolt','Roger Federer','Serena Williams','Tiger Woods','Neymar Junior','Kylian Mbappé','Mohamed Salah','Robert Lewandowski','Jacki Chan',
+      
+      // Actores y actrices
+      'Leonardo DiCaprio','Brad Pitt','Tom Cruise','Johnny Depp','Will Smith','Robert Downey','Dwayne Johnson','Chris Hemsworth','Scarlett Johansson','Jennifer Lawrence','Emma Watson','Natalie Portman','Angelina Jolie','Margot Robbie','Gal Gadot','Zendaya Coleman','Tom Holland','Timothée Chalamet','Ana de Armas','Pedro Pascal','Javier Bardem','Penélope Cruz','Antonio Banderas',
+      
+      // YouTubers y streamers
+      'MrBeast','PewDiePie','ElRubius','AuronPlay','Ibai Llanos','TheGrefg','Vegetta777','Willyrex','DjMaRiiO','Luzu','Alexby11','Fernanfloo','JuegaGerman','Ninja',
+      
+      // Países y lugares
+      'España','Francia','Italia','Alemania','Inglaterra','Portugal','Brasil','Argentina','México','Colombia','Perú','Chile','Venezuela','Uruguay','Ecuador','Cuba','Japón','China','Corea','India','Australia','Canadá','Estados Unidos','Rusia','Egipto','Marruecos','Grecia','Turquía','Tailandia','Vietnam','Noruega','Suecia','Dinamarca','Holanda','Bélgica','Suiza','Austria','Polonia','Irlanda','Escocia',
+      
+      // Personajes históricos
+      'Albert Einstein','Isaac Newton','Leonardo da Vinci','Napoleón Bonaparte','Julio César','Cleopatra','Abraham Lincoln','Winston Churchill','Gandhi','Nelson Mandela','Martin Luther King','Marie Curie','Nikola Tesla','Steve Jobs','Bill Gates','Pablo Picasso','Vincent van Gogh','Mozart','Beethoven','Shakespeare','Cervantes','Cristóbal Colón','Galileo Galilei','Charles Darwin','Adolf Hitler',
+      
+      // Trabajos y oficios
+      'médico','profesor','ingeniero','arquitecto','abogado','policía','bombero','cocinero','camarero','panadero','carpintero','electricista','fontanero','mecánico','piloto','conductor','taxista','cartero','jardinero','pintor','músico','cantante','bailarín','actor','director','fotógrafo','periodista','escritor','científico','astronauta','soldado','enfermero','veterinario','dentista','farmacéutico','programador','diseñador',
+      
+      // Películas y series famosas
+      'Titanic','Avatar','Avengers','Star Wars','Harry Potter','El Padrino','Pulp Fiction','Forrest Gump','Matrix','Gladiador','Inception','Interstellar','Breaking Bad','Game of Thrones','Stranger Things','La Casa de Papel','Friends','The Office','Narcos','Black Mirror','Squid Game','Wednesday','The Crown','Peaky Blinders','The Mandalorian','Better Call Saul',
+      
+      // Animales
+      'perro','elefante','león','tigre','oso','mono','jirafa','cebra','hipopótamo','rinoceronte','cocodrilo','serpiente','águila','búho','pato','cisne','delfín','ballena','tiburón','pulpo','pingüino','koala','canguro','panda','tortuga','conejo','ratón','ardilla','zorro','ciervo','caballo','vaca','cerdo','oveja','gallina','pavo',
+      
+      // Deportes y actividades
+      'fútbol','baloncesto','tenis','natación','ciclismo','atletismo','boxeo','gimnasia','voleibol','rugby','hockey','béisbol','golf','esquí','surf','escalada','yoga','baile','karate','judo','esgrima',
+      
+      // Tecnología y marcas
+      'iPhone','Samsung','PlayStation','Xbox','Nintendo','Tesla','Ferrari','Lamborghini','Porsche','Mercedes','BMW','Audi','Coca-Cola','Pepsi','McDonalds','Starbucks','Amazon','Google','Facebook','Instagram','Twitter','TikTok','YouTube','Netflix','Spotify','Apple','Microsoft',
+      
+      // Instrumentos musicales
+      'batería','violín','flauta','trompeta','saxofón','clarinete','ukelele',
+      
+      // Superhéroes, personajes ficticios y dibujos animados
+      'Superman','Batman','Spider-Man','Iron Man','Hulk','Thor','Capitán América','Wonder Woman','Flash','Aquaman','Deadpool','Wolverine','Black Widow','Doctor Strange','Thanos','Joker','Harley Quinn','Loki','Venom','Black Panther','Mario Bros','Luigi','Sonic','Pikachu','Mickey Mouse','Donald Duck','Goofy','Bob Esponja','Patrick Estrella','Bugs Bunny','Pato Lucas','Tom y Jerry','Scooby-Doo','Shaggy','Homer Simpson','Bart Simpson','Lisa Simpson','Marge Simpson','Peter Griffin','Stewie Griffin','Rick Sanchez','Morty Smith','Ash Ketchum','Goku','Vegeta','Naruto','Luffy','Harry Potter','Hermione Granger','Ron Weasley','Dumbledore','Voldemort','Gandalf','Frodo Bolsón','Aragorn','Legolas','Jon Nieve','Daenerys Targaryen','Tyrion Lannister','Eleven','Mike Wheeler','Dustin Henderson','Steve Harrington','Walter White','Jesse Pinkman','Saul Goodman','Sherlock Holmes','Elsa','Anna','Olaf','Woody','Buzz Lightyear','Nemo','Dory','Shrek','Burro','Simba','Mufasa','Aladino','Jasmine','Genio','La bella y la bestia','Ariel','Cenicienta','Blancanieves'
+    ];
+
+    let players = []; // {id, name, role: 'impostor'|'civil', word, eliminated: boolean}
+    let numPlayers = 4;
+    let numImpostors = 1;
+    let savedPlayerNames = []; // Store player names for restart
+
+    // Phase trackers
+    let revealIndex = 0; // player currently checking role
+
+    function randInt(max){return Math.floor(Math.random()*max)}
+
+    // Calculate max impostors based on number of players
+    function getMaxImpostors(numPlayers) {
+      if(numPlayers <= 4) return 1;
+      if(numPlayers <= 6) return 2;
+      if(numPlayers === 7) return 3;
+      if(numPlayers === 8) return 4;
+      return 5; // for 9-10 players
+    }
+
+    // Sound effects
+    function playSound(frequency, duration, volume = 0.3) {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = frequency;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playPopSound() {
+      playSound(800, 0.1, 0.2);
+    }
+
+    function playSuccessSound() {
+      playSound(600, 0.08, 0.15);
+      setTimeout(() => playSound(800, 0.08, 0.15), 50);
+      setTimeout(() => playSound(1000, 0.1, 0.2), 100);
+    }
+
+    function playClickSound() {
+      playSound(400, 0.05, 0.15);
+    }
+
+    function playStartGameSound() {
+      playSound(500, 0.1, 0.2);
+      setTimeout(() => playSound(700, 0.1, 0.2), 80);
+      setTimeout(() => playSound(900, 0.1, 0.22), 160);
+      setTimeout(() => playSound(1200, 0.15, 0.25), 240);
+    }
+
+    // Counter controls
+    decPlayers.addEventListener('click', () => {
+      if(numPlayers > 3) {
+        playClickSound();
+        numPlayers--;
+        playersDisplay.textContent = numPlayers;
+        const maxImpostors = getMaxImpostors(numPlayers);
+        if(numImpostors > maxImpostors) {
+          numImpostors = maxImpostors;
+          impostorsDisplay.textContent = numImpostors;
+        }
+      }
+    });
+
+    incPlayers.addEventListener('click', () => {
+      if(numPlayers < 10) {
+        playPopSound();
+        numPlayers++;
+        playersDisplay.textContent = numPlayers;
+      }
+    });
+
+    decImpostors.addEventListener('click', () => {
+      if(numImpostors > 1) {
+        playClickSound();
+        numImpostors--;
+        impostorsDisplay.textContent = numImpostors;
+      }
+    });
+
+    incImpostors.addEventListener('click', () => {
+      const maxImpostors = getMaxImpostors(numPlayers);
+      if(numImpostors < maxImpostors) {
+        playPopSound();
+        numImpostors++;
+        impostorsDisplay.textContent = numImpostors;
+      }
+    });
+
+    function showNamesScreen(){
+      // Build initial players
+      players = [];
+      for(let i=0;i<numPlayers;i++){
+        players.push({id:i, name:`Jugador ${i+1}`, role:'civil', word:null});
+      }
+
+      // Build names inputs
+      namesList.innerHTML = '';
+      
+      players.forEach((p, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'name-input-wrapper';
+        wrapper.style.animation = `slideIn 0.3s ease-out ${idx * 0.05}s forwards`;
+        wrapper.style.opacity = '0';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = `Jugador ${idx+1}`;
+        input.value = savedPlayerNames[idx] || '';
+        input.dataset.playerId = p.id;
+        
+        wrapper.appendChild(input);
+        namesList.appendChild(wrapper);
+      });
+
+      setup.style.display = 'none';
+      namesSection.style.display = 'block';
+    }
+
+    function startGame(){
+      // Update player names from inputs and save them
+      savedPlayerNames = [];
+      Array.from(namesList.children).forEach(wrapper => {
+        const input = wrapper.querySelector('input');
+        const id = parseInt(input.dataset.playerId);
+        const name = input.value.trim() || `Jugador ${id+1}`;
+        players[id].name = name;
+        players[id].eliminated = false;
+        savedPlayerNames[id] = input.value.trim();
+      });
+
+      // Assign impostors
+      let available = [...Array(numPlayers).keys()];
+      for(let k=0;k<numImpostors;k++){
+        const pickIdx = randInt(available.length);
+        const pidx = available.splice(pickIdx,1)[0];
+        players[pidx].role = 'impostor';
+      }
+
+      // Assign words
+      const word = defaultWords[randInt(defaultWords.length)];
+      players.forEach(p=>{
+        if(p.role === 'civil') p.word = word;
+        else p.word = null; // impostor doesn't get the civilian word
+      });
+
+      // ready to pass
+      namesSection.style.display = 'none';
+      pass.style.display = 'block';
+      discussion.style.display = 'none';
+      results.style.display = 'none';
+
+      revealIndex = 0;
+      roleArea.style.display = 'none';
+      nextBtn.style.display = 'none';
+      updatePlayerIndicator();
+
+      // Update reveal button text
+      revealBtn.disabled = false;
+      revealBtn.textContent = 'Ver mi rol';
+    }
+
+    function updatePlayerIndicator(){
+      const currentPlayer = players[revealIndex];
+      const isDefaultName = currentPlayer.name === `Jugador ${currentPlayer.id + 1}`;
+      
+      if(isDefaultName) {
+        playerIndicator.textContent = `Jugador ${revealIndex + 1}`;
+        playerNumber.textContent = `de ${numPlayers} jugadores`;
+      } else {
+        playerIndicator.textContent = currentPlayer.name;
+        playerNumber.textContent = `Jugador ${revealIndex + 1} de ${numPlayers}`;
+      }
+    }
+
+    function showRoleFor(index){
+      const p = players[index];
+      roleArea.innerHTML = '';
+      roleArea.style.display = 'flex';
+
+      if(p.role === 'impostor'){
+        const b = document.createElement('div'); 
+        b.className='impostor-badge'; 
+        b.textContent='🤫 ¡Eres el IMPOSTOR! 🔥';
+        roleArea.appendChild(b);
+        
+        const hint = document.createElement('div'); 
+        hint.className='muted'; 
+        hint.style.marginTop='8px'; 
+        hint.textContent='Pasa desapercibido entre los civiles.'; 
+        roleArea.appendChild(hint);
+      } else {
+        const b = document.createElement('div'); 
+        b.className='civil-badge'; 
+        b.textContent='✅ Eres CIVIL ✅';
+        roleArea.appendChild(b);
+        
+        const t = document.createElement('div'); 
+        t.className='muted'; 
+        t.style.fontSize='16px';
+        t.style.marginTop='12px';
+        t.textContent='La palabra es:'; 
+        roleArea.appendChild(t);
+        
+        const w = document.createElement('div'); 
+        w.className='word'; 
+        w.textContent = p.word; 
+        roleArea.appendChild(w);
+      }
+
+      nextBtn.style.display = 'inline-block';
+      revealBtn.style.display = 'none';
+      
+      // Update button text based on if it's the last player
+      if(revealIndex === players.length - 1) {
+        nextBtn.textContent = '¡Que empiece la partida!';
+      } else {
+        nextBtn.textContent = 'Siguiente';
+      }
+    }
+
+    // Event bindings
+    continueBtn.addEventListener('click', ()=>{
+      playSuccessSound();
+      showNamesScreen();
+    });
+
+    startBtn.addEventListener('click', ()=>{
+      playStartGameSound();
+      startGame();
+    });
+
+    revealBtn.addEventListener('click', ()=>{
+      playPopSound();
+      showRoleFor(revealIndex);
+    });
+
+    nextBtn.addEventListener('click', ()=>{
+      playClickSound();
+      // hide role and move on
+      roleArea.style.display = 'none';
+      revealBtn.style.display = 'inline-block';
+      nextBtn.style.display = 'none';
+      revealBtn.disabled = false;
+
+      revealIndex++;
+      if(revealIndex < players.length){
+        updatePlayerIndicator();
+      } else {
+        // all seen
+        pass.style.display = 'none';
+        discussion.style.display = 'block';
+        buildDiscussionVoteList();
+      }
+    });
+
+    function buildDiscussionVoteList(){
+      discussionVoteList.innerHTML = '';
+      players.filter(p => !p.eliminated).forEach(p=>{
+        const el = document.createElement('div');
+        el.className='player-pill';
+        el.dataset.id = p.id;
+        el.textContent = p.name;
+        el.addEventListener('click', ()=>{
+          playPopSound();
+          // toggle selection
+          if(el.classList.contains('selected')) el.classList.remove('selected');
+          else el.classList.add('selected');
+          // only one selected at a time
+          Array.from(discussionVoteList.children).forEach(ch=>{ if(ch !== el) ch.classList.remove('selected') });
+        });
+        discussionVoteList.appendChild(el);
+      });
+    }
+
+    submitGroupVoteBtn.addEventListener('click', ()=>{
+      const sel = Array.from(discussionVoteList.children).find(c=>c.classList.contains('selected'));
+      if(!sel){
+        alert('Selecciona a alguien para expulsar.');
+        return;
+      }
+      playSuccessSound();
+      const votedId = parseInt(sel.dataset.id);
+      showResults(votedId);
+    });
+
+    function showResults(executedId){
+      const executedPlayer = players.find(p=>p.id===executedId);
+      const isImpostor = executedPlayer.role === 'impostor';
+      
+      executedPlayer.eliminated = true;
+      
+      // Count remaining impostors
+      const remainingImpostors = players.filter(p => p.role === 'impostor' && !p.eliminated).length;
+      const totalImpostors = players.filter(p => p.role === 'impostor').length;
+      
+      discussion.style.display = 'none';
+      results.style.display = 'block';
+      
+      if(isImpostor) {
+        if(remainingImpostors === 0) {
+          // All impostors eliminated - Civilians win
+          const impostorText = totalImpostors === 1 ? 'el impostor' : 'el último impostor';
+          resultText.innerHTML = `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#4fd1c5">🎉 ¡Los CIVILES ganan! 🎉</div>` +
+            `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, ${impostorText}.</div>`;
+          newGameContainer.style.display = 'block';
+        } else {
+          // Still impostors remaining
+          resultText.innerHTML = `<div style="font-size:22px;font-family:'Fredoka One',cursive;color:#ffc107">⚠️ Era un impostor!</div>` +
+            `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, pero quedan ${remainingImpostors} impostor${remainingImpostors>1?'es':''} más.</div>` +
+            `<div style="margin-top:12px"><button class="btn medium" id="continueGameBtn">Continuar partida</button></div>`;
+          newGameContainer.style.display = 'none';
+          
+          setTimeout(() => {
+            document.getElementById('continueGameBtn').addEventListener('click', () => {
+              playClickSound();
+              results.style.display = 'none';
+              discussion.style.display = 'block';
+              buildDiscussionVoteList();
+            });
+          }, 100);
+        }
+      } else {
+        // Civilian eliminated - Game over, impostors win
+        resultText.innerHTML = `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#ff3b3b">💀 ¡Los IMPOSTORES ganan! 💀</div>` +
+          `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, que era un civil.</div>`;
+        newGameContainer.style.display = 'block';
+      }
+
+      // reveal who were the impostors (only at game end)
+      if(remainingImpostors === 0 || !isImpostor) {
+        const impostorNames = players.filter(p=>p.role==='impostor').map(p=>p.name);
+        const impostorText = impostorNames.map(name => `<span class="impostor-reveal">${name}</span>`).join('');
+        impostorsReveal.innerHTML = `<div style="margin-bottom:8px;font-size:14px">Impostor${impostorNames.length>1?'es':''} ${impostorNames.length>1?'eran':'era'}:</div>` + impostorText;
+      } else {
+        impostorsReveal.innerHTML = '';
+      }
+    }
+
+    newGame.addEventListener('click', ()=>{
+      playClickSound();
+      // reset votes and roles but keep player configuration
+      players = [];
+      setup.style.display = 'block';
+      namesSection.style.display = 'none';
+      pass.style.display = 'none';
+      discussion.style.display = 'none';
+      results.style.display = 'none';
+      
+      // Keep the current number of players and impostors
+      playersDisplay.textContent = numPlayers;
+      impostorsDisplay.textContent = numImpostors;
+    });
+
+    // Keyboard: enter to continue/start
+    document.addEventListener('keydown',(e)=>{ 
+      if(e.key==='Enter' && setup.style.display!== 'none'){ 
+        showNamesScreen(); 
+      } else if(e.key==='Enter' && namesSection.style.display!== 'none'){ 
+        startGame(); 
+      }
+    });
+
+  </script>
+</body>
+</html>
