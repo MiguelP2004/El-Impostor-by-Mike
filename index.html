@@ -214,21 +214,20 @@
     
     /* Countdown timer */
     .countdown-screen{
-      position:absolute;
+      position:fixed;
       top:0;
       left:0;
       right:0;
       bottom:0;
       background:rgba(0,0,0,0.95);
-      z-index:100;
+      z-index:9999;
       display:flex;
       align-items:center;
       justify-content:center;
-      border-radius:24px;
     }
     .countdown-number{
       font-family:'Fredoka One',cursive;
-      font-size:100px;
+      font-size:80px;
       color:#ffc107;
       text-shadow:0 10px 40px rgba(255,193,7,0.8);
       animation:countdownPulse 1s ease-out;
@@ -240,12 +239,13 @@
     }
     
     .first-speaker{
-      font-size:16px;
-      color:#ffc107;
+      font-size:22px;
+      color:#4fd1c5;
       font-weight:700;
-      margin-bottom:12px;
-      text-shadow:0 2px 6px rgba(255,193,7,0.4);
+      margin-bottom:16px;
+      text-shadow:0 3px 10px rgba(79,209,197,0.6);
       font-family:'Fredoka One',cursive;
+      animation:popIn 0.6s ease-out;
     }
     
     footer{margin-top:14px;display:flex;gap:8px;justify-content:center;color:#a0a3b5;text-align:center;font-weight:700}
@@ -254,7 +254,7 @@
       .grid{grid-template-columns:1fr}
       header{flex-direction:column}
       .title-wrapper{align-items:center}
-      .countdown-number{font-size:70px}
+      .countdown-number{font-size:60px}
     }
   </style>
 </head>
@@ -323,6 +323,7 @@
       <!-- DISCUSSION / VOTING -->
       <section id="discussion" class="card" style="display:none;margin-top:12px">
         <div class="center">
+          <div class="first-speaker" id="firstSpeakerName" style="display:none"></div>
           <p class="muted">Hablad entre vosotros y decidid a quién votar!!</p>
           <div style="height:8px"></div>
           <p class="muted" style="font-weight:700">Selecciona al jugador que queréis expulsar:</p>
@@ -353,6 +354,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('sw.js').then(function(registration) {
+          console
           console.log('ServiceWorker registrado con éxito:', registration.scope);
         }, function(err) {
           console.log('ServiceWorker registro fallido:', err);
@@ -831,15 +833,20 @@
     });
 
     function showCountdown() {
-      // Create countdown overlay inside container
+      // Create countdown overlay with both: fullscreen black bg + centered in container
       const countdownScreen = document.createElement('div');
       countdownScreen.className = 'countdown-screen';
-      document.querySelector('.container').appendChild(countdownScreen);
+      document.body.appendChild(countdownScreen);
+      
+      // Create inner content container
+      const innerContent = document.createElement('div');
+      innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
+      countdownScreen.appendChild(innerContent);
 
       let count = 3;
       
       function displayNumber() {
-        countdownScreen.innerHTML = `<div class="countdown-number">${count}</div>`;
+        innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
         
         // Play sound based on count
         if(count === 3) playSound(600, 0.15, 0.25);
@@ -852,13 +859,21 @@
           setTimeout(displayNumber, 1000);
         } else {
           setTimeout(() => {
-            countdownScreen.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
+            innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
             playSound(1200, 0.3, 0.3);
             setTimeout(() => playSound(1400, 0.2, 0.25), 150);
             
             setTimeout(() => {
               countdownScreen.remove();
               discussion.style.display = 'block';
+              
+              // Choose random player to start talking
+              const activePlayers = players.filter(p => !p.eliminated);
+              const firstSpeaker = activePlayers[randInt(activePlayers.length)];
+              const firstSpeakerElement = document.getElementById('firstSpeakerName');
+              firstSpeakerElement.textContent = `🎤 Empieza hablando: ${firstSpeaker.name}`;
+              firstSpeakerElement.style.display = 'block';
+              
               buildDiscussionVoteList();
             }, 1500);
           }, 1000);
