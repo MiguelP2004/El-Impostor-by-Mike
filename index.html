@@ -503,62 +503,67 @@
     const newGame = document.getElementById('newGame');
     const newGameContainer = document.getElementById('newGameContainer');
 
-  const defaultWords = [
-    // Objetos comunes
-    'manzana','gato','cohete','reloj','café','camión','playa','libro','estrella','árbol','zapato','lobo','pelota','puerta','silla','mesa','lápiz','teléfono','guitarra','piano','bicicleta','coche','avión','barco','paraguas','gafas','maleta','ordenador','teclado','cámara','micrófono','auriculares','ventana','espejo','cuchillo','tenedor','cuchara','plato','vaso','botella','cepillo','toalla','almohada','manta','sofá','lámpara','televisión',
-    
-    // Comidas y bebidas
-    'pizza','hamburguesa','sushi','paella','tacos','pasta','arroz','pollo','pescado','carne','ensalada','sopa','pan','queso','huevo','chocolate','helado','galleta','pastel','donut','zumo','agua','leche','té','cerveza','vino','naranja','plátano','fresa','sandía','melón','uva','piña','mango','aguacate','tomate','lechuga','zanahoria','patata','cebolla',
-    
-    // Personas famosas internacionales
-    'Lionel Messi','Cristiano Ronaldo','Rafael Nadal','LeBron James','Michael Jordan','Tom Brady','Usain Bolt','Roger Federer','Serena Williams','Tiger Woods','Neymar Junior','Kylian Mbappé','Mohamed Salah','Robert Lewandowski','Jackie Chan',
-    
-    // Actores y actrices
-    'Leonardo DiCaprio','Brad Pitt','Tom Cruise','Johnny Depp','Will Smith','Robert Downey','Dwayne Johnson','Chris Hemsworth','Scarlett Johansson','Jennifer Lawrence','Emma Watson','Natalie Portman','Angelina Jolie','Margot Robbie','Zendaya Coleman','Tom Holland','Timothée Chalamet','Ana de Armas','Pedro Pascal','Javier Bardem','Penélope Cruz','Antonio Banderas','Mel Gibson','Jack Nicholson','Julia Roberts','Chris Evans','Hugh Jackman','Chris Pratt','Adam Sandler',
-    
-    // YouTubers y streamers
-    'MrBeast','PewDiePie','ElRubius','AuronPlay','Ibai Llanos','TheGrefg','Vegetta777','Willyrex','DjMaRiiO','Luzu','Alexby11','Fernanfloo','JuegaGerman','Ninja',
-    
-    // Países y lugares
-    'España','Francia','Italia','Alemania','Inglaterra','Portugal','Brasil','Argentina','México','Colombia','Perú','Chile','Venezuela','Uruguay','Ecuador','Cuba','Japón','China','Corea','India','Australia','Canadá','Estados Unidos','Rusia','Egipto','Marruecos','Grecia','Turquía','Tailandia','Vietnam','Noruega','Suecia','Dinamarca','Holanda','Bélgica','Suiza','Austria','Polonia','Irlanda','Escocia',
-    
-    // Personajes históricos
-    'Albert Einstein','Isaac Newton','Leonardo da Vinci','Napoleón Bonaparte','Julio César','Cleopatra','Abraham Lincoln','Winston Churchill','Gandhi','Nelson Mandela','Martin Luther King','Marie Curie','Nikola Tesla','Steve Jobs','Bill Gates','Pablo Picasso','Vincent van Gogh','Mozart','Beethoven','Shakespeare','Cervantes','Cristóbal Colón','Galileo Galilei','Charles Darwin','Adolf Hitler','Donald Trump','Barack Obama','George Washington',
-    
-    // Trabajos y oficios
-    'médico','profesor','ingeniero','arquitecto','abogado','policía','bombero','cocinero','camarero','panadero','carpintero','electricista','fontanero','mecánico','piloto','conductor','taxista','cartero','jardinero','pintor','músico','cantante','bailarín','actor','director','fotógrafo','periodista','escritor','científico','astronauta','soldado','enfermero','veterinario','dentista','farmacéutico','programador','diseñador',
-    
-    // Películas y series famosas
-    'Titanic','Avatar','Avengers','Star Wars','Harry Potter','El Padrino','Pulp Fiction','Los Goonies','Forrest Gump','Matrix','Gladiador','Inception','Interstellar','Breaking Bad','Game of Thrones','Stranger Things','La Casa de Papel','Friends','The Office','Narcos','Black Mirror','Squid Game','Wednesday','The Crown','Peaky Blinders','The Mandalorian','Better Call Saul','Cobra Kai','The Walking Dead',
-    'El Señor de los Anillos','Los Soprano','El resplandor','Alien','Terminator','El silencio de los corderos','Jurassic Park','La vida es bella','La lista de Schindler','1917','Joker','La La Land','Toy Story','Coco','Up','Django desencadenado','Kill Bill','El club de la lucha','Memento','Donnie Darko','La Pasión de Cristo','El renacido','El último mohicano','Braveheart','Westworld','Dexter','Lost','Sherlock','True Detective','Chernóbil','The Wire','Black Panther','Guardianes de la Galaxia','Casablanca',
+    const defaultWords = [
+      // Objetos comunes
+      'manzana','gato','cohete','reloj','café','camión','playa','libro','estrella','árbol','zapato','lobo','pelota','puerta','silla','mesa','lápiz','teléfono','guitarra','piano','bicicleta','coche','avión','barco','paraguas','gafas','maleta','ordenador','teclado','cámara','micrófono','auriculares','ventana','espejo','cuchillo','tenedor','cuchara','plato','vaso','botella','cepillo','toalla','almohada','manta','sofá','lámpara','televisión',
+      
+      // Comidas y bebidas
+      'pizza','hamburguesa','paella','tacos','pasta','arroz','pollo','pescado','carne','ensalada','sopa','pan','queso','huevo','chocolate','helado','galleta','pastel','donut','zumo','agua','leche','té','cerveza','vino','naranja','plátano','fresa','sandía','melón','uva','piña','mango','aguacate','tomate','lechuga','zanahoria','patata','cebolla',
+      
+      // Deportistas reconocidos mundialmente
+      'Lionel Messi','Cristiano Ronaldo','Rafael Nadal','LeBron James','Michael Jordan','Usain Bolt','Roger Federer','Serena Williams','Tiger Woods','Neymar Junior','Kylian Mbappé','Mohamed Salah','Robert Lewandowski',
+      'Novak Djokovic','Stephen Curry','Kobe Bryant','Shaquille O\'Neal',
+      'Zinedine Zidane','Pelé','Diego Maradona','Ronaldinho','Andrés Iniesta','Xavi Hernández','Sergio Ramos','Karim Benzema','Luka Modrić','Erling Haaland','Vinícius Júnior','Gianluigi Buffon','Zlatan Ibrahimović','Luis Suárez','Kevin De Bruyne','Harry Kane','Son Heung-min','Gareth Bale','Antoine Griezmann','Paulo Dybala','Thibaut Courtois',
+      'Venus Williams','Carlos Alcaraz','Rafa Márquez','Jannik Sinner','John Cena','Conor McGregor','Ilia Topuria','Randy Orton',
+      
+      // Actores y actrices
+      'Leonardo DiCaprio','Brad Pitt','Tom Cruise','Johnny Depp','Will Smith','Robert Downey Jr.','Dwayne Johnson','Chris Hemsworth','Scarlett Johansson','Jennifer Lawrence','Emma Watson','Natalie Portman','Angelina Jolie','Margot Robbie','Zendaya Coleman','Tom Holland','Timothée Chalamet','Ana de Armas','Pedro Pascal','Javier Bardem','Penélope Cruz','Antonio Banderas','Mel Gibson','Jack Nicholson','Julia Roberts','Chris Evans','Hugh Jackman','Chris Pratt','Adam Sandler','Kevin Hart','Chris Rock',
+      'Jackie Chan','Keanu Reeves',
+      
+      // YouTubers y streamers
+      'MrBeast','PewDiePie','ElRubius','AuronPlay','Ibai Llanos','El Xokas','TheGrefg','Vegetta777','Willyrex','DjMaRiiO','Luzu','Alexby11','Fernanfloo','JuegaGerman','Ninja',
+      
+      // Países y lugares
+      'España','Francia','Italia','Alemania','Inglaterra','Portugal','Brasil','Argentina','México','Colombia','Perú','Chile','Venezuela','Uruguay','Ecuador','Cuba','Japón','China','Corea','India','Australia','Canadá','Estados Unidos','Rusia','Egipto','Marruecos','Grecia','Turquía','Tailandia','Vietnam','Noruega','Suecia','Dinamarca','Holanda','Bélgica','Suiza','Austria','Polonia','Irlanda','Escocia',
+      
+      // Personajes históricos
+      'Albert Einstein','Isaac Newton','Leonardo da Vinci','Napoleón Bonaparte','Julio César','Cleopatra','Abraham Lincoln','Winston Churchill','Gandhi','Nelson Mandela','Martin Luther King','Marie Curie','Nikola Tesla','Steve Jobs','Bill Gates','Pablo Picasso','Vincent van Gogh','Mozart','Beethoven','Shakespeare','Cervantes','Cristóbal Colón','Galileo Galilei','Charles Darwin','Adolf Hitler','Donald Trump','Barack Obama','George Washington','Javier Milei',
+      
+      // Trabajos y oficios
+      'médico','profesor','ingeniero','arquitecto','abogado','policía','bombero','cocinero','camarero','panadero','carpintero','electricista','fontanero','mecánico','piloto','conductor','taxista','cartero','jardinero','pintor','músico','cantante','bailarín','actor','director','fotógrafo','periodista','escritor','científico','astronauta','soldado','enfermero','veterinario','dentista','farmacéutico','programador','diseñador',
+      
+      // Películas y series famosas
+      'Titanic','Avatar','Avengers','Star Wars','Harry Potter','El Padrino','Pulp Fiction','Los Goonies','Forrest Gump','Matrix','Gladiador','Inception','Interstellar','Breaking Bad','Game of Thrones','Stranger Things','La Casa de Papel','Friends','The Office','Narcos','Black Mirror','Squid Game','Wednesday','The Crown','Peaky Blinders','The Mandalorian','Better Call Saul','Cobra Kai','The Walking Dead',
+      'El Señor de los Anillos','Los Soprano','El resplandor','Alien','Terminator','El silencio de los corderos','Jurassic Park','La vida es bella','La lista de Schindler','1917','Joker','La La Land','Toy Story','Coco','Up','Django desencadenado','Kill Bill','El club de la lucha','Memento','Donnie Darko','La Pasión de Cristo','El renacido','El último mohicano','Braveheart','Westworld','Dexter','Lost','Sherlock','True Detective','Chernóbil','The Wire','Black Panther','Guardianes de la Galaxia','Casablanca',
+      
+      // Animales
+      'perro','elefante','león','tigre','oso','mono','jirafa','cebra','hipopótamo','rinoceronte','cocodrilo','serpiente','águila','búho','pato','cisne','delfín','ballena','tiburón','pulpo','pingüino','koala','canguro','panda','tortuga','conejo','ratón','ardilla','zorro','ciervo','caballo','vaca','cerdo','oveja','gallina','pavo',
+      
+      // Deportes y actividades
+      'fútbol','baloncesto','tenis','natación','ciclismo','atletismo','boxeo','gimnasia','voleibol','rugby','hockey','béisbol','golf','esquí','surf','escalada','yoga','baile','karate','judo','esgrima',
+      
+      // Tecnología y marcas
+      'iPhone','Samsung','PlayStation','Xbox','Nintendo','Tesla','Ferrari','Lamborghini','Porsche','Mercedes','BMW','Audi','Coca-Cola','Pepsi','McDonald\'s','Starbucks','Amazon','Google','Facebook','Instagram','Twitter','TikTok','YouTube','Netflix','Spotify','Apple','Microsoft',
+      
+      // Instrumentos musicales
+      'batería','violín','flauta','trompeta','saxofón','clarinete','ukelele',
+      
+      // Superhéroes, personajes ficticios y dibujos animados
+      'Superman','Batman','Spider-Man','Iron Man','Hulk','Thor','Capitán América','Wonder Woman','Flash','Aquaman','Deadpool','Wolverine','Black Widow','Doctor Strange','Thanos','Harley Quinn','Loki','Venom','Mario Bros','Luigi','Sonic','Pikachu','Mickey Mouse','Donald Duck','Goofy','Bob Esponja','Patrick Estrella','Bugs Bunny','Pato Lucas','Tom y Jerry','Scooby-Doo','Shaggy','Homer Simpson','Bart Simpson','Lisa Simpson','Marge Simpson','Peter Griffin','Stewie Griffin','Rick Sanchez','Morty Smith','Ash Ketchum','Goku','Vegeta','Naruto','Luffy','Hermione Granger','Ron Weasley','Dumbledore','Voldemort','Gandalf','Frodo Bolsón','Aragorn','Legolas','Jon Nieve','Daenerys Targaryen','Tyrion Lannister','Eleven','Mike Wheeler','Dustin Henderson','Steve Harrington','Walter White','Jesse Pinkman','Saul Goodman','Sherlock Holmes','Elsa','Anna','Olaf','Woody','Buzz Lightyear','Nemo','Dory','Shrek','Burro','Simba','Mufasa','Aladino','Jasmine','Genio','La bella y la bestia','Ariel','Cenicienta','Blancanieves','James Bond','Indiana Jones','Jack Sparrow',
+      'Neo Matrix','Rey','Kylo Ren','Luke Skywalker','Leia Organa','Han Solo','Obi-Wan Kenobi','Yoda','Sauron','Severus Snape','Draco Malfoy','Sirius Black','Cersei Lannister','Sansa Stark','Ned Stark','Brienne of Tarth','Captain Hook','Peter Pan','Mulan','Pocahontas','Hercules','Maui','Moana','WALL-E','Maleficent','Grogu','Samus Aran','Lara Croft','Solid Snake','Master Chief','Marty McFly',
+      
+      // Palabras extra
+      'Madonna','Marilyn Monroe','Beyoncé','Adele','Taylor Swift','Elvis Presley','The Beatles','Rolling Stones','Queen','Michael Jackson','Whitney Houston',
+      'Shakira','Rihanna','Katy Perry','Billie Eilish','Drake','Eminem','Kanye West','Ariana Grande',
+      'Coldplay','U2','Metallica','Bruno Mars','Ed Sheeran',
+      'París','Londres','Nueva York','Tokio','Roma','Barcelona','Moscú','Berlín','Sídney','Los Ángeles',
+      'Machu Picchu','Taj Mahal','Gran Cañón','Monte Everest','Torre Eiffel','Estatua de la Libertad','Gran Muralla','Sagrada Familia',
+      'Nike','Adidas','IKEA','LEGO','croissant','ramen','Bad Bunny','Ozuna','J Balvin','Karol G','Daddy Yankee','Luis Fonsi','Maluma','Anuel AA','Bizarrap','Sebastián Yatra','Bachata',
+      'FC Barcelona','Real Madrid','Manchester United','Liverpool','Bayern Munich','Juventus','PSG',
+      'Marte','Júpiter','Saturno','Mercurio','Venus','Urano','Neptuno','Plutón','Sol','Luna',
+      'Google Maps','El Principito','Moby Dick','Cien Años de Soledad','El Hobbit',
+    ];
 
-    // Animales
-    'perro','elefante','león','tigre','oso','mono','jirafa','cebra','hipopótamo','rinoceronte','cocodrilo','serpiente','águila','búho','pato','cisne','delfín','ballena','tiburón','pulpo','pingüino','koala','canguro','panda','tortuga','conejo','ratón','ardilla','zorro','ciervo','caballo','vaca','cerdo','oveja','gallina','pavo',
-    
-    // Deportes y actividades
-    'fútbol','baloncesto','tenis','natación','ciclismo','atletismo','boxeo','gimnasia','voleibol','rugby','hockey','béisbol','golf','esquí','surf','escalada','yoga','baile','karate','judo','esgrima',
-    
-    // Tecnología y marcas
-    'iPhone','Samsung','PlayStation','Xbox','Nintendo','Tesla','Ferrari','Lamborghini','Porsche','Mercedes','BMW','Audi','Coca-Cola','Pepsi','McDonalds','Starbucks','Amazon','Google','Facebook','Instagram','Twitter','TikTok','YouTube','Netflix','Spotify','Apple','Microsoft',
-    
-    // Instrumentos musicales
-    'batería','violín','flauta','trompeta','saxofón','clarinete','ukelele',
-    
-    // Superhéroes, personajes ficticios y dibujos animados
-    'Superman','Batman','Spider-Man','Iron Man','Hulk','Thor','Capitán América','Wonder Woman','Flash','Aquaman','Deadpool','Wolverine','Black Widow','Doctor Strange','Thanos','Harley Quinn','Loki','Venom','Mario Bros','Luigi','Sonic','Pikachu','Mickey Mouse','Donald Duck','Goofy','Bob Esponja','Patrick Estrella','Bugs Bunny','Pato Lucas','Tom y Jerry','Scooby-Doo','Shaggy','Homer Simpson','Bart Simpson','Lisa Simpson','Marge Simpson','Peter Griffin','Stewie Griffin','Rick Sanchez','Morty Smith','Ash Ketchum','Goku','Vegeta','Naruto','Luffy','Hermione Granger','Ron Weasley','Dumbledore','Voldemort','Gandalf','Frodo Bolsón','Aragorn','Legolas','Jon Nieve','Daenerys Targaryen','Tyrion Lannister','Eleven','Mike Wheeler','Dustin Henderson','Steve Harrington','Walter White','Jesse Pinkman','Saul Goodman','Sherlock Holmes','Elsa','Anna','Olaf','Woody','Buzz Lightyear','Nemo','Dory','Shrek','Burro','Simba','Mufasa','Aladino','Jasmine','Genio','La bella y la bestia','Ariel','Cenicienta','Blancanieves','James Bond','Indiana Jones','Jack Sparrow',
-    'Neo Matrix','Rey','Kylo Ren','Luke Skywalker','Leia Organa','Han Solo','Obi-Wan Kenobi','Yoda','Sauron','Severus Snape','Draco Malfoy','Sirius Black','Cersei Lannister','Sansa Stark','Ned Stark','Brienne of Tarth','Captain Hook','Peter Pan','Mulan','Pocahontas','Hercules','Maui','Moana','WALL-E','Maleficent','Grogu','Samus Aran','Lara Croft','Solid Snake','Master Chief','Marty McFly',
-
-    // Palabras extra
-    'Madonna','Marilyn Monroe','Beyoncé','Adele','Taylor Swift','Elvis Presley','The Beatles','Rolling Stones','Queen','Michael Jackson','Whitney Houston',
-    'Diego Maradona','Shakira','Rihanna','Katy Perry','Billie Eilish','Drake','Eminem','Kanye West','Ariana Grande',
-    'Coldplay','U2','Metallica','Bruno Mars','Ed Sheeran',
-    'París','Londres','Nueva York','Tokio','Roma','Barcelona','Moscú','Berlín','Sídney','Los Ángeles',
-    'Machu Picchu','Taj Mahal','Gran Cañón','Monte Everest','Torre Eiffel','Estatua de la Libertad','Gran Muralla','Stonehenge','Sagrada Familia',
-    'Nike','Adidas','IKEA','LEGO','croissant','ramen',
-    'FC Barcelona','Real Madrid','Manchester United','Liverpool','Bayern Munich','Juventus','PSG',
-    'Marte','Júpiter','Saturno','Mercurio','Venus','Urano','Neptuno','Plutón','Sol','Luna',
-    'Google Maps','El Principito','Moby Dick','Cien Años de Soledad','El Hobbit',
-  ]
 
     let players = []; // {id, name, role: 'impostor'|'civil', word, eliminated: boolean}
     let numPlayers = 4;
@@ -769,7 +774,7 @@
       if(p.role === 'impostor'){
         const b = document.createElement('div'); 
         b.className='impostor-badge'; 
-        b.textContent='🔥🤫 ¡Eres el IMPOSTOR! 🤫🔥';
+        b.textContent='🤫🔥¡Eres el IMPOSTOR!🔥🤫';
         b.style.marginTop = '-40px';
         roleArea.appendChild(b);
         
