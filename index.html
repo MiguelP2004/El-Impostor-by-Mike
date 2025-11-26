@@ -248,18 +248,106 @@
       animation:popIn 0.6s ease-out;
     }
     
-    footer{margin-top:14px;display:flex;gap:8px;justify-content:center;color:#a0a3b5;text-align:center;font-weight:700}
+    footer{
+      margin-top:14px;
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      color:#a0a3b5;
+      text-align:center;
+      font-weight:700;
+    }
 
     @media(max-width:720px){
       .grid{grid-template-columns:1fr}
       header{flex-direction:column}
       .title-wrapper{align-items:center}
       .countdown-number{font-size:60px}
+      .intro-title{font-size:30px}
+      .intro-logo{width:115px;height:115px}
+    }
+
+    /* Intro Screen (simplificada, sin balanceo raro) */
+    .intro-screen{
+      position:fixed;
+      inset:0;
+      background:radial-gradient(circle at top, #2d1b4e 0, #1a1635 45%, #05020a 100%);
+      z-index:10000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:18px;
+    }
+    .intro-logo{
+      width:140px;
+      height:140px;
+      border-radius:50%;
+      border:5px solid #ffc107;
+      box-shadow:0 0 40px rgba(255,193,7,0.7);
+      object-fit:cover;
+      opacity:0;
+      transform:scale(0.6);
+      animation:introZoomSoft 0.9s ease-out forwards;
+    }
+    .intro-title{
+      font-family:'Fredoka One',cursive;
+      font-size:40px;
+      letter-spacing:2px;
+      color:#ffc107;
+      text-shadow:0 4px 16px rgba(0,0,0,0.9);
+      opacity:0;
+      transform:translateY(10px);
+      animation:introFadeUp 0.7s ease-out 0.25s forwards;
+    }
+    .intro-subtitle{
+      font-size:16px;
+      color:#4fd1c5;
+      font-weight:600;
+      opacity:0;
+      transform:translateY(10px);
+      animation:introFadeUp 0.7s ease-out 0.55s forwards;
+    }
+    .intro-glow{
+      position:absolute;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,193,7,0.20), transparent 60%);
+      filter:blur(6px);
+      opacity:0;
+      animation:introGlow 0.9s ease-out forwards;
+    }
+    @keyframes introZoomSoft{
+      from{opacity:0;transform:scale(0.6);}
+      to{opacity:1;transform:scale(1);}
+    }
+    @keyframes introFadeUp{
+      from{opacity:0;transform:translateY(10px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    @keyframes introGlow{
+      from{opacity:0;transform:scale(0.6);}
+      to{opacity:1;transform:scale(1);}
+    }
+    .intro-screen.fade-out{
+      animation:introFadeOut 0.4s ease-out forwards;
+    }
+    @keyframes introFadeOut{
+      to{opacity:0;visibility:hidden;}
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- INTRO -->
+  <div class="intro-screen" id="introScreen">
+    <div class="intro-glow"></div>
+    <img src="indiBola.png" alt="Logo" class="intro-logo">
+    <div class="intro-title">EL IMPOSTOR</div>
+    <div class="intro-subtitle">creado por Mike</div>
+  </div>
+
+  <div class="container" id="mainContainer" style="opacity:0">
     <header>
       <img src="indiBola.png" alt="Logo" class="dog-logo">
       <div class="title-wrapper">
@@ -373,14 +461,11 @@
       return sharedAudioCtx;
     }
 
-    // Llamar esto desde el primer gesto del usuario (click/tap)
     async function unlockAudioWithUserGesture(){
       try {
         const ctx = createSharedAudioContext();
-        // resume() devuelve una promesa en muchos navegadores
         if(ctx.state === 'suspended') await ctx.resume();
-        // reproducir un buffer muy corto para "desbloquear" el sistema de audio
-        const buffer = ctx.createBuffer(1, 1, 22050); // 1 sample, inaudible
+        const buffer = ctx.createBuffer(1, 1, 22050);
         const src = ctx.createBufferSource();
         src.buffer = buffer;
         src.connect(ctx.destination);
@@ -393,31 +478,25 @@
       }
     }
 
-    // Reescribe playSound para usar audio compartido
+    // ÚNICA función playSound (la buena, compartida)
     function playSound(frequency, duration, volume = 0.3) {
       try {
         const ctx = createSharedAudioContext();
         if(ctx.state === 'suspended'){
-          ctx.resume().catch(()=>{/* ignorar */});
+          return; // se reanudará en unlockAudioWithUserGesture
         }
-
         const oscillator = ctx.createOscillator();
         const gainNode = ctx.createGain();
-
         oscillator.connect(gainNode);
         gainNode.connect(ctx.destination);
-
         oscillator.frequency.value = frequency;
         oscillator.type = 'sine';
-
-        // volumen y ramp
         gainNode.gain.setValueAtTime(volume, ctx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + Math.max(0.01, duration));
-
         oscillator.start(ctx.currentTime);
         oscillator.stop(ctx.currentTime + duration + 0.01);
       } catch (e) {
-        // Si algo falla, no rompas la UI
+        // silencioso
       }
     }
 
@@ -433,44 +512,11 @@
       setTimeout(() => playSound(900, 0.1, 0.22), 160);
       setTimeout(() => playSound(1200, 0.15, 0.25), 240);
     }
+    // Antes: aquí sonaba el jingle inicial; ahora lo dejamos vacío
+    function playIntroSound() {
+      // Sin sonido en la intro inicial
+    }
     // --- FIN PATCH ---
-
-    // --- Animated background circles ---
-    function createBackgroundCircle() {
-      const circle = document.createElement('div');
-      circle.className = 'bg-circle';
-      
-      const size = Math.random() * 300 + 100;
-      circle.style.width = size + 'px';
-      circle.style.height = size + 'px';
-      
-      const startX = Math.random() * window.innerWidth;
-      const startY = Math.random() * window.innerHeight;
-      circle.style.left = startX + 'px';
-      circle.style.top = startY + 'px';
-      
-      const animations = ['floatCircle1', 'floatCircle2', 'floatCircle3'];
-      const randomAnim = animations[Math.floor(Math.random() * animations.length)];
-      const duration = Math.random() * 20 + 15; // 15-35 seconds
-      
-      circle.style.animation = `${randomAnim} ${duration}s linear forwards`;
-      
-      document.body.appendChild(circle);
-      
-      setTimeout(() => {
-        circle.remove();
-      }, duration * 1000);
-    }
-
-    // Create initial circles
-    for(let i = 0; i < 5; i++) {
-      setTimeout(() => createBackgroundCircle(), i * 2000);
-    }
-
-    // Continuously create new circles
-    setInterval(() => {
-      createBackgroundCircle();
-    }, 5000);
 
     // --- Datos y estado ---
     const continueBtn = document.getElementById('continueBtn');
@@ -484,19 +530,9 @@
     const nextBtn = document.getElementById('nextBtn');
     const playerIndicator = document.getElementById('playerIndicator');
     const playerNumber = document.getElementById('playerNumber');
-
-    // Counter elements
-    const decPlayers = document.getElementById('decPlayers');
-    const incPlayers = document.getElementById('incPlayers');
-    const playersDisplay = document.getElementById('playersDisplay');
-    const decImpostors = document.getElementById('decImpostors');
-    const incImpostors = document.getElementById('incImpostors');
-    const impostorsDisplay = document.getElementById('impostorsDisplay');
-
     const discussion = document.getElementById('discussion');
     const discussionVoteList = document.getElementById('discussionVoteList');
     const submitGroupVoteBtn = document.getElementById('submitGroupVoteBtn');
-
     const results = document.getElementById('results');
     const resultText = document.getElementById('resultText');
     const impostorsReveal = document.getElementById('impostorsReveal');
@@ -813,21 +849,201 @@
       }
     }
 
-    // Event bindings
+    function showCountdown() {
+      // Create countdown overlay with both: fullscreen black bg + centered in container
+      const countdownScreen = document.createElement('div');
+      countdownScreen.className = 'countdown-screen';
+      document.body.appendChild(countdownScreen);
+      
+      // Create inner content container
+      const innerContent = document.createElement('div');
+      innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
+      countdownScreen.appendChild(innerContent);
+
+      let count = 3;
+      
+      function displayNumber() {
+        innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
+        
+        // Play sound based on count
+        if(count === 3) playSound(600, 0.15, 0.25);
+        else if(count === 2) playSound(750, 0.15, 0.25);
+        else if(count === 1) playSound(900, 0.15, 0.25);
+        
+        count--;
+        
+        if(count >= 1) {
+          setTimeout(displayNumber, 1000);
+        } else {
+          setTimeout(() => {
+            innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
+            playSound(1200, 0.3, 0.3);
+            setTimeout(() => playSound(1400, 0.2, 0.25), 150);
+            
+            setTimeout(() => {
+              countdownScreen.remove();
+              discussion.style.display = 'block';
+              
+              // Choose random player to start talking
+              const activePlayers = players.filter(p => !p.eliminated);
+              const firstSpeaker = activePlayers[randInt(activePlayers.length)];
+              const firstSpeakerElement = document.getElementById('firstSpeakerName');
+              firstSpeakerElement.innerHTML = `🎤 Empieza hablando: <span style="font-size:28px;color:#ffffff;text-shadow:0 4px 14px rgba(255,255,255,0.8)">${firstSpeaker.name}</span>`;
+              firstSpeakerElement.style.display = 'block';
+              
+              buildDiscussionVoteList();
+            }, 1500);
+          }, 1000);
+        }
+      }
+      
+      displayNumber();
+    }
+
+    function buildDiscussionVoteList(){
+      discussionVoteList.innerHTML = '';
+      players.filter(p => !p.eliminated).forEach(p=>{
+        const el = document.createElement('div');
+        el.className='player-pill';
+        el.dataset.id = p.id;
+        el.textContent = p.name;
+        el.addEventListener('click', ()=>{
+          playPopSound();
+          // toggle selection
+          if(el.classList.contains('selected')) el.classList.remove('selected');
+          else el.classList.add('selected');
+          // only one selected at a time
+          Array.from(discussionVoteList.children).forEach(ch=>{ if(ch !== el) ch.classList.remove('selected') });
+        });
+        discussionVoteList.appendChild(el);
+      });
+    }
+
+    submitGroupVoteBtn.addEventListener('click', ()=>{
+      const sel = Array.from(discussionVoteList.children).find(c=>c.classList.contains('selected'));
+      if(!sel){
+        alert('Selecciona a alguien para expulsar.');
+        return;
+      }
+      playSuccessSound();
+      const votedId = parseInt(sel.dataset.id);
+      showResults(votedId);
+    });
+
+    function showResults(executedId){
+      const executedPlayer = players.find(p=>p.id===executedId);
+      const isImpostor = executedPlayer.role === 'impostor';
+      
+      executedPlayer.eliminated = true;
+      
+      // Count remaining impostors
+      const remainingImpostors = players.filter(p => p.role === 'impostor' && !p.eliminated).length;
+      const totalImpostors = players.filter(p => p.role === 'impostor').length;
+      
+      // Get the word that was used
+      const gameWord = players.find(p => p.role === 'civil')?.word || '';
+      
+      discussion.style.display = 'none';
+      results.style.display = 'block';
+      
+      if(isImpostor) {
+        if(remainingImpostors === 0) {
+          // All impostors eliminated - Civilians win
+          const impostorText = totalImpostors === 1 ? 'el impostor' : 'el último impostor';
+          resultText.innerHTML = `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#4fd1c5">🎉 ¡Los CIVILES ganan! 🎉</div>` +
+            `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, ${impostorText}.</div>` +
+            `<div style="margin-top:16px;font-size:18px;color:#d0d3e1">La palabra era: <span style="font-size:32px;color:#4fd1c5;font-family:'Fredoka One',cursive;text-shadow:0 3px 10px rgba(79,209,197,0.6)">${gameWord}</span></div>`;
+          newGameContainer.style.display = 'block';
+        } else {
+          // Still impostors remaining
+          resultText.innerHTML = `<div style="font-size:22px;font-family:'Fredoka One',cursive;color:#ffc107">⚠️ Era un impostor!</div>` +
+            `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, pero quedan ${remainingImpostors} impostor${remainingImpostors>1?'es':''} más.</div>` +
+            `<div style="margin-top:12px"><button class="btn medium" id="continueGameBtn">Continuar partida</button></div>`;
+          newGameContainer.style.display = 'none';
+          
+          setTimeout(() => {
+            document.getElementById('continueGameBtn').addEventListener('click', () => {
+              playClickSound();
+              results.style.display = 'none';
+              discussion.style.display = 'block';
+              buildDiscussionVoteList();
+            });
+          }, 100);
+        }
+      } else {
+        // Civilian eliminated - Game over, impostors win
+        resultText.innerHTML = `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#ff3b3b">💀 ¡Los IMPOSTORES ganan! 💀</div>` +
+          `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, que era un civil.</div>` +
+          `<div style="margin-top:16px;font-size:18px;color:#d0d3e1">La palabra era: <span style="font-size:32px;color:#4fd1c5;font-family:'Fredoka One',cursive;text-shadow:0 3px 10px rgba(79,209,197,0.6)">${gameWord}</span></div>`;
+        newGameContainer.style.display = 'block';
+      }
+
+      // reveal who were the impostors (only at game end)
+      if(remainingImpostors === 0 || !isImpostor) {
+        const impostorNames = players.filter(p=>p.role==='impostor').map(p=>p.name);
+        const impostorText = impostorNames.map(name => `<span class="impostor-reveal">${name}</span>`).join('');
+        impostorsReveal.innerHTML = `<div style="margin-bottom:8px;font-size:14px">Impostor${impostorNames.length>1?'es':''} ${impostorNames.length>1?'eran':'era'}:</div>` + impostorText;
+      } else {
+        impostorsReveal.innerHTML = '';
+      }
+    }
+
+    newGame.addEventListener('click', ()=>{
+      playClickSound();
+      // reset votes and roles but keep player configuration
+      players = [];
+      setup.style.display = 'block';
+      namesSection.style.display = 'none';
+      pass.style.display = 'none';
+      discussion.style.display = 'none';
+      results.style.display = 'none';
+      
+      // Keep the current number of players and impostors
+      playersDisplay.textContent = numPlayers;
+      impostorsDisplay.textContent = numImpostors;
+    });
+
+    // --- INTRO HANDLER ---
+    // Solo oculta la intro y muestra la pantalla de selección de jugadores/impostores.
+    function handleContinueFromIntro(){
+      const introScreen = document.getElementById('introScreen');
+      const mainContainer = document.getElementById('mainContainer');
+
+      if(introScreen){
+        introScreen.classList.add('fade-out');
+        mainContainer.style.transition = 'opacity 0.5s ease-in';
+        mainContainer.style.opacity = '1';
+        setTimeout(() => {
+          introScreen.remove();
+        }, 500);
+      } else {
+        // Si por lo que sea ya no está, aseguramos visibilidad del contenedor
+        mainContainer.style.opacity = '1';
+      }
+
+      // Mostrar solo SETUP (selector de jugadores/impostores)
+      setup.style.display = 'block';
+      namesSection.style.display = 'none';
+      pass.style.display = 'none';
+      discussion.style.display = 'none';
+      results.style.display = 'none';
+    }
+
+    // Botón "Continuar" del SETUP: pasa a nombres (igual que antes)
     continueBtn.addEventListener('click', ()=>{
-      unlockAudioWithUserGesture(); // desbloquea el audio
       playSuccessSound();
       showNamesScreen();
     });
 
+    // Botón "Empezar partida"
     startBtn.addEventListener('click', ()=>{
-      unlockAudioWithUserGesture(); // desbloquea el audio
+      unlockAudioWithUserGesture();
       playStartGameSound();
       startGame();
     });
 
     revealBtn.addEventListener('click', ()=>{
-      unlockAudioWithUserGesture(); // desbloquea el audio por si acaso
+      unlockAudioWithUserGesture();
       playPopSound();
       showRoleFor(revealIndex);
     });
@@ -1004,15 +1220,23 @@
       impostorsDisplay.textContent = numImpostors;
     });
 
-    // Keyboard: enter to continue/start
-    document.addEventListener('keydown',(e)=>{ 
-      if(e.key==='Enter' && setup.style.display!== 'none'){ 
-        showNamesScreen(); 
-      } else if(e.key==='Enter' && namesSection.style.display!== 'none'){ 
-        startGame(); 
-      }
+    // Intro: a los 3s se lanza automáticamente handleContinueFromIntro()
+    window.addEventListener('load', () => {
+      // A los 3 segundos, pasar directamente a la pantalla de nombres
+      setTimeout(() => {
+        // Solo llamar si aún no se ha quitado la intro
+        const introScreen = document.getElementById('introScreen');
+        if(introScreen){
+          handleContinueFromIntro();
+        } else {
+          // Por si acaso, aseguramos opacidad
+          const mainContainer = document.getElementById('mainContainer');
+          if(mainContainer.style.opacity === '0'){
+            mainContainer.style.opacity = '1';
+          }
+        }
+      }, 3000);
     });
-
   </script>
 </body>
 </html>
