@@ -58,7 +58,10 @@
       padding-top:max(20px, env(safe-area-inset-top));
       padding-bottom:max(20px, env(safe-area-inset-bottom));
       position:relative;
-      overflow:hidden;
+      /* CAMBIOS: permitir scroll vertical, seguir centrando horizontal y verticalmente */
+      overflow-x:hidden;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
@@ -67,6 +70,7 @@
     
     html {
       touch-action: manipulation;
+      height:100%;
     }
     
     input, button, select, textarea {
@@ -113,6 +117,9 @@
       animation: float 6s ease-in-out infinite;
       position:relative;
       z-index:1;
+      /* OPCIONAL: limitar un poco el alto para que se vea centrado en la mayoría de iPhone,
+         pero que el propio body haga scroll si hace falta */
+      max-height:calc(100vh - 40px);
     }
     
     @keyframes float {
@@ -148,6 +155,14 @@
     /* Name input styling */
     .name-input-wrapper{position:relative;margin-bottom:8px}
     .name-input-wrapper input{font-weight:500}
+    
+    /* Inputs de nombre con estilo de juego */
+    .name-input {
+      font-family:'Fredoka One',cursive;
+      font-size:18px;
+      letter-spacing:0.5px;
+      text-transform:none;
+    }
     
     /* Counter buttons */
     .counter{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:4px}
@@ -737,6 +752,8 @@
         input.placeholder = `Jugador ${idx+1}`;
         input.value = savedPlayerNames[idx] || '';
         input.dataset.playerId = p.id;
+        // aplicar estilo de juego
+        input.className = 'name-input';
         
         wrapper.appendChild(input);
         namesList.appendChild(wrapper);
