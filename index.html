@@ -54,11 +54,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:20px;
-      padding-top:max(20px, env(safe-area-inset-top));
-      padding-bottom:max(20px, env(safe-area-inset-bottom));
-      position:relative;
-      /* CAMBIOS: permitir scroll vertical, seguir centrando horizontal y verticalmente */
+      /* el scroll se hace en el body, los círculos son fixed y no se mueven */
       overflow-x:hidden;
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
@@ -79,7 +75,7 @@
     
     /* Animated background circles */
     .bg-circle{
-      position:fixed;
+      position:fixed;          /* ya fija los círculos al viewport */
       border-radius:50%;
       background:rgba(255,255,255,0.03);
       pointer-events:none;
@@ -117,9 +113,6 @@
       animation: float 6s ease-in-out infinite;
       position:relative;
       z-index:1;
-      /* OPCIONAL: limitar un poco el alto para que se vea centrado en la mayoría de iPhone,
-         pero que el propio body haga scroll si hace falta */
-      max-height:calc(100vh - 40px);
     }
     
     @keyframes float {
@@ -464,6 +457,51 @@
         });
       });
     }
+
+    // --- CÍRCULOS DE FONDO ANIMADOS ---
+    function createBackgroundCircle() {
+      const circle = document.createElement('div');
+      circle.className = 'bg-circle';
+      
+      const size = Math.random() * 220 + 100;       // un poco más pequeños: 100–320 px
+      circle.style.width = size + 'px';
+      circle.style.height = size + 'px';
+      
+      // Posición más cerca del centro de la pantalla
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const centerX = vw * 0.5;
+      const centerY = vh * 0.5;
+      const offsetX = (Math.random() - 0.5) * vw * 0.6;  // rango más estrecho
+      const offsetY = (Math.random() - 0.5) * vh * 0.6;
+      const startX = centerX + offsetX;
+      const startY = centerY + offsetY;
+      circle.style.left = startX + 'px';
+      circle.style.top = startY + 'px';
+      
+      const animations = ['floatCircle1', 'floatCircle2', 'floatCircle3'];
+      const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+      const duration = Math.random() * 14 + 14;     // algo más rápidas: 14–28 s
+      
+      circle.style.animation = `${randomAnim} ${duration}s linear forwards`;
+      
+      document.body.appendChild(circle);
+      
+      setTimeout(() => {
+        circle.remove();
+      }, duration * 1000);
+    }
+
+    // Crear algunos círculos iniciales
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => createBackgroundCircle(), i * 1200);
+    }
+
+    // Más frecuencia: cada 4s en vez de 6s
+    setInterval(() => {
+      createBackgroundCircle();
+    }, 4000);
+    // --- FIN CÍRCULOS DE FONDO ---
 
     // --- AUDIO UNLOCK PATCH ---
     let sharedAudioCtx = null;
@@ -1021,7 +1059,7 @@
     });
 
     // --- INTRO HANDLER ---
-    // Solo oculta la intro y muestra la pantalla de selección de jugadores/impostores.
+    // IMPORTANTE: definir ANTES de usar en window.load
     function handleContinueFromIntro(){
       const introScreen = document.getElementById('introScreen');
       const mainContainer = document.getElementById('mainContainer');
@@ -1034,7 +1072,6 @@
           introScreen.remove();
         }, 500);
       } else {
-        // Si por lo que sea ya no está, aseguramos visibilidad del contenedor
         mainContainer.style.opacity = '1';
       }
 
@@ -1046,13 +1083,12 @@
       results.style.display = 'none';
     }
 
-    // Botón "Continuar" del SETUP: pasa a nombres (igual que antes)
+    // Botones
     continueBtn.addEventListener('click', ()=>{
       playSuccessSound();
       showNamesScreen();
     });
 
-    // Botón "Empezar partida"
     startBtn.addEventListener('click', ()=>{
       unlockAudioWithUserGesture();
       playStartGameSound();
@@ -1083,76 +1119,6 @@
       }
     });
 
-    function showCountdown() {
-      // Create countdown overlay with both: fullscreen black bg + centered in container
-      const countdownScreen = document.createElement('div');
-      countdownScreen.className = 'countdown-screen';
-      document.body.appendChild(countdownScreen);
-      
-      // Create inner content container
-      const innerContent = document.createElement('div');
-      innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
-      countdownScreen.appendChild(innerContent);
-
-      let count = 3;
-      
-      function displayNumber() {
-        innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
-        
-        // Play sound based on count
-        if(count === 3) playSound(600, 0.15, 0.25);
-        else if(count === 2) playSound(750, 0.15, 0.25);
-        else if(count === 1) playSound(900, 0.15, 0.25);
-        
-        count--;
-        
-        if(count >= 1) {
-          setTimeout(displayNumber, 1000);
-        } else {
-          setTimeout(() => {
-            innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
-            playSound(1200, 0.3, 0.3);
-            setTimeout(() => playSound(1400, 0.2, 0.25), 150);
-            
-            setTimeout(() => {
-              countdownScreen.remove();
-              discussion.style.display = 'block';
-              
-              // Choose random player to start talking
-              const activePlayers = players.filter(p => !p.eliminated);
-              const firstSpeaker = activePlayers[randInt(activePlayers.length)];
-              const firstSpeakerElement = document.getElementById('firstSpeakerName');
-              firstSpeakerElement.innerHTML = `🎤 Empieza hablando: <span style="font-size:28px;color:#ffffff;text-shadow:0 4px 14px rgba(255,255,255,0.8)">${firstSpeaker.name}</span>`;
-              firstSpeakerElement.style.display = 'block';
-              
-              buildDiscussionVoteList();
-            }, 1500);
-          }, 1000);
-        }
-      }
-      
-      displayNumber();
-    }
-
-    function buildDiscussionVoteList(){
-      discussionVoteList.innerHTML = '';
-      players.filter(p => !p.eliminated).forEach(p=>{
-        const el = document.createElement('div');
-        el.className='player-pill';
-        el.dataset.id = p.id;
-        el.textContent = p.name;
-        el.addEventListener('click', ()=>{
-          playPopSound();
-          // toggle selection
-          if(el.classList.contains('selected')) el.classList.remove('selected');
-          else el.classList.add('selected');
-          // only one selected at a time
-          Array.from(discussionVoteList.children).forEach(ch=>{ if(ch !== el) ch.classList.remove('selected') });
-        });
-        discussionVoteList.appendChild(el);
-      });
-    }
-
     submitGroupVoteBtn.addEventListener('click', ()=>{
       const sel = Array.from(discussionVoteList.children).find(c=>c.classList.contains('selected'));
       if(!sel){
@@ -1164,93 +1130,16 @@
       showResults(votedId);
     });
 
-    function showResults(executedId){
-      const executedPlayer = players.find(p=>p.id===executedId);
-      const isImpostor = executedPlayer.role === 'impostor';
-      
-      executedPlayer.eliminated = true;
-      
-      // Count remaining impostors
-      const remainingImpostors = players.filter(p => p.role === 'impostor' && !p.eliminated).length;
-      const totalImpostors = players.filter(p => p.role === 'impostor').length;
-      
-      // Get the word that was used
-      const gameWord = players.find(p => p.role === 'civil')?.word || '';
-      
-      discussion.style.display = 'none';
-      results.style.display = 'block';
-      
-      if(isImpostor) {
-        if(remainingImpostors === 0) {
-          // All impostors eliminated - Civilians win
-          const impostorText = totalImpostors === 1 ? 'el impostor' : 'el último impostor';
-          resultText.innerHTML = `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#4fd1c5">🎉 ¡Los CIVILES ganan! 🎉</div>` +
-            `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, ${impostorText}.</div>` +
-            `<div style="margin-top:16px;font-size:18px;color:#d0d3e1">La palabra era: <span style="font-size:32px;color:#4fd1c5;font-family:'Fredoka One',cursive;text-shadow:0 3px 10px rgba(79,209,197,0.6)">${gameWord}</span></div>`;
-          newGameContainer.style.display = 'block';
-        } else {
-          // Still impostors remaining
-          resultText.innerHTML = `<div style="font-size:22px;font-family:'Fredoka One',cursive;color:#ffc107">⚠️ Era un impostor!</div>` +
-            `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, pero quedan ${remainingImpostors} impostor${remainingImpostors>1?'es':''} más.</div>` +
-            `<div style="margin-top:12px"><button class="btn medium" id="continueGameBtn">Continuar partida</button></div>`;
-          newGameContainer.style.display = 'none';
-          
-          setTimeout(() => {
-            document.getElementById('continueGameBtn').addEventListener('click', () => {
-              playClickSound();
-              results.style.display = 'none';
-              discussion.style.display = 'block';
-              buildDiscussionVoteList();
-            });
-          }, 100);
-        }
-      } else {
-        // Civilian eliminated - Game over, impostors win
-        resultText.innerHTML = `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#ff3b3b">💀 ¡Los IMPOSTORES ganan! 💀</div>` +
-          `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, que era un civil.</div>` +
-          `<div style="margin-top:16px;font-size:18px;color:#d0d3e1">La palabra era: <span style="font-size:32px;color:#4fd1c5;font-family:'Fredoka One',cursive;text-shadow:0 3px 10px rgba(79,209,197,0.6)">${gameWord}</span></div>`;
-        newGameContainer.style.display = 'block';
-      }
-
-      // reveal who were the impostors (only at game end)
-      if(remainingImpostors === 0 || !isImpostor) {
-        const impostorNames = players.filter(p=>p.role==='impostor').map(p=>p.name);
-        const impostorText = impostorNames.map(name => `<span class="impostor-reveal">${name}</span>`).join('');
-        impostorsReveal.innerHTML = `<div style="margin-bottom:8px;font-size:14px">Impostor${impostorNames.length>1?'es':''} ${impostorNames.length>1?'eran':'era'}:</div>` + impostorText;
-      } else {
-        impostorsReveal.innerHTML = '';
-      }
-    }
-
-    newGame.addEventListener('click', ()=>{
-      playClickSound();
-      // reset votes and roles but keep player configuration
-      players = [];
-      setup.style.display = 'block';
-      namesSection.style.display = 'none';
-      pass.style.display = 'none';
-      discussion.style.display = 'none';
-      results.style.display = 'none';
-      
-      // Keep the current number of players and impostors
-      playersDisplay.textContent = numPlayers;
-      impostorsDisplay.textContent = numImpostors;
-    });
-
     // Intro: a los 3s se lanza automáticamente handleContinueFromIntro()
+    // PONER ESTE LISTENER AL FINAL DEL SCRIPT
     window.addEventListener('load', () => {
-      // A los 3 segundos, pasar directamente a la pantalla de nombres
       setTimeout(() => {
-        // Solo llamar si aún no se ha quitado la intro
         const introScreen = document.getElementById('introScreen');
+        const mainContainer = document.getElementById('mainContainer');
         if(introScreen){
           handleContinueFromIntro();
-        } else {
-          // Por si acaso, aseguramos opacidad
-          const mainContainer = document.getElementById('mainContainer');
-          if(mainContainer.style.opacity === '0'){
-            mainContainer.style.opacity = '1';
-          }
+        } else if(mainContainer && mainContainer.style.opacity === '0'){
+          mainContainer.style.opacity = '1';
         }
       }, 3000);
     });
