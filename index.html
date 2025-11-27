@@ -296,6 +296,24 @@
       justify-content:center;
       flex-direction:column;
       gap:18px;
+      /* nuevo: contenedor interno centrado y limitado al ancho de la carta */
+    }
+    /* capa de oscuridad con “agujero” centrado más pequeño */
+    .intro-screen::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      /* círculo claro más pequeño centrado sobre la interfaz */
+      background:
+        radial-gradient(
+          circle at 50% 50%,
+          rgba(0,0,0,0) 0,
+          rgba(0,0,0,0) 130px,
+          rgba(0,0,0,0.95) 220px,
+          rgba(0,0,0,0.98) 100%
+        );
+      z-index:-1;
     }
     .intro-logo{
       width:140px;
@@ -328,10 +346,14 @@
     }
     .intro-glow{
       position:absolute;
-      width:220px;
-      height:220px;
+      /* círculo más pequeño y bien centrado */
+      width:180px;
+      height:180px;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
       border-radius:50%;
-      background:radial-gradient(circle, rgba(255,193,7,0.20), transparent 60%);
+      background:radial-gradient(circle, rgba(255,193,7,0.25), transparent 60%);
       filter:blur(6px);
       opacity:0;
       animation:introGlow 0.9s ease-out forwards;
@@ -345,8 +367,8 @@
       to{opacity:1;transform:translateY(0);}
     }
     @keyframes introGlow{
-      from{opacity:0;transform:scale(0.6);}
-      to{opacity:1;transform:scale(1);}
+      from{opacity:0;transform:translate(-50%,-50%) scale(0.6);}
+      to{opacity:1;transform:translate(-50%,-50%) scale(1);}
     }
     .intro-screen.fade-out{
       animation:introFadeOut 0.4s ease-out forwards;
@@ -611,7 +633,6 @@
       
       // Deportistas reconocidos mundialmente
       'Lionel Messi','Cristiano Ronaldo','Rafael Nadal','LeBron James','Michael Jordan','Usain Bolt','Roger Federer','Serena Williams','Tiger Woods','Neymar Junior','Kylian Mbappé','Mohamed Salah','Robert Lewandowski',
-      'Novak Djokovic','Stephen Curry','Kobe Bryant','Shaquille O\'Neal','Lamine Yamal','Nico Williams','Daniel Carvajal','Sergio Agüero','Ángel Di María','Paul Pogba',
       'Zinedine Zidane','Pelé','Diego Maradona','Ronaldinho','Andrés Iniesta','Xavi Hernández','Sergio Ramos','Karim Benzema','Luka Modrić','Erling Haaland','Vinícius Júnior','Gianluigi Buffon','Zlatan Ibrahimović','Luis Suárez','Kevin De Bruyne','Harry Kane','Son Heung-min','Gareth Bale','Antoine Griezmann','Paulo Dybala','Thibaut Courtois',
       'Venus Williams','Carlos Alcaraz','Rafa Márquez','Jannik Sinner','John Cena','Conor McGregor','Ilia Topuria','Randy Orton',
       
