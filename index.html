@@ -346,6 +346,28 @@
       transform:translateY(10px);
       animation:introFadeUp 0.7s ease-out 0.55s forwards;
     }
+
+    /* Barra de carga de la intro */
+    .intro-progress {
+      width: 180px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      box-shadow: 0 0 16px rgba(0,0,0,0.6);
+    }
+    .intro-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ffeb3b, #ffc107, #ff9800);
+      animation: introProgressFill 3s linear forwards;
+    }
+    @keyframes introProgressFill {
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
+
     .intro-glow{
       position:absolute;
       /* círculo más pequeño y bien centrado */
@@ -387,6 +409,10 @@
     <img src="indiBola.png" alt="Logo" class="intro-logo">
     <div class="intro-title">EL IMPOSTOR</div>
     <div class="intro-subtitle">creado por Mike</div>
+    <!-- Barra de cargando de la intro -->
+    <div class="intro-progress">
+      <div class="intro-progress-fill"></div>
+    </div>
   </div>
 
   <div class="container" id="mainContainer" style="opacity:0">
