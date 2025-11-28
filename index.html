@@ -128,6 +128,8 @@
       object-fit:cover;
       border:4px solid #ffc107;
       box-shadow:0 6px 18px rgba(255,193,7,0.4);
+      /* animación lenta de balanceo continua */
+      animation:wobble 4s ease-in-out infinite;
     }
     
     @keyframes wobble {
@@ -425,7 +427,7 @@
       <!-- NAMES SCREEN -->
       <section id="names" class="card" style="display:none;margin-top:12px">
         <div class="center">
-          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">Nombres de Jugadores</p>
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">Jugadores</p>
           <div id="namesList" style="display:grid;gap:10px;margin-bottom:16px"></div>
           <button class="btn big" id="startBtn">Empezar partida</button>
         </div>
