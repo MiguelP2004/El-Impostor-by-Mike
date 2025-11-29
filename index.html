@@ -400,6 +400,37 @@
     @keyframes introFadeOut{
       to{opacity:0;visibility:hidden;}
     }
+    .mode-buttons{
+      display:flex;
+      gap:16px;
+      justify-content:center;
+      flex-wrap:nowrap;
+    }
+    .mode-buttons .btn{
+      flex:1;
+      min-width:0;
+      padding:12px 20px;
+      font-size:18px;
+    }
+    .impostor-clue{
+      margin-top:12px;
+      text-align:center;
+    }
+    .impostor-clue-label{
+      display:block;
+      font-size:16px;
+      color:#f0f1f5;
+      font-family:'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      margin-bottom:4px;
+    }
+    .impostor-clue-word{
+      display:block;
+      font-size:34px;
+      color:#ffffff;
+      font-weight:800;
+      letter-spacing:0.6px;
+      text-shadow:0 4px 14px rgba(255,255,255,0.45);
+    }
   </style>
 </head>
 <body>
@@ -445,8 +476,9 @@
             </div>
           </div>
         </div>
-        <div style="margin-top:12px" class="center">
-          <button class="btn big" id="continueBtn">Continuar</button>
+        <div style="margin-top:12px" class="center mode-buttons">
+          <button class="btn big" id="standardModeBtn">Modo estándar</button>
+          <button class="btn big secondary" id="clueModeBtn">Modo con PISTA!! 🔍</button>
         </div>
       </section>
 
@@ -634,7 +666,6 @@
     // --- Datos y estado ---
     const continueBtn = document.getElementById('continueBtn');
     const startBtn = document.getElementById('startBtn');
-    const setup = document.getElementById('setup');
     const namesSection = document.getElementById('names');
     const namesList = document.getElementById('namesList');
     const pass = document.getElementById('pass');
@@ -651,72 +682,676 @@
     const impostorsReveal = document.getElementById('impostorsReveal');
     const newGame = document.getElementById('newGame');
     const newGameContainer = document.getElementById('newGameContainer');
+    const standardModeBtn = document.getElementById('standardModeBtn');
+    const clueModeBtn = document.getElementById('clueModeBtn');
 
-    const defaultWords = [
-      // Objetos comunes
-      'manzana','gato','cohete','reloj','café','camión','playa','libro','estrella','árbol','zapato','lobo','pelota','puerta','silla','mesa','lápiz','teléfono','guitarra','piano','bicicleta','coche','avión','barco','paraguas','gafas','maleta','ordenador','teclado','cámara','micrófono','auriculares','ventana','espejo','cuchillo','tenedor','cuchara','plato','vaso','botella','cepillo','toalla','almohada','manta','sofá','lámpara','televisión',
-      
-      // Comidas y bebidas
-      'pizza','hamburguesa','paella','tacos','pasta','arroz','pollo','pescado','carne','ensalada','sopa','pan','queso','huevo','chocolate','helado','galleta','pastel','donut','zumo','agua','leche','té','cerveza','vino','naranja','plátano','fresa','sandía','melón','uva','piña','mango','aguacate','tomate','lechuga','zanahoria','patata','cebolla',
-      
-      // Deportistas reconocidos mundialmente
-      'Lionel Messi','Cristiano Ronaldo','Rafael Nadal','LeBron James','Michael Jordan','Usain Bolt','Roger Federer','Serena Williams','Tiger Woods','Neymar Junior','Kylian Mbappé','Mohamed Salah','Robert Lewandowski',
-      'Zinedine Zidane','Pelé','Diego Maradona','Ronaldinho','Andrés Iniesta','Xavi Hernández','Sergio Ramos','Karim Benzema','Luka Modrić','Erling Haaland','Vinícius Júnior','Gianluigi Buffon','Zlatan Ibrahimovic','Luis Suárez','Kevin De Bruyne','Harry Kane','Son Heung-min','Gareth Bale','Antoine Griezmann','Paulo Dybala','Thibaut Courtois',
-      'Venus Williams','Carlos Alcaraz','Rafa Márquez','Jannik Sinner','John Cena','Conor McGregor','Ilia Topuria','Randy Orton',
-      
-      // Actores y actrices
-      'Leonardo DiCaprio','Brad Pitt','Tom Cruise','Johnny Depp','Will Smith','Robert Downey Jr.','Dwayne Johnson','Chris Hemsworth','Scarlett Johansson','Jennifer Lawrence','Emma Watson','Natalie Portman','Angelina Jolie','Margot Robbie','Zendaya Coleman','Tom Holland','Timothée Chalamet','Ana de Armas','Pedro Pascal','Javier Bardem','Penélope Cruz','Antonio Banderas','Mel Gibson','Jack Nicholson','Julia Roberts','Chris Evans','Hugh Jackman','Chris Pratt','Adam Sandler','Kevin Hart','Chris Rock',
-      'Jackie Chan','Keanu Reeves',
-      
-      // YouTubers y streamers
-      'MrBeast','PewDiePie','ElRubius','AuronPlay','Ibai Llanos','El Xokas','TheGrefg','Vegetta777','Willyrex','DjMaRiiO','Luzu','Alexby11','Fernanfloo','JuegaGerman','Ninja',
-      
-      // Países y lugares
-      'España','Francia','Italia','Alemania','Inglaterra','Portugal','Brasil','Argentina','México','Colombia','Perú','Chile','Venezuela','Uruguay','Ecuador','Cuba','Japón','China','Corea','India','Australia','Canadá','Estados Unidos','Rusia','Egipto','Marruecos','Grecia','Turquía','Tailandia','Vietnam','Noruega','Suecia','Dinamarca','Holanda','Bélgica','Suiza','Austria','Polonia','Irlanda','Escocia',
-      
-      // Personajes históricos
-      'Albert Einstein','Isaac Newton','Leonardo da Vinci','Napoleón Bonaparte','Julio César','Cleopatra','Abraham Lincoln','Winston Churchill','Mahatma Gandhi','Nelson Mandela','Martin Luther King','Marie Curie','Nikola Tesla','Steve Jobs','Bill Gates','Pablo Picasso','Vincent van Gogh','Mozart','Beethoven','Shakespeare','Cervantes','Cristóbal Colón','Galileo Galilei','Charles Darwin','Adolf Hitler','Donald Trump','Barack Obama','George Washington','Javier Milei',
-      
-      // Trabajos y oficios
-      'médico','profesor','ingeniero','arquitecto','abogado','policía','bombero','cocinero','camarero','panadero','carpintero','electricista','fontanero','mecánico','piloto','conductor','taxista','cartero','jardinero','pintor','músico','cantante','bailarín','actor','director','fotógrafo','periodista','escritor','científico','astronauta','soldado','enfermero','veterinario','dentista','farmacéutico','programador','diseñador',
-      
-      // Películas y series famosas
-      'Titanic','Avatar','Avengers','Star Wars','Harry Potter','El Padrino','Pulp Fiction','Los Goonies','Forrest Gump','Matrix','Gladiador','Inception','Interstellar','Breaking Bad','Game of Thrones','Stranger Things','La Casa de Papel','Friends','The Office','Narcos','Black Mirror','Squid Game','Wednesday','The Crown','Peaky Blinders','The Mandalorian','Better Call Saul','Cobra Kai','The Walking Dead','IT',
-      'El Señor de los Anillos','Los Soprano','El resplandor','Alien','Terminator','El silencio de los corderos','Jurassic Park','La vida es bella','La lista de Schindler','1917','Joker','La La Land','Toy Story','Coco','Up','Django desencadenado','Kill Bill','El club de la Lucha','Memento','La Pasión de Cristo','El renacido','El último mohicano','Braveheart','Westworld','Dexter','Lost','Sherlock','True Detective','Chernóbil','The Wire','Black Panther','Guardianes de la Galaxia','Casablanca',
-      
-      // Animales
-      'perro','elefante','león','tigre','oso','mono','jirafa','cebra','hipopótamo','rinoceronte','cocodrilo','serpiente','águila','búho','pato','cisne','delfín','ballena','tiburón','pulpo','pingüino','koala','canguro','panda','tortuga','conejo','ratón','ardilla','zorro','ciervo','caballo','vaca','cerdo','oveja','gallina','pavo',
-      
-      // Deportes y actividades
-      'fútbol','baloncesto','tenis','natación','ciclismo','atletismo','boxeo','gimnasia','voleibol','rugby','hockey','béisbol','golf','esquí','surf','escalada','yoga','baile','karate','judo','esgrima',
-      
-      // Tecnología y marcas
-      'iPhone','Samsung','PlayStation','Xbox','Nintendo','Tesla','Ferrari','Lamborghini','Porsche','Mercedes','BMW','Audi','Coca-Cola','Pepsi','McDonald\'s','Starbucks','Amazon','Google','Facebook','Instagram','Twitter','TikTok','YouTube','Netflix','Spotify','Apple','Microsoft',
-      
-      // Instrumentos musicales
-      'batería','violín','flauta','trompeta','saxofón','clarinete','ukelele',
-      
-      // Superhéroes, personajes ficticios y dibujos animados
-      'Superman','Batman','Spider-Man','Iron Man','Hulk','Thor','Capitán América','Wonder Woman','Flash','Aquaman','Deadpool','Wolverine','Black Widow','Doctor Strange','Thanos','Harley Quinn','Loki','Venom','Mario Bros','Luigi','Sonic','Pikachu','Mickey Mouse','Donald Duck','Goofy','Bob Esponja','Patrick Estrella','Bugs Bunny','Pato Lucas','Tom y Jerry','Scooby-Doo','Shaggy','Homer Simpson','Bart Simpson','Lisa Simpson','Marge Simpson','Peter Griffin','Stewie Griffin','Rick Sanchez','Morty Smith','Ash Ketchum','Goku','Vegeta','Naruto','Luffy','Hermione Granger','Ron Weasley','Dumbledore','Voldemort','Gandalf','Frodo Bolsón','Aragorn','Legolas','Jon Nieve','Daenerys Targaryen','Tyrion Lannister','Eleven','Mike Wheeler','Dustin Henderson',
-      'Neo Matrix','Rey','Kylo Ren','Luke Skywalker','Leia Organa','Han Solo','Obi-Wan Kenobi','Yoda','Sauron','Severus Snape','Draco Malfoy','Sirius Black','Cersei Lannister','Sansa Stark','Ned Stark','Brienne of Tarth','Captain Hook','Peter Pan','Mulan','Pocahontas','Hercules','Maui','Moana','WALL-E','Maleficent','Grogu','Steve Harrington','Walter White','Jesse Pinkman','Saul Goodman','Sherlock Holmes','Elsa','Anna','Olaf','Woody','Buzz Lightyear','Nemo','Dory','Shrek','Burro','Simba','Mufasa','Aladino','Genio','La bella y la bestia','Ariel','Cenicienta','Blancanieves','James Bond','Indiana Jones','Jack Sparrow','Invencible',
-      
-      // Palabras extra
-      'Madonna','Marilyn Monroe','Beyoncé','Adele','Taylor Swift','Elvis Presley','The Beatles','Rolling Stones','Queen','Michael Jackson','Whitney Houston',
-      'Shakira','Rihanna','Katy Perry','Billie Eilish','Drake','Eminem','Kanye West','Ariana Grande',
-      'Coldplay','U2','Metallica','Bruno Mars','Ed Sheeran','Michael Myers','Freddy Krueger','Jason Voorhees','Jigsaw','Chucky','Darth Vader','Duende Verde','Anabelle','Godzilla','R2-D2','C-3PO','E.T.',
-      'París','Londres','Nueva York','Tokio','Roma','Barcelona','Moscú','Berlín','Sídney','Los Ángeles','Madrid',
-      'Machu Picchu','Taj Mahal','Gran Cañón','Monte Everest','Torre Eiffel','Estatua de la Libertad','Gran Muralla','Sagrada Familia',
-      'Nike','Adidas','IKEA','LEGO','croissant','ramen','Bad Bunny','Ozuna','J Balvin','Karol G','Daddy Yankee','Luis Fonsi','Maluma','Anuel AA','Bizarrap','Sebastián Yatra','Bachata',
-      'FC Barcelona','Real Madrid','Manchester United','Liverpool','Bayern Munich','Juventus','PSG',
-      'Marte','Júpiter','Saturno','Mercurio','Venus','Urano','Neptuno','Plutón','Sol','Luna',
-      'Google Maps','El Principito','Moby Dick','Cien Años de Soledad','El Hobbit',
-    ];
+const classifiedWords = [
+  // OBJETO
+  {word: 'cohete', category: 'OBJETO'},
+  {word: 'reloj', category: 'OBJETO'},
+  {word: 'café', category: 'OBJETO'},
+  {word: 'camión', category: 'OBJETO'},
+  {word: 'playa', category: 'OBJETO'},
+  {word: 'libro', category: 'OBJETO'},
+  {word: 'estrella', category: 'OBJETO'},
+  {word: 'árbol', category: 'OBJETO'},
+  {word: 'zapato', category: 'OBJETO'},
+  {word: 'pelota', category: 'OBJETO'},
+  {word: 'puerta', category: 'OBJETO'},
+  {word: 'silla', category: 'OBJETO'},
+  {word: 'mesa', category: 'OBJETO'},
+  {word: 'lápiz', category: 'OBJETO'},
+  {word: 'teléfono', category: 'OBJETO'},
+  {word: 'guitarra', category: 'OBJETO'},
+  {word: 'piano', category: 'OBJETO'},
+  {word: 'bicicleta', category: 'OBJETO'},
+  {word: 'coche', category: 'OBJETO'},
+  {word: 'avión', category: 'OBJETO'},
+  {word: 'barco', category: 'OBJETO'},
+  {word: 'paraguas', category: 'OBJETO'},
+  {word: 'gafas', category: 'OBJETO'},
+  {word: 'maleta', category: 'OBJETO'},
+  {word: 'ordenador', category: 'OBJETO'},
+  {word: 'teclado', category: 'OBJETO'},
+  {word: 'cámara', category: 'OBJETO'},
+  {word: 'micrófono', category: 'OBJETO'},
+  {word: 'auriculares', category: 'OBJETO'},
+  {word: 'ventana', category: 'OBJETO'},
+  {word: 'espejo', category: 'OBJETO'},
+  {word: 'cuchillo', category: 'OBJETO'},
+  {word: 'tenedor', category: 'OBJETO'},
+  {word: 'cuchara', category: 'OBJETO'},
+  {word: 'plato', category: 'OBJETO'},
+  {word: 'vaso', category: 'OBJETO'},
+  {word: 'botella', category: 'OBJETO'},
+  {word: 'cepillo', category: 'OBJETO'},
+  {word: 'toalla', category: 'OBJETO'},
+  {word: 'almohada', category: 'OBJETO'},
+  {word: 'manta', category: 'OBJETO'},
+  {word: 'sofá', category: 'OBJETO'},
+  {word: 'lámpara', category: 'OBJETO'},
+  {word: 'televisión', category: 'OBJETO'},
+  {word: 'batería', category: 'OBJETO'},
+  {word: 'violín', category: 'OBJETO'},
+  {word: 'flauta', category: 'OBJETO'},
+  {word: 'trompeta', category: 'OBJETO'},
+  {word: 'saxofón', category: 'OBJETO'},
+  {word: 'clarinete', category: 'OBJETO'},
+  {word: 'ukelele', category: 'OBJETO'},
+
+  // ALIMENTACIÓN
+  {word: 'pizza', category: 'ALIMENTACIÓN'},
+  {word: 'hamburguesa', category: 'ALIMENTACIÓN'},
+  {word: 'paella', category: 'ALIMENTACIÓN'},
+  {word: 'tacos', category: 'ALIMENTACIÓN'},
+  {word: 'pasta', category: 'ALIMENTACIÓN'},
+  {word: 'arroz', category: 'ALIMENTACIÓN'},
+  {word: 'pollo', category: 'ALIMENTACIÓN'},
+  {word: 'pescado', category: 'ALIMENTACIÓN'},
+  {word: 'carne', category: 'ALIMENTACIÓN'},
+  {word: 'ensalada', category: 'ALIMENTACIÓN'},
+  {word: 'sopa', category: 'ALIMENTACIÓN'},
+  {word: 'pan', category: 'ALIMENTACIÓN'},
+  {word: 'queso', category: 'ALIMENTACIÓN'},
+  {word: 'huevo', category: 'ALIMENTACIÓN'},
+  {word: 'chocolate', category: 'ALIMENTACIÓN'},
+  {word: 'helado', category: 'ALIMENTACIÓN'},
+  {word: 'galleta', category: 'ALIMENTACIÓN'},
+  {word: 'pastel', category: 'ALIMENTACIÓN'},
+  {word: 'donut', category: 'ALIMENTACIÓN'},
+  {word: 'zumo', category: 'ALIMENTACIÓN'},
+  {word: 'agua', category: 'ALIMENTACIÓN'},
+  {word: 'leche', category: 'ALIMENTACIÓN'},
+  {word: 'té', category: 'ALIMENTACIÓN'},
+  {word: 'cerveza', category: 'ALIMENTACIÓN'},
+  {word: 'vino', category: 'ALIMENTACIÓN'},
+  {word: 'naranja', category: 'ALIMENTACIÓN'},
+  {word: 'plátano', category: 'ALIMENTACIÓN'},
+  {word: 'manzana', category: 'ALIMENTACIÓN'},
+  {word: 'fresa', category: 'ALIMENTACIÓN'},
+  {word: 'sandía', category: 'ALIMENTACIÓN'},
+  {word: 'melón', category: 'ALIMENTACIÓN'},
+  {word: 'uva', category: 'ALIMENTACIÓN'},
+  {word: 'piña', category: 'ALIMENTACIÓN'},
+  {word: 'mango', category: 'ALIMENTACIÓN'},
+  {word: 'aguacate', category: 'ALIMENTACIÓN'},
+  {word: 'tomate', category: 'ALIMENTACIÓN'},
+  {word: 'lechuga', category: 'ALIMENTACIÓN'},
+  {word: 'zanahoria', category: 'ALIMENTACIÓN'},
+  {word: 'patata', category: 'ALIMENTACIÓN'},
+  {word: 'cebolla', category: 'ALIMENTACIÓN'},
+  {word: 'croissant', category: 'ALIMENTACIÓN'},
+  {word: 'ramen', category: 'ALIMENTACIÓN'},
+
+  // FAMOSO (PERSONA REAL)
+  {word: 'Lionel Messi', category: 'FAMOSO'},
+  {word: 'Cristiano Ronaldo', category: 'FAMOSO'},
+  {word: 'Rafael Nadal', category: 'FAMOSO'},
+  {word: 'LeBron James', category: 'FAMOSO'},
+  {word: 'Michael Jordan', category: 'FAMOSO'},
+  {word: 'Usain Bolt', category: 'FAMOSO'},
+  {word: 'Roger Federer', category: 'FAMOSO'},
+  {word: 'Serena Williams', category: 'FAMOSO'},
+  {word: 'Tiger Woods', category: 'FAMOSO'},
+  {word: 'Neymar Junior', category: 'FAMOSO'},
+  {word: 'Kylian Mbappé', category: 'FAMOSO'},
+  {word: 'Mohamed Salah', category: 'FAMOSO'},
+  {word: 'Robert Lewandowski', category: 'FAMOSO'},
+  {word: 'Zinedine Zidane', category: 'FAMOSO'},
+  {word: 'Pelé', category: 'FAMOSO'},
+  {word: 'Diego Maradona', category: 'FAMOSO'},
+  {word: 'Ronaldinho', category: 'FAMOSO'},
+  {word: 'Andrés Iniesta', category: 'FAMOSO'},
+  {word: 'Xavi Hernández', category: 'FAMOSO'},
+  {word: 'Sergio Ramos', category: 'FAMOSO'},
+  {word: 'Karim Benzema', category: 'FAMOSO'},
+  {word: 'Luka Modrić', category: 'FAMOSO'},
+  {word: 'Erling Haaland', category: 'FAMOSO'},
+  {word: 'Vinícius Júnior', category: 'FAMOSO'},
+  {word: 'Gianluigi Buffon', category: 'FAMOSO'},
+  {word: 'Zlatan Ibrahimovic', category: 'FAMOSO'},
+  {word: 'Luis Suárez', category: 'FAMOSO'},
+  {word: 'Kevin De Bruyne', category: 'FAMOSO'},
+  {word: 'Harry Kane', category: 'FAMOSO'},
+  {word: 'Son Heung-min', category: 'FAMOSO'},
+  {word: 'Gareth Bale', category: 'FAMOSO'},
+  {word: 'Antoine Griezmann', category: 'FAMOSO'},
+  {word: 'Paulo Dybala', category: 'FAMOSO'},
+  {word: 'Thibaut Courtois', category: 'FAMOSO'},
+  {word: 'Venus Williams', category: 'FAMOSO'},
+  {word: 'Carlos Alcaraz', category: 'FAMOSO'},
+  {word: 'Rafa Márquez', category: 'FAMOSO'},
+  {word: 'Jannik Sinner', category: 'FAMOSO'},
+  {word: 'John Cena', category: 'FAMOSO'},
+  {word: 'Conor McGregor', category: 'FAMOSO'},
+  {word: 'Ilia Topuria', category: 'FAMOSO'},
+  {word: 'Randy Orton', category: 'FAMOSO'},
+  {word: 'Leonardo DiCaprio', category: 'FAMOSO'},
+  {word: 'Brad Pitt', category: 'FAMOSO'},
+  {word: 'Tom Cruise', category: 'FAMOSO'},
+  {word: 'Johnny Depp', category: 'FAMOSO'},
+  {word: 'Will Smith', category: 'FAMOSO'},
+  {word: 'Robert Downey Jr.', category: 'FAMOSO'},
+  {word: 'Dwayne Johnson', category: 'FAMOSO'},
+  {word: 'Chris Hemsworth', category: 'FAMOSO'},
+  {word: 'Scarlett Johansson', category: 'FAMOSO'},
+  {word: 'Jennifer Lawrence', category: 'FAMOSO'},
+  {word: 'Emma Watson', category: 'FAMOSO'},
+  {word: 'Natalie Portman', category: 'FAMOSO'},
+  {word: 'Angelina Jolie', category: 'FAMOSO'},
+  {word: 'Margot Robbie', category: 'FAMOSO'},
+  {word: 'Zendaya Coleman', category: 'FAMOSO'},
+  {word: 'Tom Holland', category: 'FAMOSO'},
+  {word: 'Timothée Chalamet', category: 'FAMOSO'},
+  {word: 'Ana de Armas', category: 'FAMOSO'},
+  {word: 'Pedro Pascal', category: 'FAMOSO'},
+  {word: 'Javier Bardem', category: 'FAMOSO'},
+  {word: 'Penélope Cruz', category: 'FAMOSO'},
+  {word: 'Antonio Banderas', category: 'FAMOSO'},
+  {word: 'Mel Gibson', category: 'FAMOSO'},
+  {word: 'Jack Nicholson', category: 'FAMOSO'},
+  {word: 'Julia Roberts', category: 'FAMOSO'},
+  {word: 'Chris Evans', category: 'FAMOSO'},
+  {word: 'Hugh Jackman', category: 'FAMOSO'},
+  {word: 'Chris Pratt', category: 'FAMOSO'},
+  {word: 'Adam Sandler', category: 'FAMOSO'},
+  {word: 'Kevin Hart', category: 'FAMOSO'},
+  {word: 'Chris Rock', category: 'FAMOSO'},
+  {word: 'Jackie Chan', category: 'FAMOSO'},
+  {word: 'Keanu Reeves', category: 'FAMOSO'},
+  {word: 'MrBeast', category: 'FAMOSO'},
+  {word: 'PewDiePie', category: 'FAMOSO'},
+  {word: 'ElRubius', category: 'FAMOSO'},
+  {word: 'AuronPlay', category: 'FAMOSO'},
+  {word: 'Ibai Llanos', category: 'FAMOSO'},
+  {word: 'El Xokas', category: 'FAMOSO'},
+  {word: 'TheGrefg', category: 'FAMOSO'},
+  {word: 'Vegetta777', category: 'FAMOSO'},
+  {word: 'Willyrex', category: 'FAMOSO'},
+  {word: 'DjMaRiiO', category: 'FAMOSO'},
+  {word: 'Luzu', category: 'FAMOSO'},
+  {word: 'Alexby11', category: 'FAMOSO'},
+  {word: 'Fernanfloo', category: 'FAMOSO'},
+  {word: 'JuegaGerman', category: 'FAMOSO'},
+  {word: 'Ninja', category: 'FAMOSO'},
+  {word: 'Albert Einstein', category: 'FAMOSO'},
+  {word: 'Isaac Newton', category: 'FAMOSO'},
+  {word: 'Leonardo da Vinci', category: 'FAMOSO'},
+  {word: 'Napoleón Bonaparte', category: 'FAMOSO'},
+  {word: 'Julio César', category: 'FAMOSO'},
+  {word: 'Cleopatra', category: 'FAMOSO'},
+  {word: 'Abraham Lincoln', category: 'FAMOSO'},
+  {word: 'Winston Churchill', category: 'FAMOSO'},
+  {word: 'Mahatma Gandhi', category: 'FAMOSO'},
+  {word: 'Nelson Mandela', category: 'FAMOSO'},
+  {word: 'Martin Luther King', category: 'FAMOSO'},
+  {word: 'Marie Curie', category: 'FAMOSO'},
+  {word: 'Nikola Tesla', category: 'FAMOSO'},
+  {word: 'Steve Jobs', category: 'FAMOSO'},
+  {word: 'Bill Gates', category: 'FAMOSO'},
+  {word: 'Pablo Picasso', category: 'FAMOSO'},
+  {word: 'Vincent van Gogh', category: 'FAMOSO'},
+  {word: 'Mozart', category: 'FAMOSO'},
+  {word: 'Beethoven', category: 'FAMOSO'},
+  {word: 'Shakespeare', category: 'FAMOSO'},
+  {word: 'Cervantes', category: 'FAMOSO'},
+  {word: 'Cristóbal Colón', category: 'FAMOSO'},
+  {word: 'Galileo Galilei', category: 'FAMOSO'},
+  {word: 'Charles Darwin', category: 'FAMOSO'},
+  {word: 'Adolf Hitler', category: 'FAMOSO'},
+  {word: 'Donald Trump', category: 'FAMOSO'},
+  {word: 'Barack Obama', category: 'FAMOSO'},
+  {word: 'George Washington', category: 'FAMOSO'},
+  {word: 'Javier Milei', category: 'FAMOSO'},
+  {word: 'Madonna', category: 'FAMOSO'},
+  {word: 'Marilyn Monroe', category: 'FAMOSO'},
+  {word: 'Beyoncé', category: 'FAMOSO'},
+  {word: 'Adele', category: 'FAMOSO'},
+  {word: 'Taylor Swift', category: 'FAMOSO'},
+  {word: 'Elvis Presley', category: 'FAMOSO'},
+  {word: 'The Beatles', category: 'FAMOSO'},
+  {word: 'Rolling Stones', category: 'FAMOSO'},
+  {word: 'Queen', category: 'FAMOSO'},
+  {word: 'Michael Jackson', category: 'FAMOSO'},
+  {word: 'Whitney Houston', category: 'FAMOSO'},
+  {word: 'Shakira', category: 'FAMOSO'},
+  {word: 'Rihanna', category: 'FAMOSO'},
+  {word: 'Katy Perry', category: 'FAMOSO'},
+  {word: 'Billie Eilish', category: 'FAMOSO'},
+  {word: 'Drake', category: 'FAMOSO'},
+  {word: 'Eminem', category: 'FAMOSO'},
+  {word: 'Kanye West', category: 'FAMOSO'},
+  {word: 'Ariana Grande', category: 'FAMOSO'},
+  {word: 'Coldplay', category: 'FAMOSO'},
+  {word: 'U2', category: 'FAMOSO'},
+  {word: 'Metallica', category: 'FAMOSO'},
+  {word: 'Bruno Mars', category: 'FAMOSO'},
+  {word: 'Ed Sheeran', category: 'FAMOSO'},
+  {word: 'Bad Bunny', category: 'FAMOSO'},
+  {word: 'Ozuna', category: 'FAMOSO'},
+  {word: 'J Balvin', category: 'FAMOSO'},
+  {word: 'Karol G', category: 'FAMOSO'},
+  {word: 'Daddy Yankee', category: 'FAMOSO'},
+  {word: 'Luis Fonsi', category: 'FAMOSO'},
+  {word: 'Maluma', category: 'FAMOSO'},
+  {word: 'Anuel AA', category: 'FAMOSO'},
+  {word: 'Bizarrap', category: 'FAMOSO'},
+  {word: 'Sebastián Yatra', category: 'FAMOSO'},
+
+  // PERSONAJE (FICTICIO)
+  {word: 'Superman', category: 'PERSONAJE'},
+  {word: 'Batman', category: 'PERSONAJE'},
+  {word: 'Spider-Man', category: 'PERSONAJE'},
+  {word: 'Iron Man', category: 'PERSONAJE'},
+  {word: 'Hulk', category: 'PERSONAJE'},
+  {word: 'Thor', category: 'PERSONAJE'},
+  {word: 'Capitán América', category: 'PERSONAJE'},
+  {word: 'Wonder Woman', category: 'PERSONAJE'},
+  {word: 'Flash', category: 'PERSONAJE'},
+  {word: 'Aquaman', category: 'PERSONAJE'},
+  {word: 'Deadpool', category: 'PERSONAJE'},
+  {word: 'Wolverine', category: 'PERSONAJE'},
+  {word: 'Black Widow', category: 'PERSONAJE'},
+  {word: 'Doctor Strange', category: 'PERSONAJE'},
+  {word: 'Thanos', category: 'PERSONAJE'},
+  {word: 'Harley Quinn', category: 'PERSONAJE'},
+  {word: 'Loki', category: 'PERSONAJE'},
+  {word: 'Venom', category: 'PERSONAJE'},
+  {word: 'Mario Bros', category: 'PERSONAJE'},
+  {word: 'Luigi', category: 'PERSONAJE'},
+  {word: 'Sonic', category: 'PERSONAJE'},
+  {word: 'Pikachu', category: 'PERSONAJE'},
+  {word: 'Mickey Mouse', category: 'PERSONAJE'},
+  {word: 'Donald Duck', category: 'PERSONAJE'},
+  {word: 'Goofy', category: 'PERSONAJE'},
+  {word: 'Bob Esponja', category: 'PERSONAJE'},
+  {word: 'Patrick Estrella', category: 'PERSONAJE'},
+  {word: 'Bugs Bunny', category: 'PERSONAJE'},
+  {word: 'Pato Lucas', category: 'PERSONAJE'},
+  {word: 'Tom y Jerry', category: 'PERSONAJE'},
+  {word: 'Scooby-Doo', category: 'PERSONAJE'},
+  {word: 'Shaggy', category: 'PERSONAJE'},
+  {word: 'Homer Simpson', category: 'PERSONAJE'},
+  {word: 'Bart Simpson', category: 'PERSONAJE'},
+  {word: 'Lisa Simpson', category: 'PERSONAJE'},
+  {word: 'Marge Simpson', category: 'PERSONAJE'},
+  {word: 'Peter Griffin', category: 'PERSONAJE'},
+  {word: 'Stewie Griffin', category: 'PERSONAJE'},
+  {word: 'Rick Sanchez', category: 'PERSONAJE'},
+  {word: 'Morty Smith', category: 'PERSONAJE'},
+  {word: 'Ash Ketchum', category: 'PERSONAJE'},
+  {word: 'Goku', category: 'PERSONAJE'},
+  {word: 'Vegeta', category: 'PERSONAJE'},
+  {word: 'Naruto', category: 'PERSONAJE'},
+  {word: 'Luffy', category: 'PERSONAJE'},
+  {word: 'Hermione Granger', category: 'PERSONAJE'},
+  {word: 'Ron Weasley', category: 'PERSONAJE'},
+  {word: 'Dumbledore', category: 'PERSONAJE'},
+  {word: 'Voldemort', category: 'PERSONAJE'},
+  {word: 'Gandalf', category: 'PERSONAJE'},
+  {word: 'Frodo Bolsón', category: 'PERSONAJE'},
+  {word: 'Aragorn', category: 'PERSONAJE'},
+  {word: 'Legolas', category: 'PERSONAJE'},
+  {word: 'Jon Nieve', category: 'PERSONAJE'},
+  {word: 'Daenerys Targaryen', category: 'PERSONAJE'},
+  {word: 'Tyrion Lannister', category: 'PERSONAJE'},
+  {word: 'Eleven', category: 'PERSONAJE'},
+  {word: 'Mike Wheeler', category: 'PERSONAJE'},
+  {word: 'Dustin Henderson', category: 'PERSONAJE'},
+  {word: 'Neo Matrix', category: 'PERSONAJE'},
+  {word: 'Rey', category: 'PERSONAJE'},
+  {word: 'Kylo Ren', category: 'PERSONAJE'},
+  {word: 'Luke Skywalker', category: 'PERSONAJE'},
+  {word: 'Leia Organa', category: 'PERSONAJE'},
+  {word: 'Han Solo', category: 'PERSONAJE'},
+  {word: 'Obi-Wan Kenobi', category: 'PERSONAJE'},
+  {word: 'Yoda', category: 'PERSONAJE'},
+  {word: 'Sauron', category: 'PERSONAJE'},
+  {word: 'Severus Snape', category: 'PERSONAJE'},
+  {word: 'Draco Malfoy', category: 'PERSONAJE'},
+  {word: 'Sirius Black', category: 'PERSONAJE'},
+  {word: 'Cersei Lannister', category: 'PERSONAJE'},
+  {word: 'Sansa Stark', category: 'PERSONAJE'},
+  {word: 'Ned Stark', category: 'PERSONAJE'},
+  {word: 'Brienne of Tarth', category: 'PERSONAJE'},
+  {word: 'Captain Hook', category: 'PERSONAJE'},
+  {word: 'Peter Pan', category: 'PERSONAJE'},
+  {word: 'Mulan', category: 'PERSONAJE'},
+  {word: 'Pocahontas', category: 'PERSONAJE'},
+  {word: 'Hercules', category: 'PERSONAJE'},
+  {word: 'Moana', category: 'PERSONAJE'},
+  {word: 'WALL-E', category: 'PERSONAJE'},
+  {word: 'Maleficent', category: 'PERSONAJE'},
+  {word: 'Grogu', category: 'PERSONAJE'},
+  {word: 'Steve Harrington', category: 'PERSONAJE'},
+  {word: 'Walter White', category: 'PERSONAJE'},
+  {word: 'Jesse Pinkman', category: 'PERSONAJE'},
+  {word: 'Saul Goodman', category: 'PERSONAJE'},
+  {word: 'Sherlock Holmes', category: 'PERSONAJE'},
+  {word: 'Elsa', category: 'PERSONAJE'},
+  {word: 'Anna', category: 'PERSONAJE'},
+  {word: 'Olaf', category: 'PERSONAJE'},
+  {word: 'Woody', category: 'PERSONAJE'},
+  {word: 'Buzz Lightyear', category: 'PERSONAJE'},
+  {word: 'Nemo', category: 'PERSONAJE'},
+  {word: 'Dory', category: 'PERSONAJE'},
+  {word: 'Shrek', category: 'PERSONAJE'},
+  {word: 'Burro', category: 'PERSONAJE'},
+  {word: 'Simba', category: 'PERSONAJE'},
+  {word: 'Mufasa', category: 'PERSONAJE'},
+  {word: 'Aladino', category: 'PERSONAJE'},
+  {word: 'Genio', category: 'PERSONAJE'},
+  {word: 'La bella y la bestia', category: 'PERSONAJE'},
+  {word: 'Ariel', category: 'PERSONAJE'},
+  {word: 'Cenicienta', category: 'PERSONAJE'},
+  {word: 'Blancanieves', category: 'PERSONAJE'},
+  {word: 'James Bond', category: 'PERSONAJE'},
+  {word: 'Indiana Jones', category: 'PERSONAJE'},
+  {word: 'Jack Sparrow', category: 'PERSONAJE'},
+  {word: 'Invencible', category: 'PERSONAJE'},
+  {word: 'Michael Myers', category: 'PERSONAJE'},
+  {word: 'Freddy Krueger', category: 'PERSONAJE'},
+  {word: 'Jason Voorhees', category: 'PERSONAJE'},
+  {word: 'Jigsaw', category: 'PERSONAJE'},
+  {word: 'Chucky', category: 'PERSONAJE'},
+  {word: 'Darth Vader', category: 'PERSONAJE'},
+  {word: 'Duende Verde', category: 'PERSONAJE'},
+  {word: 'Anabelle', category: 'PERSONAJE'},
+  {word: 'Godzilla', category: 'PERSONAJE'},
+  {word: 'R2-D2', category: 'PERSONAJE'},
+  {word: 'C-3PO', category: 'PERSONAJE'},
+  {word: 'E.T.', category: 'PERSONAJE'},
+
+  // PELICULA O SERIE
+  {word: 'Titanic', category: 'PELICULA O SERIE'},
+  {word: 'Avatar', category: 'PELICULA O SERIE'},
+  {word: 'Avengers', category: 'PELICULA O SERIE'},
+  {word: 'Star Wars', category: 'PELICULA O SERIE'},
+  {word: 'Harry Potter', category: 'PELICULA O SERIE'},
+  {word: 'El Padrino', category: 'PELICULA O SERIE'},
+  {word: 'Pulp Fiction', category: 'PELICULA O SERIE'},
+  {word: 'Los Goonies', category: 'PELICULA O SERIE'},
+  {word: 'Forrest Gump', category: 'PELICULA O SERIE'},
+  {word: 'Matrix', category: 'PELICULA O SERIE'},
+  {word: 'Gladiador', category: 'PELICULA O SERIE'},
+  {word: 'Inception', category: 'PELICULA O SERIE'},
+  {word: 'Interstellar', category: 'PELICULA O SERIE'},
+  {word: 'Breaking Bad', category: 'PELICULA O SERIE'},
+  {word: 'Game of Thrones', category: 'PELICULA O SERIE'},
+  {word: 'Stranger Things', category: 'PELICULA O SERIE'},
+  {word: 'La Casa de Papel', category: 'PELICULA O SERIE'},
+  {word: 'Friends', category: 'PELICULA O SERIE'},
+  {word: 'The Office', category: 'PELICULA O SERIE'},
+  {word: 'Narcos', category: 'PELICULA O SERIE'},
+  {word: 'Black Mirror', category: 'PELICULA O SERIE'},
+  {word: 'Squid Game', category: 'PELICULA O SERIE'},
+  {word: 'Wednesday', category: 'PELICULA O SERIE'},
+  {word: 'The Crown', category: 'PELICULA O SERIE'},
+  {word: 'Peaky Blinders', category: 'PELICULA O SERIE'},
+  {word: 'The Mandalorian', category: 'PELICULA O SERIE'},
+  {word: 'Better Call Saul', category: 'PELICULA O SERIE'},
+  {word: 'Cobra Kai', category: 'PELICULA O SERIE'},
+  {word: 'The Walking Dead', category: 'PELICULA O SERIE'},
+  {word: 'IT', category: 'PELICULA O SERIE'},
+  {word: 'El Señor de los Anillos', category: 'PELICULA O SERIE'},
+  {word: 'Los Soprano', category: 'PELICULA O SERIE'},
+  {word: 'El resplandor', category: 'PELICULA O SERIE'},
+  {word: 'Alien', category: 'PELICULA O SERIE'},
+  {word: 'Terminator', category: 'PELICULA O SERIE'},
+  {word: 'El silencio de los corderos', category: 'PELICULA O SERIE'},
+  {word: 'Jurassic Park', category: 'PELICULA O SERIE'},
+  {word: 'La vida es bella', category: 'PELICULA O SERIE'},
+  {word: 'La lista de Schindler', category: 'PELICULA O SERIE'},
+  {word: '1917', category: 'PELICULA O SERIE'},
+  {word: 'Joker', category: 'PELICULA O SERIE'},
+  {word: 'La La Land', category: 'PELICULA O SERIE'},
+  {word: 'Toy Story', category: 'PELICULA O SERIE'},
+  {word: 'Coco', category: 'PELICULA O SERIE'},
+  {word: 'Up', category: 'PELICULA O SERIE'},
+  {word: 'Django desencadenado', category: 'PELICULA O SERIE'},
+  {word: 'Kill Bill', category: 'PELICULA O SERIE'},
+  {word: 'El club de la Lucha', category: 'PELICULA O SERIE'},
+  {word: 'Memento', category: 'PELICULA O SERIE'},
+  {word: 'La Pasión de Cristo', category: 'PELICULA O SERIE'},
+  {word: 'El renacido', category: 'PELICULA O SERIE'},
+  {word: 'El último mohicano', category: 'PELICULA O SERIE'},
+  {word: 'Braveheart', category: 'PELICULA O SERIE'},
+  {word: 'Westworld', category: 'PELICULA O SERIE'},
+  {word: 'Dexter', category: 'PELICULA O SERIE'},
+  {word: 'Lost', category: 'PELICULA O SERIE'},
+  {word: 'Sherlock', category: 'PELICULA O SERIE'},
+  {word: 'True Detective', category: 'PELICULA O SERIE'},
+  {word: 'Chernóbil', category: 'PELICULA O SERIE'},
+  {word: 'The Wire', category: 'PELICULA O SERIE'},
+  {word: 'Black Panther', category: 'PELICULA O SERIE'},
+  {word: 'Guardianes de la Galaxia', category: 'PELICULA O SERIE'},
+  {word: 'Casablanca', category: 'PELICULA O SERIE'},
+
+  // MARCA
+  {word: 'iPhone', category: 'MARCA'},
+  {word: 'Samsung', category: 'MARCA'},
+  {word: 'PlayStation', category: 'MARCA'},
+  {word: 'Xbox', category: 'MARCA'},
+  {word: 'Nintendo', category: 'MARCA'},
+  {word: 'Tesla', category: 'MARCA'},
+  {word: 'Ferrari', category: 'MARCA'},
+  {word: 'Lamborghini', category: 'MARCA'},
+  {word: 'Porsche', category: 'MARCA'},
+  {word: 'Mercedes', category: 'MARCA'},
+  {word: 'BMW', category: 'MARCA'},
+  {word: 'Audi', category: 'MARCA'},
+  {word: 'Coca-Cola', category: 'MARCA'},
+  {word: 'Pepsi', category: 'MARCA'},
+  {word: 'McDonald\'s', category: 'MARCA'},
+  {word: 'Starbucks', category: 'MARCA'},
+  {word: 'Amazon', category: 'MARCA'},
+  {word: 'Google', category: 'MARCA'},
+  {word: 'Facebook', category: 'MARCA'},
+  {word: 'Instagram', category: 'MARCA'},
+  {word: 'Twitter', category: 'MARCA'},
+  {word: 'TikTok', category: 'MARCA'},
+  {word: 'YouTube', category: 'MARCA'},
+  {word: 'Netflix', category: 'MARCA'},
+  {word: 'Spotify', category: 'MARCA'},
+  {word: 'Apple', category: 'MARCA'},
+  {word: 'Microsoft', category: 'MARCA'},
+  {word: 'Nike', category: 'MARCA'},
+  {word: 'Adidas', category: 'MARCA'},
+  {word: 'IKEA', category: 'MARCA'},
+  {word: 'LEGO', category: 'MARCA'},
+  {word: 'Google Maps', category: 'MARCA'},
+
+  // DEPORTE
+  {word: 'fútbol', category: 'DEPORTE'},
+  {word: 'baloncesto', category: 'DEPORTE'},
+  {word: 'tenis', category: 'DEPORTE'},
+  {word: 'natación', category: 'DEPORTE'},
+  {word: 'ciclismo', category: 'DEPORTE'},
+  {word: 'atletismo', category: 'DEPORTE'},
+  {word: 'boxeo', category: 'DEPORTE'},
+  {word: 'gimnasia', category: 'DEPORTE'},
+  {word: 'voleibol', category: 'DEPORTE'},
+  {word: 'rugby', category: 'DEPORTE'},
+  {word: 'hockey', category: 'DEPORTE'},
+  {word: 'béisbol', category: 'DEPORTE'},
+  {word: 'golf', category: 'DEPORTE'},
+  {word: 'esquí', category: 'DEPORTE'},
+  {word: 'surf', category: 'DEPORTE'},
+  {word: 'escalada', category: 'DEPORTE'},
+  {word: 'yoga', category: 'DEPORTE'},
+  {word: 'baile', category: 'DEPORTE'},
+  {word: 'karate', category: 'DEPORTE'},
+  {word: 'judo', category: 'DEPORTE'},
+  {word: 'esgrima', category: 'DEPORTE'},
+  {word: 'FC Barcelona', category: 'DEPORTE'},
+  {word: 'Real Madrid', category: 'DEPORTE'},
+  {word: 'Manchester United', category: 'DEPORTE'},
+  {word: 'Liverpool', category: 'DEPORTE'},
+  {word: 'Bayern Munich', category: 'DEPORTE'},
+  {word: 'Juventus', category: 'DEPORTE'},
+  {word: 'PSG', category: 'DEPORTE'},
+
+  // ANIMAL
+  {word: 'perro', category: 'ANIMAL'},
+  {word: 'elefante', category: 'ANIMAL'},
+  {word: 'león', category: 'ANIMAL'},
+  {word: 'tigre', category: 'ANIMAL'},
+  {word: 'oso', category: 'ANIMAL'},
+  {word: 'mono', category: 'ANIMAL'},
+  {word: 'jirafa', category: 'ANIMAL'},
+  {word: 'cebra', category: 'ANIMAL'},
+  {word: 'hipopótamo', category: 'ANIMAL'},
+  {word: 'rinoceronte', category: 'ANIMAL'},
+  {word: 'cocodrilo', category: 'ANIMAL'},
+  {word: 'serpiente', category: 'ANIMAL'},
+  {word: 'águila', category: 'ANIMAL'},
+  {word: 'búho', category: 'ANIMAL'},
+  {word: 'pato', category: 'ANIMAL'},
+  {word: 'cisne', category: 'ANIMAL'},
+  {word: 'delfín', category: 'ANIMAL'},
+  {word: 'ballena', category: 'ANIMAL'},
+  {word: 'tiburón', category: 'ANIMAL'},
+  {word: 'pulpo', category: 'ANIMAL'},
+  {word: 'pingüino', category: 'ANIMAL'},
+  {word: 'koala', category: 'ANIMAL'},
+  {word: 'canguro', category: 'ANIMAL'},
+  {word: 'panda', category: 'ANIMAL'},
+  {word: 'tortuga', category: 'ANIMAL'},
+  {word: 'conejo', category: 'ANIMAL'},
+  {word: 'ratón', category: 'ANIMAL'},
+  {word: 'ardilla', category: 'ANIMAL'},
+  {word: 'zorro', category: 'ANIMAL'},
+  {word: 'ciervo', category: 'ANIMAL'},
+  {word: 'caballo', category: 'ANIMAL'},
+  {word: 'vaca', category: 'ANIMAL'},
+  {word: 'cerdo', category: 'ANIMAL'},
+  {word: 'oveja', category: 'ANIMAL'},
+  {word: 'gallina', category: 'ANIMAL'},
+  {word: 'pavo', category: 'ANIMAL'},
+  {word: 'gato', category: 'ANIMAL'},
+  {word: 'lobo', category: 'ANIMAL'},
+
+  // OFICIO
+  {word: 'médico', category: 'OFICIO'},
+  {word: 'profesor', category: 'OFICIO'},
+  {word: 'ingeniero', category: 'OFICIO'},
+  {word: 'arquitecto', category: 'OFICIO'},
+  {word: 'abogado', category: 'OFICIO'},
+  {word: 'policía', category: 'OFICIO'},
+  {word: 'bombero', category: 'OFICIO'},
+  {word: 'cocinero', category: 'OFICIO'},
+  {word: 'camarero', category: 'OFICIO'},
+  {word: 'panadero', category: 'OFICIO'},
+  {word: 'carpintero', category: 'OFICIO'},
+  {word: 'electricista', category: 'OFICIO'},
+  {word: 'fontanero', category: 'OFICIO'},
+  {word: 'mecánico', category: 'OFICIO'},
+  {word: 'piloto', category: 'OFICIO'},
+  {word: 'conductor', category: 'OFICIO'},
+  {word: 'taxista', category: 'OFICIO'},
+  {word: 'cartero', category: 'OFICIO'},
+  {word: 'jardinero', category: 'OFICIO'},
+  {word: 'pintor', category: 'OFICIO'},
+  {word: 'músico', category: 'OFICIO'},
+  {word: 'cantante', category: 'OFICIO'},
+  {word: 'bailarín', category: 'OFICIO'},
+  {word: 'actor', category: 'OFICIO'},
+  {word: 'director', category: 'OFICIO'},
+  {word: 'fotógrafo', category: 'OFICIO'},
+  {word: 'periodista', category: 'OFICIO'},
+  {word: 'escritor', category: 'OFICIO'},
+  {word: 'científico', category: 'OFICIO'},
+  {word: 'astronauta', category: 'OFICIO'},
+  {word: 'soldado', category: 'OFICIO'},
+  {word: 'enfermero', category: 'OFICIO'},
+  {word: 'veterinario', category: 'OFICIO'},
+  {word: 'dentista', category: 'OFICIO'},
+  {word: 'farmacéutico', category: 'OFICIO'},
+  {word: 'programador', category: 'OFICIO'},
+  {word: 'diseñador', category: 'OFICIO'},
+
+  // LUGARES
+  {word: 'España', category: 'LUGAR'},
+  {word: 'Francia', category: 'LUGAR'},
+  {word: 'Italia', category: 'LUGAR'},
+  {word: 'Alemania', category: 'LUGAR'},
+  {word: 'Inglaterra', category: 'LUGAR'},
+  {word: 'Portugal', category: 'LUGAR'},
+  {word: 'Brasil', category: 'LUGAR'},
+  {word: 'Argentina', category: 'LUGAR'},
+  {word: 'México', category: 'LUGAR'},
+  {word: 'Colombia', category: 'LUGAR'},
+  {word: 'Perú', category: 'LUGAR'},
+  {word: 'Chile', category: 'LUGAR'},
+  {word: 'Venezuela', category: 'LUGAR'},
+  {word: 'Uruguay', category: 'LUGAR'},
+  {word: 'Ecuador', category: 'LUGAR'},
+  {word: 'Cuba', category: 'LUGAR'},
+  {word: 'Japón', category: 'LUGAR'},
+  {word: 'China', category: 'LUGAR'},
+  {word: 'Corea', category: 'LUGAR'},
+  {word: 'India', category: 'LUGAR'},
+  {word: 'Australia', category: 'LUGAR'},
+  {word: 'Canadá', category: 'LUGAR'},
+  {word: 'Estados Unidos', category: 'LUGAR'},
+  {word: 'Rusia', category: 'LUGAR'},
+  {word: 'Egipto', category: 'LUGAR'},
+  {word: 'Marruecos', category: 'LUGAR'},
+  {word: 'Grecia', category: 'LUGAR'},
+  {word: 'Turquía', category: 'LUGAR'},
+  {word: 'Tailandia', category: 'LUGAR'},
+  {word: 'Vietnam', category: 'LUGAR'},
+  {word: 'Noruega', category: 'LUGAR'},
+  {word: 'Suecia', category: 'LUGAR'},
+  {word: 'Dinamarca', category: 'LUGAR'},
+  {word: 'Holanda', category: 'LUGAR'},
+  {word: 'Bélgica', category: 'LUGAR'},
+  {word: 'Suiza', category: 'LUGAR'},
+  {word: 'Austria', category: 'LUGAR'},
+  {word: 'Polonia', category: 'LUGAR'},
+  {word: 'Irlanda', category: 'LUGAR'},
+  {word: 'Escocia', category: 'LUGAR'},
+  {word: 'París', category: 'LUGAR'},
+  {word: 'Londres', category: 'LUGAR'},
+  {word: 'Nueva York', category: 'LUGAR'},
+  {word: 'Tokio', category: 'LUGAR'},
+  {word: 'Roma', category: 'LUGAR'},
+  {word: 'Barcelona', category: 'LUGAR'},
+  {word: 'Moscú', category: 'LUGAR'},
+  {word: 'Berlín', category: 'LUGAR'},
+  {word: 'Sídney', category: 'LUGAR'},
+  {word: 'Los Ángeles', category: 'LUGAR'},
+  {word: 'Madrid', category: 'LUGAR'},
+  {word: 'Machu Picchu', category: 'LUGAR'},
+  {word: 'Taj Mahal', category: 'LUGAR'},
+  {word: 'Gran Cañón', category: 'LUGAR'},
+  {word: 'Monte Everest', category: 'LUGAR'},
+  {word: 'Torre Eiffel', category: 'LUGAR'},
+  {word: 'Estatua de la Libertad', category: 'LUGAR'},
+  {word: 'Gran Muralla', category: 'LUGAR'},
+  {word: 'Sagrada Familia', category: 'LUGAR'},
+  {word: 'Marte', category: 'LUGAR'},
+  {word: 'Júpiter', category: 'LUGAR'},
+  {word: 'Saturno', category: 'LUGAR'},
+  {word: 'Mercurio', category: 'LUGAR'},
+  {word: 'Venus', category: 'LUGAR'},
+  {word: 'Urano', category: 'LUGAR'},
+  {word: 'Neptuno', category: 'LUGAR'},
+  {word: 'Plutón', category: 'LUGAR'},
+  {word: 'Sol', category: 'LUGAR'},
+  {word: 'Luna', category: 'LUGAR'},
+  {word: 'Vía Láctea', category: 'LUGAR'}
+];
+
+const defaultWords = classifiedWords.map(entry => entry.word);
 
 
     let players = []; // {id, name, role: 'impostor'|'civil', word, eliminated: boolean}
     let numPlayers = 4;
     let numImpostors = 1;
-    let savedPlayerNames = []; // Store player names for restart
+    let savedPlayerNames = [];
+    let clueModeEnabled = false;
+    let currentWordCategory = '';
 
     // Phase trackers
     let revealIndex = 0; // player currently checking role
@@ -828,6 +1463,12 @@
       }
     });
 
+    function handleModeSelection(enableHints){
+      clueModeEnabled = enableHints;
+      playSuccessSound();
+      showNamesScreen();
+    }
+
     function showNamesScreen(){
       // Build initial players
       players = [];
@@ -881,10 +1522,12 @@
       }
 
       // Assign words
-      const word = defaultWords[randInt(defaultWords.length)];
+      const wordEntry = classifiedWords[randInt(classifiedWords.length)];
+      const word = wordEntry.word;
+      currentWordCategory = wordEntry.category;
       players.forEach(p=>{
         if(p.role === 'civil') p.word = word;
-        else p.word = null; // impostor doesn't get the civilian word
+        else p.word = null;
       });
 
       // ready to pass
@@ -933,6 +1576,16 @@
         hint.style.marginTop='4px'; 
         hint.textContent='Pasa desapercibido entre los civiles.'; 
         roleArea.appendChild(hint);
+
+        if(clueModeEnabled && currentWordCategory){
+          const clue = document.createElement('div');
+          clue.className='impostor-clue';
+          clue.innerHTML = `
+            <span class="impostor-clue-label">La pista es:</span>
+            <span class="impostor-clue-word">${currentWordCategory}</span>
+          `;
+          roleArea.appendChild(clue);
+        }
       } else {
         const b = document.createElement('div'); 
         b.className='civil-badge'; 
@@ -1143,10 +1796,15 @@
     }
 
     // Botones
-    continueBtn.addEventListener('click', ()=>{
-      playSuccessSound();
-      showNamesScreen();
-    });
+    if(continueBtn){
+      continueBtn.addEventListener('click', ()=>{
+        playSuccessSound();
+        showNamesScreen();
+      });
+    }
+
+    standardModeBtn.addEventListener('click', ()=>handleModeSelection(false));
+    clueModeBtn.addEventListener('click', ()=>handleModeSelection(true));
 
     startBtn.addEventListener('click', ()=>{
       unlockAudioWithUserGesture();
