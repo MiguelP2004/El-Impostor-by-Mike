@@ -407,23 +407,15 @@
       align-items:center;
     }
     .mode-buttons-row{
-      display:flex;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
       gap:16px;
       width:100%;
     }
     .mode-buttons-row .btn{
-      flex:1;
-      min-width:0;
+      width:100%;
       padding:12px 20px;
       font-size:18px;
-    }
-    #categoryModeBtn{
-      align-self:center;
-      width:100%;
-      max-width:260px;
-      background:linear-gradient(180deg,#ff8a8a,#ff4d4d);
-      color:#141010;
-      box-shadow:0 8px 22px rgba(255,77,77,0.45);
     }
     .category-grid{
       display:grid;
@@ -453,6 +445,9 @@
       background:linear-gradient(180deg,#ff8a8a,#ff4d4d);
       color:#141010;
       box-shadow:0 8px 22px rgba(255,77,77,0.45);
+      justify-self:center;
+      width:auto;
+      min-width:220px;
     }
     #categoryModeBtn:hover{
       box-shadow:0 12px 28px rgba(255,77,77,0.6);
@@ -479,6 +474,17 @@
       letter-spacing:0.6px;
       text-shadow:0 4px 14px rgba(255,255,255,0.45);
     }
+    .category-banner{
+      display:none;
+      margin:8px 0 16px;
+      padding:12px 18px;
+      border-radius:16px;
+      background:linear-gradient(90deg,rgba(255,193,7,0.2),rgba(255,255,255,0.08));
+      color:#fdf6c3;
+      font-family:'Fredoka One',cursive;
+      text-align:center;
+      box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    }
   </style>
 </head>
 <body>
@@ -502,8 +508,9 @@
         <p class="lead">creado por Mike</p>
       </div>
     </header>
+    <div id="activeCategoryBanner" class="category-banner"></div>
 
-    <main id="app">
+  <main id="app">
       <!-- SETUP SCREEN -->
       <section id="setup" class="card">
         <div class="grid">
@@ -528,8 +535,8 @@
           <div class="mode-buttons-row">
             <button class="btn big" id="standardModeBtn">Modo estándar</button>
             <button class="btn big secondary" id="clueModeBtn">Modo con PISTA!! 🔍</button>
+            <button class="btn big" id="categoryModeBtn">Jugar por categoría 🧩</button>
           </div>
-          <button class="btn big" id="categoryModeBtn">Jugar por categoría</button>
         </div>
       </section>
 
@@ -746,6 +753,7 @@
     const categoryModeBtn = document.getElementById('categoryModeBtn');
     const categorySelection = document.getElementById('categorySelection');
     const categoryButtons = document.getElementById('categoryButtons');
+    const activeCategoryBanner = document.getElementById('activeCategoryBanner');
 
 const classifiedWords = [
   // OBJETO
@@ -883,6 +891,10 @@ const classifiedWords = [
   {word: 'Venus Williams', category: 'FAMOSO'},
   {word: 'Carlos Alcaraz', category: 'FAMOSO'},
   {word: 'Rafa Márquez', category: 'FAMOSO'},
+  {word: 'Lamine Yamal', category: 'FAMOSO'},
+  {word: 'Nico Williams', category: 'FAMOSO'},
+  {word: 'Daniel Carvajal', category: 'FAMOSO'},
+  {word: 'Luka Modric', category: 'FAMOSO'},
   {word: 'Jannik Sinner', category: 'FAMOSO'},
   {word: 'John Cena', category: 'FAMOSO'},
   {word: 'Conor McGregor', category: 'FAMOSO'},
@@ -1083,7 +1095,7 @@ const classifiedWords = [
   {word: 'Hercules', category: 'PERSONAJE'},
   {word: 'Moana', category: 'PERSONAJE'},
   {word: 'WALL-E', category: 'PERSONAJE'},
-  {word: 'Maleficent', category: 'PERSONAJE'},
+  {word: 'Maléfica', category: 'PERSONAJE'},
   {word: 'Grogu', category: 'PERSONAJE'},
   {word: 'Steve Harrington', category: 'PERSONAJE'},
   {word: 'Jim Hopper', category: 'PERSONAJE'},
@@ -1129,71 +1141,83 @@ const classifiedWords = [
   {word: 'R2-D2', category: 'PERSONAJE'},
   {word: 'C-3PO', category: 'PERSONAJE'},
   {word: 'E.T.', category: 'PERSONAJE'},
+  {word: 'Super Mario', category: 'PERSONAJE'},
+  {word: 'Sonic', category: 'PERSONAJE'},
+  {word: 'Franklin Clinton', category: 'PERSONAJE'},
+  {word: 'Trevor Philips', category: 'PERSONAJE'},
+  {word: 'Michael De Santa', category: 'PERSONAJE'},
 
-  // PELICULA O SERIE
-  {word: 'Titanic', category: 'PELICULA O SERIE'},
-  {word: 'Avatar', category: 'PELICULA O SERIE'},
-  {word: 'Avengers', category: 'PELICULA O SERIE'},
-  {word: 'Star Wars', category: 'PELICULA O SERIE'},
-  {word: 'Harry Potter', category: 'PELICULA O SERIE'},
-  {word: 'El Padrino', category: 'PELICULA O SERIE'},
-  {word: 'Pulp Fiction', category: 'PELICULA O SERIE'},
-  {word: 'Los Goonies', category: 'PELICULA O SERIE'},
-  {word: 'Forrest Gump', category: 'PELICULA O SERIE'},
-  {word: 'Matrix', category: 'PELICULA O SERIE'},
-  {word: 'Gladiador', category: 'PELICULA O SERIE'},
-  {word: 'Inception', category: 'PELICULA O SERIE'},
-  {word: 'Interstellar', category: 'PELICULA O SERIE'},
-  {word: 'Breaking Bad', category: 'PELICULA O SERIE'},
-  {word: 'Game of Thrones', category: 'PELICULA O SERIE'},
-  {word: 'Stranger Things', category: 'PELICULA O SERIE'},
-  {word: 'La Casa de Papel', category: 'PELICULA O SERIE'},
-  {word: 'Friends', category: 'PELICULA O SERIE'},
-  {word: 'The Office', category: 'PELICULA O SERIE'},
-  {word: 'Narcos', category: 'PELICULA O SERIE'},
-  {word: 'Black Mirror', category: 'PELICULA O SERIE'},
-  {word: 'Squid Game', category: 'PELICULA O SERIE'},
-  {word: 'Wednesday', category: 'PELICULA O SERIE'},
-  {word: 'The Crown', category: 'PELICULA O SERIE'},
-  {word: 'Peaky Blinders', category: 'PELICULA O SERIE'},
-  {word: 'The Mandalorian', category: 'PELICULA O SERIE'},
-  {word: 'Better Call Saul', category: 'PELICULA O SERIE'},
-  {word: 'Cobra Kai', category: 'PELICULA O SERIE'},
-  {word: 'The Walking Dead', category: 'PELICULA O SERIE'},
-  {word: 'IT', category: 'PELICULA O SERIE'},
-  {word: 'El Señor de los Anillos', category: 'PELICULA O SERIE'},
-  {word: 'Los Soprano', category: 'PELICULA O SERIE'},
-  {word: 'El resplandor', category: 'PELICULA O SERIE'},
-  {word: 'Alien', category: 'PELICULA O SERIE'},
-  {word: 'Terminator', category: 'PELICULA O SERIE'},
-  {word: 'El silencio de los corderos', category: 'PELICULA O SERIE'},
-  {word: 'Jurassic Park', category: 'PELICULA O SERIE'},
-  {word: 'La vida es bella', category: 'PELICULA O SERIE'},
-  {word: 'La lista de Schindler', category: 'PELICULA O SERIE'},
-  {word: '1917', category: 'PELICULA O SERIE'},
-  {word: 'Joker', category: 'PELICULA O SERIE'},
-  {word: 'La La Land', category: 'PELICULA O SERIE'},
-  {word: 'Toy Story', category: 'PELICULA O SERIE'},
-  {word: 'Coco', category: 'PELICULA O SERIE'},
-  {word: 'Up', category: 'PELICULA O SERIE'},
-  {word: 'Django desencadenado', category: 'PELICULA O SERIE'},
-  {word: 'Kill Bill', category: 'PELICULA O SERIE'},
-  {word: 'El club de la Lucha', category: 'PELICULA O SERIE'},
-  {word: 'Memento', category: 'PELICULA O SERIE'},
-  {word: 'La Pasión de Cristo', category: 'PELICULA O SERIE'},
-  {word: 'El renacido', category: 'PELICULA O SERIE'},
-  {word: 'El último mohicano', category: 'PELICULA O SERIE'},
-  {word: 'Braveheart', category: 'PELICULA O SERIE'},
-  {word: 'Westworld', category: 'PELICULA O SERIE'},
-  {word: 'Dexter', category: 'PELICULA O SERIE'},
-  {word: 'Lost', category: 'PELICULA O SERIE'},
-  {word: 'Sherlock', category: 'PELICULA O SERIE'},
-  {word: 'True Detective', category: 'PELICULA O SERIE'},
-  {word: 'Chernóbil', category: 'PELICULA O SERIE'},
-  {word: 'The Wire', category: 'PELICULA O SERIE'},
-  {word: 'Black Panther', category: 'PELICULA O SERIE'},
-  {word: 'Guardianes de la Galaxia', category: 'PELICULA O SERIE'},
-  {word: 'Casablanca', category: 'PELICULA O SERIE'},
+  // CINE
+  {word: 'Titanic', category: 'CINE'},
+  {word: 'Avatar', category: 'CINE'},
+  {word: 'Avengers', category: 'CINE'},
+  {word: 'Star Wars', category: 'CINE'},
+  {word: 'Harry Potter', category: 'CINE'},
+  {word: 'El Padrino', category: 'CINE'},
+  {word: 'Pulp Fiction', category: 'CINE'},
+  {word: 'Los Goonies', category: 'CINE'},
+  {word: 'Forrest Gump', category: 'CINE'},
+  {word: 'Matrix', category: 'CINE'},
+  {word: 'Gladiador', category: 'CINE'},
+  {word: 'Inception', category: 'CINE'},
+  {word: 'Interstellar', category: 'CINE'},
+  {word: 'Breaking Bad', category: 'CINE'},
+  {word: 'Game of Thrones', category: 'CINE'},
+  {word: 'Stranger Things', category: 'CINE'},
+  {word: 'La Casa de Papel', category: 'CINE'},
+  {word: 'Friends', category: 'CINE'},
+  {word: 'The Office', category: 'CINE'},
+  {word: 'Narcos', category: 'CINE'},
+  {word: 'Black Mirror', category: 'CINE'},
+  {word: 'Squid Game', category: 'CINE'},
+  {word: 'Wednesday', category: 'CINE'},
+  {word: 'The Crown', category: 'CINE'},
+  {word: 'Peaky Blinders', category: 'CINE'},
+  {word: 'The Mandalorian', category: 'CINE'},
+  {word: 'Better Call Saul', category: 'CINE'},
+  {word: 'Cobra Kai', category: 'CINE'},
+  {word: 'The Walking Dead', category: 'CINE'},
+  {word: 'IT', category: 'CINE'},
+  {word: 'El Señor de los Anillos', category: 'CINE'},
+  {word: 'Los Soprano', category: 'CINE'},
+  {word: 'El resplandor', category: 'CINE'},
+  {word: 'Alien', category: 'CINE'},
+  {word: 'Terminator', category: 'CINE'},
+  {word: 'El silencio de los corderos', category: 'CINE'},
+  {word: 'Jurassic Park', category: 'CINE'},
+  {word: 'La vida es bella', category: 'CINE'},
+  {word: 'La lista de Schindler', category: 'CINE'},
+  {word: '1917', category: 'CINE'},
+  {word: 'Joker', category: 'CINE'},
+  {word: 'La La Land', category: 'CINE'},
+  {word: 'Toy Story', category: 'CINE'},
+  {word: 'Coco', category: 'CINE'},
+  {word: 'Up', category: 'CINE'},
+  {word: 'Django desencadenado', category: 'CINE'},
+  {word: 'Kill Bill', category: 'CINE'},
+  {word: 'El club de la Lucha', category: 'CINE'},
+  {word: 'Memento', category: 'CINE'},
+  {word: 'La Pasión de Cristo', category: 'CINE'},
+  {word: 'El renacido', category: 'CINE'},
+  {word: 'El último mohicano', category: 'CINE'},
+  {word: 'Braveheart', category: 'CINE'},
+  {word: 'Westworld', category: 'CINE'},
+  {word: 'Dexter', category: 'CINE'},
+  {word: 'Lost', category: 'CINE'},
+  {word: 'Sherlock', category: 'CINE'},
+  {word: 'True Detective', category: 'CINE'},
+  {word: 'Chernóbil', category: 'CINE'},
+  {word: 'The Wire', category: 'CINE'},
+  {word: 'Black Panther', category: 'CINE'},
+  {word: 'Guardianes de la Galaxia', category: 'CINE'},
+  {word: 'Casablanca', category: 'CINE'},
+  {word: 'Los Juegos del Hambre', category: 'CINE'},
+  {word: 'El corredor del Laberinto', category: 'CINE'},
+  {word: 'Crepúsculo', category: 'CINE'},
+  {word: 'Piratas del Caribe', category: 'CINE'},
+  {word: 'Misión Imposible', category: 'CINE'},
+  {word: 'John Wick', category: 'CINE'},
+  {word: 'Deadpool', category: 'CINE'},
 
   // MARCA
   {word: 'iPhone', category: 'MARCA'},
@@ -1446,7 +1470,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       { label: 'famoso', key: 'FAMOSO', icon: '🌟' },
       { label: 'personaje', key: 'PERSONAJE', icon: '🦸' },
       { label: 'lugar', key: 'LUGAR', icon: '🌍' },
-      { label: 'pelicula o serie', key: 'PELICULA O SERIE', icon: '🍿' },
+      { label: 'cine', key: 'CINE', icon: '🍿' },
       { label: 'objeto', key: 'OBJETO', icon: '📦' },
       { label: 'animal', key: 'ANIMAL', icon: '🦁' }
     ];
