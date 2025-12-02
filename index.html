@@ -412,6 +412,41 @@
       padding:12px 20px;
       font-size:18px;
     }
+    .category-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:12px;
+    }
+    .category-grid .btn{
+      width:100%;
+    }
+    .category-btn{
+      padding:10px 14px;
+      font-size:16px;
+      font-family:'Fredoka One',cursive;
+      background:linear-gradient(180deg,#b8f0ff,#7ed9ff);
+      color:#1f2533;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      box-shadow:0 6px 16px rgba(79,195,255,0.35);
+    }
+    .category-btn .category-icon{
+      font-size:20px;
+      filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    #categoryModeBtn{
+      background:linear-gradient(180deg,#ff8a8a,#ff4d4d);
+      color:#141010;
+      box-shadow:0 8px 22px rgba(255,77,77,0.45);
+    }
+    #categoryModeBtn:hover{
+      box-shadow:0 12px 28px rgba(255,77,77,0.6);
+    }
+    #categoryModeBtn:active{
+      box-shadow:0 6px 16px rgba(255,77,77,0.4);
+    }
     .impostor-clue{
       margin-top:12px;
       text-align:center;
@@ -479,6 +514,15 @@
         <div style="margin-top:12px" class="center mode-buttons">
           <button class="btn big" id="standardModeBtn">Modo estándar</button>
           <button class="btn big secondary" id="clueModeBtn">Modo con PISTA!! 🔍</button>
+          <button class="btn big" id="categoryModeBtn">Jugar por categoría</button>
+        </div>
+      </section>
+
+      <!-- CATEGORY SELECTION -->
+      <section id="categorySelection" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">Elige la categoría</p>
+          <div class="category-grid" id="categoryButtons"></div>
         </div>
       </section>
 
@@ -684,6 +728,9 @@
     const newGameContainer = document.getElementById('newGameContainer');
     const standardModeBtn = document.getElementById('standardModeBtn');
     const clueModeBtn = document.getElementById('clueModeBtn');
+    const categoryModeBtn = document.getElementById('categoryModeBtn');
+    const categorySelection = document.getElementById('categorySelection');
+    const categoryButtons = document.getElementById('categoryButtons');
 
 const classifiedWords = [
   // OBJETO
@@ -1230,6 +1277,27 @@ const classifiedWords = [
   {word: 'pavo', category: 'ANIMAL'},
   {word: 'gato', category: 'ANIMAL'},
   {word: 'lobo', category: 'ANIMAL'},
+  {word: 'leopardo', category: 'ANIMAL'},
+  {word: 'macaco', category: 'ANIMAL'},
+  {word: 'loro', category: 'ANIMAL'},
+  {word: 'orca', category: 'ANIMAL'},
+  {word: 'mosquito', category: 'ANIMAL'},
+  {word: 'mosca', category: 'ANIMAL'},
+  {word: 'escorpión', category: 'ANIMAL'},
+  {word: 'oso polar', category: 'ANIMAL'},
+  {word: 'halcón', category: 'ANIMAL'},
+  {word: 'liebre', category: 'ANIMAL'},
+  {word: 'cienpiés', category: 'ANIMAL'},
+  {word: 'dinosaurio', category: 'ANIMAL'},
+  {word: 'araña', category: 'ANIMAL'},
+  {word: 'tarántula', category: 'ANIMAL'},
+  {word: 'abeja', category: 'ANIMAL'},
+  {word: 'avispa', category: 'ANIMAL'},
+  {word: 'mofeta', category: 'ANIMAL'},
+  {word: 'cangrejo', category: 'ANIMAL'},
+  {word: 'estrella de mar', category: 'ANIMAL'},
+  {word: 'foca', category: 'ANIMAL'},
+  {word: 'puma', category: 'ANIMAL'},
 
   // OFICIO
   {word: 'médico', category: 'OFICIO'},
@@ -1352,6 +1420,15 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     let savedPlayerNames = [];
     let clueModeEnabled = false;
     let currentWordCategory = '';
+    let selectedCategoryFilter = null;
+    const categoryOptions = [
+      { label: 'famoso', key: 'FAMOSO', icon: '🌟' },
+      { label: 'personaje', key: 'PERSONAJE', icon: '🦸' },
+      { label: 'lugar', key: 'LUGAR', icon: '🌍' },
+      { label: 'pelicula o serie', key: 'PELICULA O SERIE', icon: '🍿' },
+      { label: 'objeto', key: 'OBJETO', icon: '📦' },
+      { label: 'animal', key: 'ANIMAL', icon: '🦁' }
+    ];
 
     // Phase trackers
     let revealIndex = 0; // player currently checking role
@@ -1465,11 +1542,43 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
     function handleModeSelection(enableHints){
       clueModeEnabled = enableHints;
+      selectedCategoryFilter = null;
       playSuccessSound();
       showNamesScreen();
     }
 
+    function showCategorySelection(){
+      playSuccessSound();
+      clueModeEnabled = false;
+      selectedCategoryFilter = null;
+      setup.style.display = 'none';
+      namesSection.style.display = 'none';
+      pass.style.display = 'none';
+      discussion.style.display = 'none';
+      results.style.display = 'none';
+      categorySelection.style.display = 'block';
+      buildCategoryButtons();
+    }
+
+    function buildCategoryButtons(){
+      categoryButtons.innerHTML = '';
+      categoryOptions.forEach(option=>{
+        const btn = document.createElement('button');
+        btn.className = 'btn category-btn';
+        btn.textContent = `${option.label} ${option.icon}`;
+        btn.addEventListener('click', ()=>handleCategoryPick(option));
+        categoryButtons.appendChild(btn);
+      });
+    }
+
+    function handleCategoryPick(option){
+      playSuccessSound();
+      selectedCategoryFilter = option.key;
+      showNamesScreen();
+    }
+
     function showNamesScreen(){
+      categorySelection.style.display = 'none';
       // Build initial players
       players = [];
       for(let i=0;i<numPlayers;i++){
@@ -1522,7 +1631,11 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       }
 
       // Assign words
-      const wordEntry = classifiedWords[randInt(classifiedWords.length)];
+      const wordPoolSource = selectedCategoryFilter
+        ? classifiedWords.filter(entry => entry.category === selectedCategoryFilter)
+        : classifiedWords;
+      const wordPool = wordPoolSource.length ? wordPoolSource : classifiedWords;
+      const wordEntry = wordPool[randInt(wordPool.length)];
       const word = wordEntry.word;
       currentWordCategory = wordEntry.category;
       players.forEach(p=>{
@@ -1768,6 +1881,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       // Keep the current number of players and impostors
       playersDisplay.textContent = numPlayers;
       impostorsDisplay.textContent = numImpostors;
+      categorySelection.style.display = 'none';
     });
 
     // --- INTRO HANDLER ---
@@ -1793,6 +1907,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       pass.style.display = 'none';
       discussion.style.display = 'none';
       results.style.display = 'none';
+      if(categorySelection) categorySelection.style.display = 'none';
     }
 
     // Botones
@@ -1805,6 +1920,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
     standardModeBtn.addEventListener('click', ()=>handleModeSelection(false));
     clueModeBtn.addEventListener('click', ()=>handleModeSelection(true));
+    categoryModeBtn.addEventListener('click', showCategorySelection);
 
     startBtn.addEventListener('click', ()=>{
       unlockAudioWithUserGesture();
