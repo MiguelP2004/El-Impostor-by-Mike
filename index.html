@@ -402,15 +402,28 @@
     }
     .mode-buttons{
       display:flex;
-      gap:16px;
-      justify-content:center;
-      flex-wrap:nowrap;
+      flex-direction:column;
+      gap:14px;
+      align-items:center;
     }
-    .mode-buttons .btn{
+    .mode-buttons-row{
+      display:flex;
+      gap:16px;
+      width:100%;
+    }
+    .mode-buttons-row .btn{
       flex:1;
       min-width:0;
       padding:12px 20px;
       font-size:18px;
+    }
+    #categoryModeBtn{
+      align-self:center;
+      width:100%;
+      max-width:260px;
+      background:linear-gradient(180deg,#ff8a8a,#ff4d4d);
+      color:#141010;
+      box-shadow:0 8px 22px rgba(255,77,77,0.45);
     }
     .category-grid{
       display:grid;
@@ -512,8 +525,10 @@
           </div>
         </div>
         <div style="margin-top:12px" class="center mode-buttons">
-          <button class="btn big" id="standardModeBtn">Modo estándar</button>
-          <button class="btn big secondary" id="clueModeBtn">Modo con PISTA!! 🔍</button>
+          <div class="mode-buttons-row">
+            <button class="btn big" id="standardModeBtn">Modo estándar</button>
+            <button class="btn big secondary" id="clueModeBtn">Modo con PISTA!! 🔍</button>
+          </div>
           <button class="btn big" id="categoryModeBtn">Jugar por categoría</button>
         </div>
       </section>
@@ -1060,7 +1075,7 @@ const classifiedWords = [
   {word: 'Cersei Lannister', category: 'PERSONAJE'},
   {word: 'Sansa Stark', category: 'PERSONAJE'},
   {word: 'Ned Stark', category: 'PERSONAJE'},
-  {word: 'Brienne of Tarth', category: 'PERSONAJE'},
+  {word: 'Jaime Lannister', category: 'PERSONAJE'},
   {word: 'Captain Hook', category: 'PERSONAJE'},
   {word: 'Peter Pan', category: 'PERSONAJE'},
   {word: 'Mulan', category: 'PERSONAJE'},
@@ -1071,8 +1086,14 @@ const classifiedWords = [
   {word: 'Maleficent', category: 'PERSONAJE'},
   {word: 'Grogu', category: 'PERSONAJE'},
   {word: 'Steve Harrington', category: 'PERSONAJE'},
+  {word: 'Jim Hopper', category: 'PERSONAJE'},
+  {word: 'Eleven', category: 'PERSONAJE'},
+  {word: 'Tony Soprano', category: 'PERSONAJE'},
   {word: 'Walter White', category: 'PERSONAJE'},
   {word: 'Jesse Pinkman', category: 'PERSONAJE'},
+  {word: 'Gustavo Fring', category: 'PERSONAJE'},
+  {word: 'Hector Salamanca', category: 'PERSONAJE'},
+  {word: 'Tuco Salamanca', category: 'PERSONAJE'},
   {word: 'Saul Goodman', category: 'PERSONAJE'},
   {word: 'Sherlock Holmes', category: 'PERSONAJE'},
   {word: 'Elsa', category: 'PERSONAJE'},
