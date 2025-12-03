@@ -412,10 +412,10 @@
       gap:16px;
       width:100%;
     }
-    .mode-buttons-row .btn{
-      width:100%;
-      padding:12px 20px;
-      font-size:18px;
+    .mode-buttons-row.single{
+      grid-template-columns:minmax(180px,1fr);
+      max-width:420px;
+      margin:0 auto;
     }
     .category-grid{
       display:grid;
@@ -439,8 +439,7 @@
       background:linear-gradient(180deg,#ff8a8a,#ff4d4d);
       color:#141010;
       box-shadow:0 8px 22px rgba(255,77,77,0.45);
-      align-self:center;
-      width:220px;
+      width:100%;
     }
     #categoryModeBtn:hover{
       box-shadow:0 12px 28px rgba(255,77,77,0.6);
@@ -529,7 +528,9 @@
             <button class="btn big" id="standardModeBtn">Modo estándar</button>
             <button class="btn big secondary" id="clueModeBtn">Modo con PISTA!! 🔍</button>
           </div>
-          <button class="btn big" id="categoryModeBtn">Jugar por categoría 🧩</button>
+          <div class="mode-buttons-row single">
+            <button class="btn big" id="categoryModeBtn">Jugar por categoría 🧩</button>
+          </div>
         </div>
       </section>
 
