@@ -1390,12 +1390,9 @@ const classifiedWords = [
   {word: 'conductor', category: 'OFICIO'},
   {word: 'taxista', category: 'OFICIO'},
   {word: 'cartero', category: 'OFICIO'},
-  {word: 'jardinero', category: 'OFICIO'},
   {word: 'pintor', category: 'OFICIO'},
   {word: 'músico', category: 'OFICIO'},
   {word: 'cantante', category: 'OFICIO'},
-  {word: 'bailarín', category: 'OFICIO'},
-  {word: 'actor', category: 'OFICIO'},
   {word: 'director', category: 'OFICIO'},
   {word: 'fotógrafo', category: 'OFICIO'},
   {word: 'periodista', category: 'OFICIO'},
@@ -1406,9 +1403,7 @@ const classifiedWords = [
   {word: 'enfermero', category: 'OFICIO'},
   {word: 'veterinario', category: 'OFICIO'},
   {word: 'dentista', category: 'OFICIO'},
-  {word: 'farmacéutico', category: 'OFICIO'},
   {word: 'programador', category: 'OFICIO'},
-  {word: 'diseñador', category: 'OFICIO'},
 
   // LUGARES
   {word: 'España', category: 'LUGAR'},
@@ -1480,7 +1475,8 @@ const classifiedWords = [
   {word: 'Plutón', category: 'LUGAR'},
   {word: 'Sol', category: 'LUGAR'},
   {word: 'Luna', category: 'LUGAR'},
-  {word: 'Vía Láctea', category: 'LUGAR'}
+  {word: 'Vía Láctea', category: 'LUGAR'},
+  {word: 'Budapest', category: 'LUGAR'}
 ];
 
 const defaultWords = classifiedWords.map(entry => entry.word);
@@ -1999,7 +1995,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       playStartGameSound();
       startGame();
     });
-
+    
     revealBtn.addEventListener('click', ()=>{
       unlockAudioWithUserGesture();
       playPopSound();
