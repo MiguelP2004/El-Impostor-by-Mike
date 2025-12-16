@@ -5,30 +5,23 @@
   <meta name="apple-mobile-web-app-title" content="Impostor by Mike">
   <link rel="apple-touch-icon" sizes="180x180" href="indiBola.png">
 
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-  
+   
   <meta name="description" content="Juego del impostor creado por Mike">
 
-  <!-- PWA & icons: usa rutas relativas (sin / inicial) -->
   <link rel="manifest" href="manifest.json">
-
-  <!-- iOS home screen icon -->
   <link rel="apple-touch-icon" href="indiBola.png">
   <link rel="apple-touch-icon" sizes="180x180" href="indiBola.png">
-
-  <!-- General icons (PWA / Android) -->
   <link rel="icon" type="image/png" sizes="192x192" href="indiBola.png">
   <link rel="icon" type="image/png" sizes="512x512" href="indiBola.png">
   <link rel="icon" href="indiBola.png">
 
   <meta name="theme-color" content="#ffc107">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Impostor by Mike">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  
+   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -54,7 +47,6 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      /* el scroll se hace en el body, los círculos son fixed y no se mueven */
       overflow-x:hidden;
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
@@ -63,46 +55,46 @@
       user-select: none;
       touch-action: pan-y;
     }
-    
+   
     html {
       touch-action: manipulation;
       height:100%;
     }
-    
+   
     input, button, select, textarea {
       touch-action: manipulation;
     }
-    
+   
     /* Animated background circles */
     .bg-circle{
-      position:fixed;          /* ya fija los círculos al viewport */
+      position:fixed;
       border-radius:50%;
       background:rgba(255,255,255,0.03);
       pointer-events:none;
       z-index:0;
     }
-    
+   
     @keyframes floatCircle1 {
       0% { transform:translate(0, 0) scale(1); opacity:0; }
       10% { opacity:1; }
       90% { opacity:1; }
       100% { transform:translate(100vw, -100vh) scale(1.5); opacity:0; }
     }
-    
+   
     @keyframes floatCircle2 {
       0% { transform:translate(0, 0) scale(1); opacity:0; }
       10% { opacity:1; }
       90% { opacity:1; }
       100% { transform:translate(-100vw, 100vh) scale(1.2); opacity:0; }
     }
-    
+   
     @keyframes floatCircle3 {
       0% { transform:translate(0, 0) scale(1); opacity:0; }
       10% { opacity:1; }
       90% { opacity:1; }
       100% { transform:translate(80vw, 90vh) scale(1.3); opacity:0; }
     }
-    
+   
     .container{
       width:100%;
       max-width:550px;
@@ -114,12 +106,12 @@
       position:relative;
       z-index:1;
     }
-    
+   
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-15px); }
     }
-    
+   
     header{display:flex;gap:12px;align-items:center;margin-bottom:12px;justify-content:center;text-align:center;flex-direction:row}
     .dog-logo{
       width:70px;
@@ -128,15 +120,14 @@
       object-fit:cover;
       border:4px solid #ffc107;
       box-shadow:0 6px 18px rgba(255,193,7,0.4);
-      /* animación lenta de balanceo continua */
       animation:wobble 4s ease-in-out infinite;
     }
-    
+   
     @keyframes wobble {
       0%, 100% { transform:rotate(-3deg); }
       50% { transform:rotate(3deg); }
     }
-    
+   
     h1{font-family:'Fredoka One',cursive;margin:0;font-size:20px;text-align:center;color:#ffc107;text-shadow:0 2px 8px rgba(255,193,7,0.3)}
     p.lead{margin:0;color:#d0d3e1;text-align:center}
     .title-wrapper{display:flex;flex-direction:column;align-items:flex-start}
@@ -146,26 +137,25 @@
     input[type=number], input[type=text], select{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,193,7,0.3);background:var(--card-light);color:var(--text);font-size:16px;transition:all 0.3s ease;touch-action:manipulation}
     input[type=text]:focus{outline:none;border-color:#ffc107;box-shadow:0 0 0 3px rgba(255,193,7,0.25);transform:scale(1.02)}
     input[type=text]::placeholder{color:#9a9dad;font-weight:400}
-    
+   
     /* Name input styling */
     .name-input-wrapper{position:relative;margin-bottom:8px}
     .name-input-wrapper input{font-weight:500}
-    
-    /* Inputs de nombre con estilo de juego */
+   
     .name-input {
       font-family:'Fredoka One',cursive;
       font-size:18px;
       letter-spacing:0.5px;
       text-transform:none;
     }
-    
+   
     /* Counter buttons */
     .counter{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:4px}
     .counter-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,#ffc107,#ffb300);color:#3e2723;font-weight:700;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(255,193,7,0.4);transition:all 0.2s ease}
     .counter-btn:hover{transform:scale(1.1);box-shadow:0 5px 16px rgba(255,193,7,0.6)}
     .counter-btn:active{transform:scale(0.95);box-shadow:0 2px 6px rgba(255,193,7,0.5)}
     .counter-value{font-size:28px;font-weight:700;color:#ffc107;min-width:50px;text-align:center;text-shadow:0 2px 4px rgba(255,193,7,0.2)}
-    
+   
     .btn{display:inline-block;padding:12px 16px;border-radius:14px;background:linear-gradient(180deg,#ffc107,#ffb300);color:#3e2723;font-weight:700;text-align:center;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(255,193,7,0.4);transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)}
     .btn:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 10px 24px rgba(255,193,7,0.6)}
     .btn:active{transform:translateY(-2px) scale(1.02);box-shadow:0 5px 12px rgba(255,193,7,0.5)}
@@ -185,28 +175,28 @@
     .word{font-family:'Fredoka One',cursive;font-size:48px;color:#4fd1c5;margin-top:16px;animation:popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);text-shadow:0 4px 12px rgba(79,209,197,0.6)}
     .impostor-badge{font-family:'Fredoka One',cursive;color:white;background:#ff3b3b;padding:10px 14px;border-radius:999px;font-size:20px;animation:shake 0.5s ease-in-out;box-shadow:0 4px 12px rgba(255,59,59,0.5)}
     .civil-badge{font-family:'Fredoka One',cursive;color:white;background:#4fd1c5;padding:10px 14px;border-radius:999px;font-size:20px;animation:popIn 0.5s ease-in-out;box-shadow:0 4px 12px rgba(79,209,197,0.5)}
-    
+   
     @keyframes popIn {
       0% { transform:scale(0); opacity:0; }
       50% { transform:scale(1.1); }
       100% { transform:scale(1); opacity:1; }
     }
-    
+   
     @keyframes shake {
       0%, 100% { transform:translateX(0); }
       10%, 30%, 50%, 70%, 90% { transform:translateX(-5px); }
       20%, 40%, 60%, 80% { transform:translateX(5px); }
     }
-    
+   
     @keyframes slideIn {
       from { transform:translateY(20px); opacity:0; }
       to { transform:translateY(0); opacity:1; }
     }
-    
+   
     .role-card > * {
       animation:slideIn 0.3s ease-out forwards;
     }
-    
+   
     .role-card > *:nth-child(2) {
       animation-delay:0.1s;
       opacity:0;
@@ -221,7 +211,7 @@
     .player-pill.selected{outline:4px solid rgba(255,193,7,0.7);background:linear-gradient(180deg,rgba(255,193,7,0.3),rgba(255,193,7,0.2));border-color:#ffc107;transform:translateY(-2px) scale(1.03);box-shadow:0 8px 20px rgba(255,193,7,0.4)}
     .muted{color:#d0d3e1}
     .impostor-reveal{display:inline-block;background:linear-gradient(135deg,#ff3b3b,#ff6b6b);color:#2a2d3a;padding:8px 16px;border-radius:999px;font-family:'Fredoka One',cursive;font-size:16px;margin-top:8px;margin-left:4px;margin-right:4px;box-shadow:0 4px 12px rgba(255,59,59,0.4);animation:popIn 0.5s ease-out}
-    
+   
     /* Countdown timer */
     .countdown-screen{
       position:fixed;
@@ -247,7 +237,7 @@
       50% { transform:scale(1.2); }
       100% { transform:scale(1); opacity:1; }
     }
-    
+   
     .first-speaker{
       font-size:22px;
       color:#4fd1c5;
@@ -257,7 +247,7 @@
       font-family:'Fredoka One',cursive;
       animation:popIn 0.6s ease-out;
     }
-    
+   
     footer{
       margin-top:14px;
       display:flex;
@@ -266,6 +256,46 @@
       color:#a0a3b5;
       text-align:center;
       font-weight:700;
+    }
+
+    /* ESTILOS DE LA FLECHA */
+    .back-arrow-btn {
+      position: fixed;
+      /* Ajuste para iPhone / Notch: usa env(safe-area...) + un margen extra */
+      top: max(20px, calc(env(safe-area-inset-top) + 12px));
+      left: 20px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #ffc107, #ffb300);
+      border: 3px solid #3e2723;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.4);
+      display: none; /* Inicialmente oculta hasta que se decida mostrar */
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 9000;
+      transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      animation: fadeInArrow 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeInArrow {
+      from { opacity:0; transform:scale(0.8); }
+      to { opacity:1; transform:scale(1); }
+    }
+
+    .back-arrow-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    
+    .back-arrow-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: #3e2723;
+      stroke: #3e2723;
+      stroke-width: 1.5;
     }
 
     @media(max-width:720px){
@@ -277,14 +307,12 @@
       .intro-logo{width:115px;height:115px}
     }
 
-    /* Ajuste extra para iPhone / móviles estrechos:
-       deja un poco de hueco lateral a la interfaz */
     @media (max-width: 420px) {
       .container{
-        width: calc(100% - 32px); /* 16px de margen a cada lado */
+        width: calc(100% - 32px);
         max-width: 420px;
         margin: 0 auto;
-        padding-inline: 16px;     /* un poco menos de padding horizontal */
+        padding-inline: 16px;
       }
     }
 
@@ -298,15 +326,12 @@
       justify-content:center;
       flex-direction:column;
       gap:18px;
-      /* nuevo: contenedor interno centrado y limitado al ancho de la carta */
     }
-    /* capa de oscuridad con “agujero” centrado más pequeño */
     .intro-screen::before{
       content:'';
       position:fixed;
       inset:0;
       pointer-events:none;
-      /* círculo claro más pequeño centrado sobre la interfaz */
       background:
         radial-gradient(
           circle at 50% 50%,
@@ -370,7 +395,6 @@
 
     .intro-glow{
       position:absolute;
-      /* círculo más pequeño y bien centrado */
       width:180px;
       height:180px;
       top:50%;
@@ -480,17 +504,21 @@
   </style>
 </head>
 <body>
-  <!-- INTRO -->
   <div class="intro-screen" id="introScreen">
     <div class="intro-glow"></div>
     <img src="indiBola.png" alt="Logo" class="intro-logo">
     <div class="intro-title">EL IMPOSTOR</div>
     <div class="intro-subtitle">creado por Mike</div>
-    <!-- Barra de cargando de la intro -->
     <div class="intro-progress">
       <div class="intro-progress-fill"></div>
     </div>
   </div>
+
+  <button id="backArrowBtn" class="back-arrow-btn">
+    <svg viewBox="0 0 24 24">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+    </svg>
+  </button>
 
   <div class="container" id="mainContainer" style="opacity:0">
     <header>
@@ -503,7 +531,6 @@
     <div id="activeCategoryBanner" class="category-banner"></div>
 
   <main id="app">
-      <!-- SETUP SCREEN -->
       <section id="setup" class="card">
         <div class="grid">
           <div>
@@ -534,7 +561,6 @@
         </div>
       </section>
 
-      <!-- CATEGORY SELECTION -->
       <section id="categorySelection" class="card" style="display:none;margin-top:12px">
         <div class="center">
           <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">Elige la categoría</p>
@@ -542,7 +568,6 @@
         </div>
       </section>
 
-      <!-- NAMES SCREEN -->
       <section id="names" class="card" style="display:none;margin-top:12px">
         <div class="center">
           <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">Jugadores</p>
@@ -551,7 +576,6 @@
         </div>
       </section>
 
-      <!-- PASS & REVEAL SCREEN -->
       <section id="pass" class="card" style="display:none;margin-top:12px">
         <div class="center">
           <div class="player-indicator" id="playerIndicator">Mike</div>
@@ -561,14 +585,12 @@
         </div>
         <div style="height:12px"></div>
         <div id="roleArea" style="display:none;" class="role-card">
-          <!-- role revealed content injected here -->
-        </div>
+          </div>
         <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
           <button class="btn medium" id="nextBtn" style="display:none">Siguiente</button>
         </div>
       </section>
 
-      <!-- DISCUSSION / VOTING -->
       <section id="discussion" class="card" style="display:none;margin-top:12px">
         <div class="center">
           <div class="first-speaker" id="firstSpeakerName" style="display:none"></div>
@@ -581,7 +603,6 @@
         </div>
       </section>
 
-      <!-- RESULTS -->
       <section id="results" class="card" style="display:none;margin-top:12px">
         <div id="resultText" class="center"></div>
         <div style="height:12px"></div>
@@ -614,42 +635,39 @@
     function createBackgroundCircle() {
       const circle = document.createElement('div');
       circle.className = 'bg-circle';
-      
-      const size = Math.random() * 220 + 100;       // un poco más pequeños: 100–320 px
+       
+      const size = Math.random() * 220 + 100;
       circle.style.width = size + 'px';
       circle.style.height = size + 'px';
-      
-      // Posición más cerca del centro de la pantalla
+       
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const centerX = vw * 0.5;
       const centerY = vh * 0.5;
-      const offsetX = (Math.random() - 0.5) * vw * 0.6;  // rango más estrecho
+      const offsetX = (Math.random() - 0.5) * vw * 0.6;
       const offsetY = (Math.random() - 0.5) * vh * 0.6;
       const startX = centerX + offsetX;
       const startY = centerY + offsetY;
       circle.style.left = startX + 'px';
       circle.style.top = startY + 'px';
-      
+       
       const animations = ['floatCircle1', 'floatCircle2', 'floatCircle3'];
       const randomAnim = animations[Math.floor(Math.random() * animations.length)];
-      const duration = Math.random() * 14 + 14;     // algo más rápidas: 14–28 s
-      
+      const duration = Math.random() * 14 + 14;
+       
       circle.style.animation = `${randomAnim} ${duration}s linear forwards`;
-      
+       
       document.body.appendChild(circle);
-      
+       
       setTimeout(() => {
         circle.remove();
       }, duration * 1000);
     }
 
-    // Crear algunos círculos iniciales
     for (let i = 0; i < 6; i++) {
       setTimeout(() => createBackgroundCircle(), i * 1200);
     }
 
-    // Más frecuencia: cada 4s en vez de 6s
     setInterval(() => {
       createBackgroundCircle();
     }, 4000);
@@ -688,7 +706,7 @@
       try {
         const ctx = createSharedAudioContext();
         if(ctx.state === 'suspended'){
-          return; // se reanudará en unlockAudioWithUserGesture
+          return;
         }
         const oscillator = ctx.createOscillator();
         const gainNode = ctx.createGain();
@@ -701,7 +719,6 @@
         oscillator.start(ctx.currentTime);
         oscillator.stop(ctx.currentTime + duration + 0.01);
       } catch (e) {
-        // silencioso
       }
     }
 
@@ -717,10 +734,7 @@
       setTimeout(() => playSound(900, 0.1, 0.22), 160);
       setTimeout(() => playSound(1200, 0.15, 0.25), 240);
     }
-    // Antes: aquí sonaba el jingle inicial; ahora lo dejamos vacío
-    function playIntroSound() {
-      // Sin sonido en la intro inicial
-    }
+    function playIntroSound() {}
     // --- FIN PATCH ---
 
     // --- Datos y estado ---
@@ -748,6 +762,7 @@
     const categorySelection = document.getElementById('categorySelection');
     const categoryButtons = document.getElementById('categoryButtons');
     const activeCategoryBanner = document.getElementById('activeCategoryBanner');
+    const backArrowBtn = document.getElementById('backArrowBtn');
 
 const classifiedWords = [
   // OBJETO
@@ -1526,49 +1541,6 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       return audioContext;
     }
 
-    function playSound(frequency, duration, volume = 0.3) {
-      try {
-        const ctx = initAudioContext();
-        const oscillator = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        
-        oscillator.frequency.value = frequency;
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(volume, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-        
-        oscillator.start(ctx.currentTime);
-        oscillator.stop(ctx.currentTime + duration);
-      } catch (err) {
-        console.log('Audio error:', err);
-      }
-    }
-
-    function playPopSound() {
-      playSound(800, 0.1, 0.2);
-    }
-
-    function playSuccessSound() {
-      playSound(600, 0.08, 0.15);
-      setTimeout(() => playSound(800, 0.08, 0.15), 50);
-      setTimeout(() => playSound(1000, 0.1, 0.2), 100);
-    }
-
-    function playClickSound() {
-      playSound(400, 0.05, 0.15);
-    }
-
-    function playStartGameSound() {
-      playSound(500, 0.1, 0.2);
-      setTimeout(() => playSound(700, 0.1, 0.2), 80);
-      setTimeout(() => playSound(900, 0.1, 0.22), 160);
-      setTimeout(() => playSound(1200, 0.15, 0.25), 240);
-    }
-
     // Counter controls
     decPlayers.addEventListener('click', () => {
       if(numPlayers > 3) {
@@ -1607,10 +1579,71 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         impostorsDisplay.textContent = numImpostors;
       }
     });
+    
+    // --- LÓGICA DE VISIBILIDAD DE FLECHA Y NAVEGACIÓN ---
+    function updateArrowVisibility() {
+      if (!backArrowBtn) return;
+      
+      // Regla 1: Menú Principal (setup) -> OCULTA
+      if (setup.style.display === 'block') {
+        backArrowBtn.style.display = 'none';
+      }
+      // Regla 2: Selección Categoría -> VISIBLE
+      else if (categorySelection.style.display === 'block') {
+        backArrowBtn.style.display = 'flex';
+      }
+      // Regla 3: Nombres -> VISIBLE
+      else if (namesSection.style.display === 'block') {
+        backArrowBtn.style.display = 'flex';
+      }
+      // Regla 4: Juego (Pass screen) - CASO ESPECIAL JUGADOR 1
+      else if (pass.style.display === 'block') {
+        // Solo visible si es el Jugador 1 Y aún no ha revelado el rol (roleArea oculto)
+        if (revealIndex === 0 && roleArea.style.display === 'none') {
+           backArrowBtn.style.display = 'flex';
+        } else {
+           backArrowBtn.style.display = 'none';
+        }
+      }
+      // Regla 5: Cualquier otra pantalla (Roles revelados, Votación, Resultados) -> OCULTA
+      else {
+        backArrowBtn.style.display = 'none';
+      }
+    }
+
+    // Listener de la flecha
+    if (backArrowBtn) {
+      backArrowBtn.addEventListener('click', () => {
+        playClickSound();
+        
+        // Si estamos en Selección de Categoría -> Volver a Setup
+        if (categorySelection.style.display === 'block') {
+          categorySelection.style.display = 'none';
+          setup.style.display = 'block';
+        }
+        // Si estamos en Nombres
+        else if (namesSection.style.display === 'block') {
+          namesSection.style.display = 'none';
+          
+          if (selectedCategoryFilter !== null) {
+             categorySelection.style.display = 'block';
+          } else {
+             setup.style.display = 'block';
+          }
+        }
+        // Si estamos en Pass (Jugador 1 antes de ver rol) -> Volver a Nombres
+        else if (pass.style.display === 'block') {
+          pass.style.display = 'none';
+          namesSection.style.display = 'block';
+        }
+        
+        updateArrowVisibility();
+      });
+    }
 
     function handleModeSelection(enableHints){
       clueModeEnabled = enableHints;
-      selectedCategoryFilter = null;
+      selectedCategoryFilter = null; // Reset filter for standard modes
       playSuccessSound();
       showNamesScreen();
     }
@@ -1625,6 +1658,8 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       discussion.style.display = 'none';
       results.style.display = 'none';
       categorySelection.style.display = 'block';
+      
+      updateArrowVisibility(); // Actualizar flecha
       buildCategoryButtons();
     }
 
@@ -1647,6 +1682,8 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
     function showNamesScreen(){
       categorySelection.style.display = 'none';
+      setup.style.display = 'none'; // Asegurar que setup se oculta
+      
       // Build initial players
       players = [];
       for(let i=0;i<numPlayers;i++){
@@ -1655,13 +1692,13 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
       // Build names inputs
       namesList.innerHTML = '';
-      
+       
       players.forEach((p, idx) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'name-input-wrapper';
         wrapper.style.animation = `slideIn 0.3s ease-out ${idx * 0.05}s forwards`;
         wrapper.style.opacity = '0';
-        
+       
         const input = document.createElement('input');
         input.type = 'text';
         input.placeholder = `Jugador ${idx+1}`;
@@ -1669,13 +1706,13 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         input.dataset.playerId = p.id;
         // aplicar estilo de juego
         input.className = 'name-input';
-        
+       
         wrapper.appendChild(input);
         namesList.appendChild(wrapper);
       });
 
-      setup.style.display = 'none';
       namesSection.style.display = 'block';
+      updateArrowVisibility(); // Actualizar flecha
     }
 
     function startGame(){
@@ -1716,10 +1753,13 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       pass.style.display = 'block';
       discussion.style.display = 'none';
       results.style.display = 'none';
-
+      
       revealIndex = 0;
       roleArea.style.display = 'none';
       nextBtn.style.display = 'none';
+      
+      updateArrowVisibility(); // IMPORTANTE: Aquí se chequeará si mostramos la flecha (Jugador 1)
+
       updatePlayerIndicator();
 
       // Update reveal button text
@@ -1730,7 +1770,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     function updatePlayerIndicator(){
       const currentPlayer = players[revealIndex];
       const isDefaultName = currentPlayer.name === `Jugador ${currentPlayer.id + 1}`;
-      
+       
       if(isDefaultName) {
         playerIndicator.textContent = `Jugador ${revealIndex + 1}`;
         playerNumber.textContent = `de ${numPlayers} jugadores`;
@@ -1744,6 +1784,9 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       const p = players[index];
       roleArea.innerHTML = '';
       roleArea.style.display = 'flex';
+      
+      // Al mostrar el rol, ocultamos la flecha definitivamente para esta partida
+      updateArrowVisibility();
 
       if(p.role === 'impostor'){
         const b = document.createElement('div'); 
@@ -1751,7 +1794,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         b.textContent='🤫🔥¡Eres el IMPOSTOR!🔥🤫';
         b.style.marginTop = '-40px';
         roleArea.appendChild(b);
-        
+         
         const hint = document.createElement('div'); 
         hint.className='muted'; 
         hint.style.marginTop='4px'; 
@@ -1772,14 +1815,14 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         b.className='civil-badge'; 
         b.textContent='✅ Eres CIVIL ✅';
         roleArea.appendChild(b);
-        
+         
         const t = document.createElement('div'); 
         t.className='muted'; 
         t.style.fontSize='16px';
         t.style.marginTop='12px';
         t.textContent='La palabra es:'; 
         roleArea.appendChild(t);
-        
+         
         const w = document.createElement('div'); 
         w.className='word'; 
         w.textContent = p.word; 
@@ -1788,7 +1831,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
       nextBtn.style.display = 'inline-block';
       revealBtn.style.display = 'none';
-      
+       
       // Update button text based on if it's the last player
       if(revealIndex === players.length - 1) {
         nextBtn.textContent = '¡Que empiece la partida!';
@@ -1802,24 +1845,24 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       const countdownScreen = document.createElement('div');
       countdownScreen.className = 'countdown-screen';
       document.body.appendChild(countdownScreen);
-      
+       
       // Create inner content container
       const innerContent = document.createElement('div');
       innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
       countdownScreen.appendChild(innerContent);
 
       let count = 3;
-      
+       
       function displayNumber() {
         innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
-        
+         
         // Play sound based on count
         if(count === 3) playSound(600, 0.15, 0.25);
         else if(count === 2) playSound(750, 0.15, 0.25);
         else if(count === 1) playSound(900, 0.15, 0.25);
-        
+         
         count--;
-        
+         
         if(count >= 1) {
           setTimeout(displayNumber, 1000);
         } else {
@@ -1827,24 +1870,25 @@ const defaultWords = classifiedWords.map(entry => entry.word);
             innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
             playSound(1200, 0.3, 0.3);
             setTimeout(() => playSound(1400, 0.2, 0.25), 150);
-            
+             
             setTimeout(() => {
               countdownScreen.remove();
               discussion.style.display = 'block';
-              
+              updateArrowVisibility(); // Asegurar que sigue oculta
+
               // Choose random player to start talking
               const activePlayers = players.filter(p => !p.eliminated);
               const firstSpeaker = activePlayers[randInt(activePlayers.length)];
               const firstSpeakerElement = document.getElementById('firstSpeakerName');
               firstSpeakerElement.innerHTML = `🎤 Empieza hablando: <span style="font-size:28px;color:#ffffff;text-shadow:0 4px 14px rgba(255,255,255,0.8)">${firstSpeaker.name}</span>`;
               firstSpeakerElement.style.display = 'block';
-              
+               
               buildDiscussionVoteList();
             }, 1500);
           }, 1000);
         }
       }
-      
+       
       displayNumber();
     }
 
@@ -1881,19 +1925,20 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     function showResults(executedId){
       const executedPlayer = players.find(p=>p.id===executedId);
       const isImpostor = executedPlayer.role === 'impostor';
-      
+       
       executedPlayer.eliminated = true;
-      
+       
       // Count remaining impostors
       const remainingImpostors = players.filter(p => p.role === 'impostor' && !p.eliminated).length;
       const totalImpostors = players.filter(p => p.role === 'impostor').length;
-      
+       
       // Get the word that was used
       const gameWord = players.find(p => p.role === 'civil')?.word || '';
-      
+       
       discussion.style.display = 'none';
       results.style.display = 'block';
-      
+      updateArrowVisibility(); // Sigue oculta
+       
       if(isImpostor) {
         if(remainingImpostors === 0) {
           // All impostors eliminated - Civilians win
@@ -1908,12 +1953,14 @@ const defaultWords = classifiedWords.map(entry => entry.word);
             `<div style="margin-top:8px" class="muted">Habéis expulsado a <strong>${executedPlayer.name}</strong>, pero quedan ${remainingImpostors} impostor${remainingImpostors>1?'es':''} más.</div>` +
             `<div style="margin-top:12px"><button class="btn medium" id="continueGameBtn">Continuar partida</button></div>`;
           newGameContainer.style.display = 'none';
-          
+           
           setTimeout(() => {
             document.getElementById('continueGameBtn').addEventListener('click', () => {
               playClickSound();
               results.style.display = 'none';
               discussion.style.display = 'block';
+              // Al continuar partida NO mostramos flecha
+              updateArrowVisibility(); 
               buildDiscussionVoteList();
             });
           }, 100);
@@ -1946,6 +1993,8 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       discussion.style.display = 'none';
       results.style.display = 'none';
       
+      updateArrowVisibility(); // Aquí se ocultará la flecha (Menú principal)
+       
       // Keep the current number of players and impostors
       playersDisplay.textContent = numPlayers;
       impostorsDisplay.textContent = numImpostors;
@@ -1953,7 +2002,6 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     });
 
     // --- INTRO HANDLER ---
-    // IMPORTANTE: definir ANTES de usar en window.load
     function handleContinueFromIntro(){
       const introScreen = document.getElementById('introScreen');
       const mainContainer = document.getElementById('mainContainer');
@@ -1976,6 +2024,8 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       discussion.style.display = 'none';
       results.style.display = 'none';
       if(categorySelection) categorySelection.style.display = 'none';
+      
+      updateArrowVisibility(); // Flecha oculta al inicio
     }
 
     // Botones
@@ -1995,7 +2045,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       playStartGameSound();
       startGame();
     });
-    
+     
     revealBtn.addEventListener('click', ()=>{
       unlockAudioWithUserGesture();
       playPopSound();
@@ -2031,8 +2081,6 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       showResults(votedId);
     });
 
-    // Intro: a los 3s se lanza automáticamente handleContinueFromIntro()
-    // PONER ESTE LISTENER AL FINAL DEL SCRIPT
     window.addEventListener('load', () => {
       setTimeout(() => {
         const introScreen = document.getElementById('introScreen');
