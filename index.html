@@ -258,18 +258,19 @@
       font-weight:700;
     }
 
-    /* ESTILOS DE LA FLECHA */
+    /* ESTILOS DE LA FLECHA CARTOON MEJORADA */
     .back-arrow-btn {
       position: fixed;
       /* Ajuste para iPhone / Notch: usa env(safe-area...) + un margen extra */
       top: max(20px, calc(env(safe-area-inset-top) + 12px));
       left: 20px;
-      width: 46px;
-      height: 46px;
+      width: 54px; /* Un poco más grande */
+      height: 54px;
       border-radius: 50%;
       background: linear-gradient(180deg, #ffc107, #ffb300);
-      border: 3px solid #3e2723;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.4);
+      border: 4px solid #3e2723; /* Borde más grueso */
+      /* Sombra estilo cartoon 3D dura */
+      box-shadow: 0 6px 0px #3e2723, 0 8px 10px rgba(0,0,0,0.3), inset 0 4px 8px rgba(255,255,255,0.5);
       display: none; /* Inicialmente oculta hasta que se decida mostrar */
       align-items: center;
       justify-content: center;
@@ -286,16 +287,18 @@
     }
 
     .back-arrow-btn:active {
-      transform: scale(0.9);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      /* Al presionar, se mueve hacia abajo y reduce la sombra dura para efecto de pulsado */
+      transform: translateY(4px) scale(0.95);
+      box-shadow: 0 2px 0px #3e2723, inset 0 2px 4px rgba(0,0,0,0.2);
     }
     
     .back-arrow-btn svg {
-      width: 24px;
-      height: 24px;
+      width: 28px; /* Icono más grande */
+      height: 28px;
       fill: #3e2723;
       stroke: #3e2723;
-      stroke-width: 1.5;
+      stroke-width: 2.5; /* Trazo más grueso */
+      filter: drop-shadow(0 2px 0px rgba(62, 39, 35, 0.5)); /* Sombra interna al icono */
     }
 
     @media(max-width:720px){
