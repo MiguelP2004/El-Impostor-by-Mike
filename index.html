@@ -258,20 +258,21 @@
       font-weight:700;
     }
 
-    /* ESTILOS DE LA FLECHA CARTOON MEJORADA */
+    /* ESTILOS DE LA FLECHA CARTOON CLARA */
     .back-arrow-btn {
       position: fixed;
-      /* Ajuste para iPhone / Notch: usa env(safe-area...) + un margen extra */
+      /* Ajuste para iPhone / Notch */
       top: max(20px, calc(env(safe-area-inset-top) + 12px));
       left: 20px;
-      width: 54px; /* Un poco más grande */
+      width: 54px; 
       height: 54px;
       border-radius: 50%;
-      background: linear-gradient(180deg, #ffc107, #ffb300);
-      border: 4px solid #3e2723; /* Borde más grueso */
-      /* Sombra estilo cartoon 3D dura */
-      box-shadow: 0 6px 0px #3e2723, 0 8px 10px rgba(0,0,0,0.3), inset 0 4px 8px rgba(255,255,255,0.5);
-      display: none; /* Inicialmente oculta hasta que se decida mostrar */
+      /* Diseño más claro y brillante (estilo huevo frito / sol) */
+      background: linear-gradient(180deg, #ffffff, #fff176);
+      border: 4px solid #3e2723; /* Borde oscuro grueso */
+      /* Sombra dura estilo cartoon */
+      box-shadow: 0 5px 0px #3e2723, 0 10px 20px rgba(0,0,0,0.25);
+      display: none; 
       align-items: center;
       justify-content: center;
       cursor: pointer;
@@ -287,18 +288,16 @@
     }
 
     .back-arrow-btn:active {
-      /* Al presionar, se mueve hacia abajo y reduce la sombra dura para efecto de pulsado */
-      transform: translateY(4px) scale(0.95);
-      box-shadow: 0 2px 0px #3e2723, inset 0 2px 4px rgba(0,0,0,0.2);
+      transform: translateY(5px) scale(0.95);
+      box-shadow: 0 0px 0px #3e2723, 0 2px 4px rgba(0,0,0,0.2);
     }
     
     .back-arrow-btn svg {
-      width: 28px; /* Icono más grande */
+      width: 28px;
       height: 28px;
       fill: #3e2723;
       stroke: #3e2723;
-      stroke-width: 2.5; /* Trazo más grueso */
-      filter: drop-shadow(0 2px 0px rgba(62, 39, 35, 0.5)); /* Sombra interna al icono */
+      stroke-width: 2.5; 
     }
 
     @media(max-width:720px){
@@ -829,6 +828,21 @@ const classifiedWords = [
   {word: 'i-pad', category: 'OBJETO'},
   {word: 'calendario', category: 'OBJETO'},
   {word: 'almohada', category: 'OBJETO'},
+  {word: 'secador', category: 'OBJETO'},
+  {word: 'microondas', category: 'OBJETO'},
+  {word: 'aspiradora', category: 'OBJETO'},
+  {word: 'caja fuerte', category: 'OBJETO'},
+  {word: 'extintor', category: 'OBJETO'},
+  {word: 'brújula', category: 'OBJETO'},
+  {word: 'imán', category: 'OBJETO'},
+  {word: 'prismáticos', category: 'OBJETO'},
+  {word: 'cartera', category: 'OBJETO'},
+  {word: 'cinturón', category: 'OBJETO'},
+  {word: 'sombrero', category: 'OBJETO'},
+  {word: 'calcetines', category: 'OBJETO'},
+  {word: 'anillo', category: 'OBJETO'},
+  {word: 'mando', category: 'OBJETO'},
+  {word: 'dron', category: 'OBJETO'},
 
   // ALIMENTACIÓN
   {word: 'pizza', category: 'ALIMENTACIÓN'},
@@ -873,6 +887,18 @@ const classifiedWords = [
   {word: 'cebolla', category: 'ALIMENTACIÓN'},
   {word: 'croissant', category: 'ALIMENTACIÓN'},
   {word: 'ramen', category: 'ALIMENTACIÓN'},
+  {word: 'sushi', category: 'ALIMENTACIÓN'},
+  {word: 'kebab', category: 'ALIMENTACIÓN'},
+  {word: 'palomitas', category: 'ALIMENTACIÓN'},
+  {word: 'miel', category: 'ALIMENTACIÓN'},
+  {word: 'aceituna', category: 'ALIMENTACIÓN'},
+  {word: 'chicle', category: 'ALIMENTACIÓN'},
+  {word: 'lasaña', category: 'ALIMENTACIÓN'},
+  {word: 'tortilla de patata', category: 'ALIMENTACIÓN'},
+  {word: 'churros', category: 'ALIMENTACIÓN'},
+  {word: 'guacamole', category: 'ALIMENTACIÓN'},
+  {word: 'yogur', category: 'ALIMENTACIÓN'},
+  {word: 'cerezas', category: 'ALIMENTACIÓN'},
 
   // FAMOSO (PERSONA REAL)
   {word: 'Lionel Messi', category: 'FAMOSO'},
@@ -1037,6 +1063,16 @@ const classifiedWords = [
   {word: 'Federico García Lorca', category: 'FAMOSO'},
   {word: 'William Shakespeare', category: 'FAMOSO'},
   {word: 'Leonardo da Vinci', category: 'FAMOSO'},
+  {word: 'Elon Musk', category: 'FAMOSO'},
+  {word: 'Jeff Bezos', category: 'FAMOSO'},
+  {word: 'Mark Zuckerberg', category: 'FAMOSO'},
+  {word: 'Dua Lipa', category: 'FAMOSO'},
+  {word: 'Rosalía', category: 'FAMOSO'},
+  {word: 'Quevedo', category: 'FAMOSO'},
+  {word: 'Gordon Ramsay', category: 'FAMOSO'},
+  {word: 'Salvador Dalí', category: 'FAMOSO'},
+  {word: 'Mike Tyson', category: 'FAMOSO'},
+  {word: 'Muhammad Ali', category: 'FAMOSO'},
 
   // PERSONAJE (FICTICIO)
   {word: 'Superman', category: 'PERSONAJE'},
@@ -1182,8 +1218,23 @@ const classifiedWords = [
   {word: 'Filemón', category: 'PERSONAJE'},
   {word: 'Tintín', category: 'PERSONAJE'},
   {word: 'Popeye', category: 'PERSONAJE'},
+  {word: 'Frankenstein', category: 'PERSONAJE'},
+  {word: 'Drácula', category: 'PERSONAJE'},
+  {word: 'King Kong', category: 'PERSONAJE'},
+  {word: 'Garfield', category: 'PERSONAJE'},
+  {word: 'Snoopy', category: 'PERSONAJE'},
+  {word: 'Pantera Rosa', category: 'PERSONAJE'},
+  {word: 'Minion', category: 'PERSONAJE'},
+  {word: 'Kratos', category: 'PERSONAJE'},
+  {word: 'Zelda', category: 'PERSONAJE'},
+  {word: 'Barbie', category: 'PERSONAJE'},
 
   // CINE
+  {word: 'Oppenheimer', category: 'CINE'},
+  {word: 'Barbie (Película)', category: 'CINE'},
+  {word: 'Top Gun', category: 'CINE'},
+  {word: 'The Last of Us', category: 'CINE'},
+  {word: 'Frozen', category: 'CINE'},
   {word: 'Titanic', category: 'CINE'},
   {word: 'Avatar', category: 'CINE'},
   {word: 'Avengers', category: 'CINE'},
@@ -1205,7 +1256,7 @@ const classifiedWords = [
   {word: 'The Office', category: 'CINE'},
   {word: 'Narcos', category: 'CINE'},
   {word: 'Black Mirror', category: 'CINE'},
-  {word: 'Squid Game', category: 'CINE'},
+  {word: 'El Juego del Calamar', category: 'CINE'},
   {word: 'Wednesday', category: 'CINE'},
   {word: 'The Crown', category: 'CINE'},
   {word: 'Peaky Blinders', category: 'CINE'},
@@ -1290,6 +1341,14 @@ const classifiedWords = [
   {word: 'IKEA', category: 'MARCA'},
   {word: 'LEGO', category: 'MARCA'},
   {word: 'Google Maps', category: 'MARCA'},
+  {word: 'Zara', category: 'MARCA'},
+  {word: 'Rolex', category: 'MARCA'},
+  {word: 'Disney', category: 'MARCA'},
+  {word: 'Red Bull', category: 'MARCA'},
+  {word: 'Pringles', category: 'MARCA'},
+  {word: 'Nuttella', category: 'MARCA'},
+  {word: 'Doritos', category: 'MARCA'},
+  {word: 'Uber', category: 'MARCA'},
 
   // DEPORTE
   {word: 'fútbol', category: 'DEPORTE'},
@@ -1313,6 +1372,7 @@ const classifiedWords = [
   {word: 'karate', category: 'DEPORTE'},
   {word: 'judo', category: 'DEPORTE'},
   {word: 'esgrima', category: 'DEPORTE'},
+  {word: 'patinaje', category: 'DEPORTE'},
   {word: 'FC Barcelona', category: 'DEPORTE'},
   {word: 'Real Madrid', category: 'DEPORTE'},
   {word: 'Manchester United', category: 'DEPORTE'},
@@ -1388,6 +1448,17 @@ const classifiedWords = [
   {word: 'unicornio', category: 'ANIMAL'},
   {word: 'minotauro', category: 'ANIMAL'},
   {word: 'mammut', category: 'ANIMAL'},
+  {word: 'medusa', category: 'ANIMAL'},
+  {word: 'camaleón', category: 'ANIMAL'},
+  {word: 'erizo', category: 'ANIMAL'},
+  {word: 'flamenco', category: 'ANIMAL'},
+  {word: 'mapache', category: 'ANIMAL'},
+  {word: 'nutria', category: 'ANIMAL'},
+  {word: 'perezoso', category: 'ANIMAL'},
+  {word: 'hámster', category: 'ANIMAL'},
+  {word: 'caballito de mar', category: 'ANIMAL'},
+  {word: 'murciélago', category: 'ANIMAL'},
+  {word: 'calamar', category: 'ANIMAL'},
 
   // OFICIO
   {word: 'médico', category: 'OFICIO'},
@@ -1494,7 +1565,13 @@ const classifiedWords = [
   {word: 'Sol', category: 'LUGAR'},
   {word: 'Luna', category: 'LUGAR'},
   {word: 'Vía Láctea', category: 'LUGAR'},
-  {word: 'Budapest', category: 'LUGAR'}
+  {word: 'Budapest', category: 'LUGAR'},
+  {word: 'Dubai', category: 'LUGAR'},
+  {word: 'Hawái', category: 'LUGAR'},
+  {word: 'Chernóbil', category: 'LUGAR'},
+  {word: 'Hollywood', category: 'LUGAR'},
+  {word: 'Antártida', category: 'LUGAR'},
+  {word: 'Las Vegas', category: 'LUGAR'}
 ];
 
 const defaultWords = classifiedWords.map(entry => entry.word);
@@ -1623,6 +1700,9 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         if (categorySelection.style.display === 'block') {
           categorySelection.style.display = 'none';
           setup.style.display = 'block';
+          // Actualizar UI por si acaso hubo un desajuste
+          playersDisplay.textContent = numPlayers;
+          impostorsDisplay.textContent = numImpostors;
         }
         // Si estamos en Nombres
         else if (namesSection.style.display === 'block') {
@@ -1632,6 +1712,9 @@ const defaultWords = classifiedWords.map(entry => entry.word);
              categorySelection.style.display = 'block';
           } else {
              setup.style.display = 'block';
+             // Actualizar UI por si acaso hubo un desajuste
+             playersDisplay.textContent = numPlayers;
+             impostorsDisplay.textContent = numImpostors;
           }
         }
         // Si estamos en Pass (Jugador 1 antes de ver rol) -> Volver a Nombres
@@ -1729,6 +1812,16 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         players[id].eliminated = false;
         savedPlayerNames[id] = input.value.trim();
       });
+
+      // --- SAFETY CHECK (CORRECCIÓN) ---
+      // Asegurarse de que no haya más impostores de los permitidos antes de empezar
+      const maxAllowed = getMaxImpostors(numPlayers);
+      if (numImpostors > maxAllowed) {
+        numImpostors = maxAllowed;
+        // Actualizamos la UI visualmente aunque el usuario no la vea ahora mismo,
+        // para que si vuelve atrás, vea el número correcto.
+        impostorsDisplay.textContent = numImpostors;
+      }
 
       // Assign impostors
       let available = [...Array(numPlayers).keys()];
