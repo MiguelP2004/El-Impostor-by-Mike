@@ -1099,6 +1099,10 @@ const classifiedWords = [
   {word: 'Stephen Hawking', category: 'FAMOSO'},
   {word: 'Neil Armstrong', category: 'FAMOSO'},
   {word: 'Stan Lee', category: 'FAMOSO'},
+  {word: 'Che Guevara', category: 'FAMOSO'},
+  {word: 'Fidel Castro', category: 'FAMOSO'},
+  {word: 'Greta Thunberg', category: 'FAMOSO'},
+  {word: 'Walt Disney', category: 'FAMOSO'},
 
   // PERSONAJE (FICTICIO)
   {word: 'Superman', category: 'PERSONAJE'},
@@ -1259,6 +1263,11 @@ const classifiedWords = [
   {word: 'Pocoyo', category: 'PERSONAJE'},
   {word: 'Úrsula', category: 'PERSONAJE'},
   {word: 'Scar', category: 'PERSONAJE'},
+  {word: 'Optimus Prime', category: 'PERSONAJE'},
+  {word: 'Megatron', category: 'PERSONAJE'},
+  {word: 'Bumblebee', category: 'PERSONAJE'},
+  {word: 'Cruella de Vil', category: 'PERSONAJE'},
+  {word: 'Jafar', category: 'PERSONAJE'},
 
   // CINE
   {word: 'Rocky', category: 'CINE'},
@@ -1343,6 +1352,11 @@ const classifiedWords = [
   {word: 'Deadpool', category: 'CINE'},
   {word: 'El indomable Will Hunting', category: 'CINE'},
   {word: 'Big Bang Theory', category: 'CINE'},
+  {word: 'Jungla de Cristal', category: 'CINE'},
+  {word: 'Pesadilla antes de Navidad', category: 'CINE'},
+  {word: 'Eduardo Manostijeras', category: 'CINE'},
+  {word: 'Bitelchús', category: 'CINE'},
+  {word: 'Gremlins', category: 'CINE'},
 
   // MARCA
   {word: 'iPhone', category: 'MARCA'},
@@ -1391,6 +1405,10 @@ const classifiedWords = [
   {word: 'Levi\'s', category: 'MARCA'},
   {word: 'H&M', category: 'MARCA'},
   {word: 'Gucci', category: 'MARCA'},
+  {word: 'Reebok', category: 'MARCA'},
+  {word: 'Uniqlo', category: 'MARCA'},
+  {word: 'Louis Vuitton', category: 'MARCA'},
+  {word: 'Prada', category: 'MARCA'},
 
   // DEPORTE
   {word: 'fútbol', category: 'DEPORTE'},
@@ -1422,6 +1440,16 @@ const classifiedWords = [
   {word: 'Bayern Munich', category: 'DEPORTE'},
   {word: 'Juventus', category: 'DEPORTE'},
   {word: 'PSG', category: 'DEPORTE'},
+  {word: 'sumo', category: 'DEPORTE'},
+  {word: 'críquet', category: 'DEPORTE'},
+  {word: 'lacrosse', category: 'DEPORTE'},
+  {word: 'balonmano', category: 'DEPORTE'},
+  {word: 'piragüismo', category: 'DEPORTE'},
+  {word: 'snowboard', category: 'DEPORTE'},
+  {word: 'skateboarding', category: 'DEPORTE'},
+  {word: 'parkour', category: 'DEPORTE'},
+  {word: 'paintball', category: 'DEPORTE'},
+  {word: 'airsoft', category: 'DEPORTE'},
 
   // ANIMAL
   {word: 'perro', category: 'ANIMAL'},
@@ -1544,6 +1572,16 @@ const classifiedWords = [
   {word: 'veterinario', category: 'OFICIO'},
   {word: 'dentista', category: 'OFICIO'},
   {word: 'programador', category: 'OFICIO'},
+  {word: 'actor', category: 'OFICIO'},
+  {word: 'bailarín', category: 'OFICIO'},
+  {word: 'político', category: 'OFICIO'},
+  {word: 'sacerdote', category: 'OFICIO'},
+  {word: 'pescador', category: 'OFICIO'},
+  {word: 'azafata', category: 'OFICIO'},
+  {word: 'modelo', category: 'OFICIO'},
+  {word: 'entrenador', category: 'OFICIO'},
+  {word: 'árbitro', category: 'OFICIO'},
+  {word: 'espía', category: 'OFICIO'},
 
   // LUGARES
   {word: 'España', category: 'LUGAR'},
@@ -1622,7 +1660,17 @@ const classifiedWords = [
   {word: 'Chernóbil', category: 'LUGAR'},
   {word: 'Hollywood', category: 'LUGAR'},
   {word: 'Antártida', category: 'LUGAR'},
-  {word: 'Las Vegas', category: 'LUGAR'}
+  {word: 'Las Vegas', category: 'LUGAR'},
+  {word: 'hospital', category: 'LUGAR'},
+  {word: 'banco', category: 'LUGAR'},
+  {word: 'puerto', category: 'LUGAR'},
+  {word: 'aeropuerto', category: 'LUGAR'},
+  {word: 'estación de tren', category: 'LUGAR'},
+  {word: 'parque de atracciones', category: 'LUGAR'},
+  {word: 'zoológico', category: 'LUGAR'},
+  {word: 'circo', category: 'LUGAR'},
+  {word: 'catedral', category: 'LUGAR'},
+  {word: 'museo', category: 'LUGAR'}
 ];
 
 const defaultWords = classifiedWords.map(entry => entry.word);
@@ -1651,11 +1699,11 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
     // Calculate max impostors based on number of players
     function getMaxImpostors(numPlayers) {
-      if(numPlayers <= 4) return 1;
-      if(numPlayers <= 6) return 2;
-      if(numPlayers === 7) return 3;
-      if(numPlayers === 8) return 4;
-      return 5; // for 9-10 players
+      if (numPlayers <= 4) return 1;
+      if (numPlayers <= 7) return 2;
+      if (numPlayers <= 9) return 3;
+      if (numPlayers <= 13) return 4;
+      return 5; // for 14 and 15
     }
 
     // Sound effects
@@ -1687,7 +1735,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     });
 
     incPlayers.addEventListener('click', () => {
-      if(numPlayers < 10) {
+      if(numPlayers < 15) {
         playPopSound();
         numPlayers++;
         playersDisplay.textContent = numPlayers;
