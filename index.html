@@ -348,11 +348,12 @@
       text-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
     
-    /* ESTILOS TARJETA TABÚ Y CONTROLES */
+/* ESTILOS TARJETA TABÚ Y CONTROLES (MODIFICADO) */
     .taboo-card {
       background: #fdfdfd;
       color: #2a2d3a;
-      padding: 24px;
+      /* Reducido de 24px a 16px para ganar espacio */
+      padding: 16px;
       border-radius: 20px;
       margin: 20px 0;
       box-shadow: 0 8px 25px rgba(0,0,0,0.5);
@@ -361,28 +362,34 @@
       position: relative;
       animation: popIn 0.3s ease-out;
     }
+
     .taboo-main-word {
       font-family: 'Fredoka One', cursive;
-      font-size: 36px;
+      /* Reducido de 36px a 28px */
+      font-size: 28px;
       color: #d32f2f;
       text-transform: uppercase;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
+      margin-bottom: 8px; /* Un poco menos de margen */
+      padding-bottom: 8px;
       border-bottom: 3px dashed #ddd;
       letter-spacing: 1px;
+      line-height: 1.2;
     }
+
     .taboo-forbidden-list {
       list-style: none;
       padding: 0;
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 4px; /* Menos espacio entre palabras */
     }
+
     .taboo-forbidden-item {
       font-family: 'Poppins', sans-serif;
       font-weight: 700;
-      font-size: 20px;
+      /* Reducido de 20px a 17px */
+      font-size: 17px;
       color: #555;
       text-transform: uppercase;
     }
@@ -482,6 +489,9 @@
       justify-content:center;
       flex-direction:column;
       gap:18px;
+      /* NUEVO: Asegura el centrado del texto y márgenes seguros */
+      text-align: center;
+      padding: 20px;
     }
     .intro-screen::before{
       content:'';
@@ -511,13 +521,16 @@
     }
     .intro-title{
       font-family:'Fredoka One',cursive;
-      font-size:40px;
+      font-size:40px; /* Puedes bajarlo a 32px si sigue siendo muy grande */
       letter-spacing:2px;
       color:#ffc107;
       text-shadow:0 4px 16px rgba(0,0,0,0.9);
       opacity:0;
       transform:translateY(10px);
       animation:introFadeUp 0.7s ease-out 0.25s forwards;
+      /* NUEVO: Para que no se desborde en pantallas estrechas */
+      line-height: 1.2;
+      max-width: 100%;
     }
     .intro-subtitle{
       font-size:16px;
