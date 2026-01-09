@@ -797,7 +797,11 @@
 
       <section id="tabooGame" class="card" style="display:none;margin-top:12px">
         <div class="center">
-          <h2 style="color:#ffeb3b;margin-bottom:12px;font-family:'Fredoka One',cursive;">Tabú</h2>
+          <h2 style="color:#ffeb3b;margin-bottom:6px;font-family:'Fredoka One',cursive;">Tabú</h2>
+          
+          <div id="tabooRoundDisplay" class="muted" style="font-weight:700; margin-bottom:12px; font-size:18px; color: #fff;">
+            Ronda 1 de 8
+          </div>
           
           <div id="turnDisplay" class="turn-display"></div>
 
@@ -822,24 +826,41 @@
                     <li class="taboo-forbidden-item">Prohibida 4</li>
                 </ul>
             </div>
-              <div class="taboo-controls">
+            <div class="taboo-controls">
                 <button class="action-btn btn-skip" id="tabooSkipBtn">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M18 6L6 18M6 6l12 12"></path>
-                  </svg>
+                  <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
                 </button>
                 
                 <button class="action-btn btn-correct" id="tabooCorrectBtn">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M20 6L9 17l-5-5"></path>
-                  </svg>
+                  <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
                 </button>
             </div>
           </div>
 
-          <div class="timer-display" id="tabooTimer">2:00</div>
+          <div class="timer-display" id="tabooTimer">1:00</div>
 
           <button class="btn big" id="startTabooTurnBtn">Empezar Turno</button>
+        </div>
+      </section>
+
+      <section id="tabooResults" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:24px;color:#ffeb3b;margin-bottom:10px;">¡FIN DE LA PARTIDA!</p>
+          <div id="tabooWinnerMsg" style="font-family:'Fredoka One',cursive;font-size:32px;color:#ffffff;margin-bottom:20px;text-shadow:0 4px 10px rgba(0,0,0,0.5);"></div>
+          
+          <div class="score-board">
+            <div class="team-score team-red">
+              <div class="score-label">ROJO</div>
+              <div class="score-val" id="finalScoreRed">0</div>
+            </div>
+            <div class="team-score team-blue">
+              <div class="score-label">AZUL</div>
+              <div class="score-val" id="finalScoreBlue">0</div>
+            </div>
+          </div>
+          
+          <div style="height:20px"></div>
+          <button class="btn big secondary" id="tabooBackToMenuBtn">Volver al Menú</button>
         </div>
       </section>
 
@@ -3045,7 +3066,11 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     let tabooBlueScore = 0;
     let tabooTimerInterval = null;
     let isTabooTimerRunning = false;
-    let currentTabooTeam = null; // 'red' or 'blue'
+    let currentTabooTeam = null; 
+    
+    // --- VARIABLES DE RONDAS (AGREGAR ESTO) ---
+    let currentTabooRound = 1;
+    const maxTabooRounds = 8;
 
     // Phase trackers
     let revealIndex = 0; 
@@ -3215,7 +3240,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
           if (isTabooTimerRunning) {
             clearInterval(tabooTimerInterval);
             isTabooTimerRunning = false;
-            tabooTimerDisplay.textContent = '2:00';
+            tabooTimerDisplay.textContent = '1:00';
             startTabooTurnBtn.disabled = false;
             startTabooTurnBtn.style.opacity = '1';
             startTabooTurnBtn.style.display = 'inline-block';
@@ -3267,15 +3292,27 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
     selectTabooMode.addEventListener('click', () => {
       playClickSound();
-      gameModeSelection.style.display = 'none';
-      tabooGame.style.display = 'block';
       
-      // Reset Tabú
+      // ESTO ES LO QUE ARREGLA EL ERROR VISUAL: Ocultamos el menú
+      gameModeSelection.style.display = 'none';
+      setup.style.display = 'none'; // Por seguridad
+      
+      // Mostramos el juego
+      tabooGame.style.display = 'block';
+      document.getElementById('tabooResults').style.display = 'none'; // Aseguramos que resultados esté oculto
+      
+      // Reset Tabú state
       tabooRedScore = 0;
       tabooBlueScore = 0;
       scoreRedDisplay.textContent = '0';
       scoreBlueDisplay.textContent = '0';
-      tabooTimerDisplay.textContent = '2:00';
+      tabooTimerDisplay.textContent = '1:00';
+      
+      // RESETEAR RONDAS
+      currentTabooRound = 1; 
+      const roundDisplay = document.getElementById('tabooRoundDisplay');
+      if(roundDisplay) roundDisplay.textContent = `Ronda ${currentTabooRound} de ${maxTabooRounds}`;
+      
       startTabooTurnBtn.disabled = false;
       startTabooTurnBtn.style.opacity = '1';
       startTabooTurnBtn.style.display = 'inline-block';
@@ -3284,6 +3321,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       
       currentTabooTeam = Math.random() < 0.5 ? 'red' : 'blue';
       updateTabooTurnDisplay();
+      
       updateArrowVisibility();
     });
 
@@ -3317,13 +3355,14 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     startTabooTurnBtn.addEventListener('click', () => {
       unlockAudioWithUserGesture();
       playStartGameSound();
-      startTabooTurnBtn.style.display = 'none';
+      
+      startTabooTurnBtn.style.display = 'none'; 
       isTabooTimerRunning = true;
-      tabooCardArea.style.display = 'block';
-      loadTabooCard();
-      updateArrowVisibility();
+      tabooCardArea.style.display = 'block'; 
+      loadTabooCard(); 
+      updateArrowVisibility(); 
 
-      let timeLeft = 120; // 2 minutes
+      let timeLeft = 60; // 1 minuto
       
       tabooTimerInterval = setInterval(() => {
         timeLeft--;
@@ -3334,15 +3373,27 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
         if (timeLeft <= 0) {
           clearInterval(tabooTimerInterval);
-          playSuccessSound();
-          tabooTimerDisplay.textContent = "2:00";
+          playSuccessSound(); 
+          tabooTimerDisplay.textContent = "1:00";
           isTabooTimerRunning = false;
-          startTabooTurnBtn.disabled = false;
-          startTabooTurnBtn.style.display = 'inline-block';
-          startTabooTurnBtn.style.opacity = '1';
-          tabooCardArea.style.display = 'none';
-          toggleTabooTeam();
-          updateArrowVisibility();
+          
+          // --- LÓGICA DE CAMBIO DE RONDA ---
+          if (currentTabooRound >= maxTabooRounds) {
+              // FIN DEL JUEGO
+              showTabooResults(); // Llamamos a la función de fin
+          } else {
+              // SIGUIENTE RONDA
+              currentTabooRound++;
+              const roundDisplay = document.getElementById('tabooRoundDisplay');
+              if(roundDisplay) roundDisplay.textContent = `Ronda ${currentTabooRound} de ${maxTabooRounds}`;
+              
+              startTabooTurnBtn.disabled = false;
+              startTabooTurnBtn.style.display = 'inline-block';
+              startTabooTurnBtn.style.opacity = '1';
+              tabooCardArea.style.display = 'none'; 
+              toggleTabooTeam(); 
+              updateArrowVisibility(); 
+          }
         }
       }, 1000);
     });
@@ -3751,6 +3802,38 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       playSuccessSound();
       const votedId = parseInt(sel.dataset.id);
       showResults(votedId);
+    });
+
+    function showTabooResults() {
+        tabooGame.style.display = 'none';
+        const resultsSection = document.getElementById('tabooResults');
+        resultsSection.style.display = 'block';
+        
+        document.getElementById('finalScoreRed').textContent = tabooRedScore;
+        document.getElementById('finalScoreBlue').textContent = tabooBlueScore;
+        
+        const winnerMsg = document.getElementById('tabooWinnerMsg');
+        if (tabooRedScore > tabooBlueScore) {
+            winnerMsg.textContent = "¡GANA EL EQUIPO ROJO! 🔴";
+            winnerMsg.style.color = "#ff5252";
+        } else if (tabooBlueScore > tabooRedScore) {
+            winnerMsg.textContent = "¡GANA EL EQUIPO AZUL! 🔵";
+            winnerMsg.style.color = "#448aff";
+        } else {
+            winnerMsg.textContent = "¡EMPATE! 🤝";
+            winnerMsg.style.color = "#ffffff";
+        }
+        
+        // Ocultar flecha para obligar a usar el botón de menú
+        if(backArrowBtn) backArrowBtn.style.display = 'none';
+    }
+
+    // Botón para volver al menú desde resultados
+    document.getElementById('tabooBackToMenuBtn').addEventListener('click', () => {
+        playClickSound();
+        document.getElementById('tabooResults').style.display = 'none';
+        gameModeSelection.style.display = 'block';
+        updateArrowVisibility();
     });
 
     window.addEventListener('load', () => {
