@@ -3373,7 +3373,58 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
         if (timeLeft <= 0) {
           clearInterval(tabooTimerInterval);
-          playSuccessSound(); 
+          playTimeOverSound();
+          tabooTimerDisplay.textContent = "1:00";
+          isTabooTimerRunning = false;
+          // Sonido especial para Fin de Ronda (tipo silbato: Pi-Pi-Poooo)
+          // Sonido especial Fin de Ronda (Estilo Arcade: Pi-Pi-Poooow)
+          // Sonido especial Fin de Ronda (Optimizado para respuesta inmediata)
+          function playTimeOverSound() {
+            const ctx = createSharedAudioContext();
+            // Intentar despertar el audio si se durmió durante la espera
+            if (ctx.state === 'suspended') {
+              ctx.resume();
+            }
+
+            const t = ctx.currentTime;
+
+            // 1. Primer "PI" (Instantáneo y seco)
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.type = 'square'; 
+            osc1.frequency.setValueAtTime(1500, t); // Más agudo para que se oiga antes
+            gain1.gain.setValueAtTime(0.2, t);
+            gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.08); // Muy corto
+            osc1.start(t);
+            osc1.stop(t + 0.08);
+
+            // 2. Segundo "PI" 
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.type = 'square';
+            osc2.frequency.setValueAtTime(1500, t + 0.12);
+            gain2.gain.setValueAtTime(0.2, t + 0.12);
+            gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            osc2.start(t + 0.12);
+            osc2.stop(t + 0.2);
+
+            // 3. "POOOO" (Bajada final)
+            const osc3 = ctx.createOscillator();
+            const gain3 = ctx.createGain();
+            osc3.connect(gain3);
+            gain3.connect(ctx.destination);
+            osc3.type = 'sawtooth'; 
+            osc3.frequency.setValueAtTime(800, t + 0.25);
+            osc3.frequency.exponentialRampToValueAtTime(50, t + 0.8);
+            gain3.gain.setValueAtTime(0.3, t + 0.25);
+            gain3.gain.linearRampToValueAtTime(0, t + 0.8);
+            osc3.start(t + 0.25);
+            osc3.stop(t + 0.8);
+          }
           tabooTimerDisplay.textContent = "1:00";
           isTabooTimerRunning = false;
           
