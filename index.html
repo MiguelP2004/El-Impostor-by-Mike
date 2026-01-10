@@ -837,7 +837,7 @@
             </div>
           </div>
 
-          <div class="timer-display" id="tabooTimer">1:00</div>
+          <div class="timer-display" id="tabooTimer">2:00</div>
 
           <button class="btn big" id="startTabooTurnBtn">Empezar Turno</button>
         </div>
@@ -978,7 +978,7 @@
     function playFailSound(){ playSound(300, 0.15, 0.25); setTimeout(()=>playSound(200, 0.2, 0.25), 150); } 
     function playSuccessSound(){ 
       playSound(600, 0.06, 0.12); 
-      setTimeout(()=>playSound(900,0.07,0.14),60); 
+      setTimeout(()=>playSound(900,0.07,0.14),120); 
     }
     function playStartGameSound() {
       playSound(500, 0.1, 0.2);
@@ -3416,7 +3416,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
     function playFailSound(){ playSound(300, 0.15, 0.25); setTimeout(()=>playSound(200, 0.2, 0.25), 150); }
     function playSuccessSound(){ 
       playSound(600, 0.06, 0.12); 
-      setTimeout(()=>playSound(900,0.07,0.14),60); 
+      setTimeout(()=>playSound(900,0.07,0.14),120); 
     }
     function playStartGameSound() {
       playSound(500, 0.1, 0.2);
@@ -3518,7 +3518,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
           if (isTabooTimerRunning) {
             clearInterval(tabooTimerInterval);
             isTabooTimerRunning = false;
-            tabooTimerDisplay.textContent = '1:00';
+            tabooTimerDisplay.textContent = '2:00';
             startTabooTurnBtn.disabled = false;
             startTabooTurnBtn.style.opacity = '1';
             startTabooTurnBtn.style.display = 'inline-block';
@@ -3584,7 +3584,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       tabooBlueScore = 0;
       scoreRedDisplay.textContent = '0';
       scoreBlueDisplay.textContent = '0';
-      tabooTimerDisplay.textContent = '1:00';
+      tabooTimerDisplay.textContent = '2:00';
       
       // RESETEAR RONDAS
       currentTabooRound = 1; 
@@ -3640,7 +3640,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       loadTabooCard(); 
       updateArrowVisibility(); 
 
-      let timeLeft = 60; // 1 minuto
+      let timeLeft = 120; // 2 minutos
       
       tabooTimerInterval = setInterval(() => {
         timeLeft--;
@@ -3652,7 +3652,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         if (timeLeft <= 0) {
           clearInterval(tabooTimerInterval);
           playTimeOverSound();
-          tabooTimerDisplay.textContent = "1:00";
+          tabooTimerDisplay.textContent = "2:00";
           isTabooTimerRunning = false;
           // Sonido especial para Fin de Ronda (tipo silbato: Pi-Pi-Poooo)
           // Sonido especial Fin de Ronda (Estilo Arcade: Pi-Pi-Poooow)
@@ -3703,7 +3703,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
             osc3.start(t + 0.25);
             osc3.stop(t + 0.8);
           }
-          tabooTimerDisplay.textContent = "1:00";
+          tabooTimerDisplay.textContent = "2:00";
           isTabooTimerRunning = false;
           
           // --- LÓGICA DE CAMBIO DE RONDA ---
