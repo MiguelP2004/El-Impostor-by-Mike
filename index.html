@@ -38,29 +38,33 @@
       --round:20px;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    body {
+      margin: 0;
+      font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: #1a1635;
-      min-height:100vh;
-      /* Asegura que ocupe toda la altura disponible en móviles */
+
+      /* Asegura que ocupe toda la altura real del móvil (truco para iOS) */
+      min-height: 100vh;
       min-height: -webkit-fill-available;
-      
-      display:flex;
-      /* Esto lo vuelve a CENTRAR verticalmente */
-      align-items:center; 
-      justify-content:center;
-      
-      overflow-x:hidden;
-      overflow-y:auto;
-      -webkit-overflow-scrolling:touch;
+
+      display: flex;
+      /* VUELVE A ESTAR CENTRADO VERTICALMENTE */
+      align-items: center;
+      justify-content: center;
+
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
       touch-action: pan-y;
+
+      /* Márgenes de seguridad: */
+      padding: 20px; /* Un poco de aire alrededor de todo */
       
-      /* Esta línea es la CLAVE para iPhone: añade espacio abajo si es necesario */
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+      /* ESTA LÍNEA ARREGLA EL IPHONE: Suma el área segura del móvil + 30px extra */
+      padding-bottom: calc(env(safe-area-inset-bottom) + 30px);
     }
    
     html {
