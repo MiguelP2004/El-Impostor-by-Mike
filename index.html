@@ -511,16 +511,14 @@
 
     .intro-screen {
       position: fixed;
-      /* TRUCO: Estiramos la intro 100px por arriba y por abajo para tapar cualquier hueco o rebote */
-      top: -100px;
-      bottom: -100px;
+      top: 0;
       left: 0;
-      right: 0;
       width: 100%;
-      height: auto; 
+      height: 100%;
+      min-height: 100dvh; /* Asegura cobertura total */
       
-      /* Fondo NEGRO puro para que no se vea nada morado */
-      background: #000000; 
+      /* FONDO RESTAURADO AL MORADO ORIGINAL */
+      background: radial-gradient(circle at top, #2d1b4e 0, #1a1635 45%, #05020a 100%);
       
       z-index: 10000;
       
@@ -533,7 +531,7 @@
       
       padding: 20px;
       
-      /* Bloqueamos el movimiento en la intro */
+      /* Bloqueamos el movimiento en la intro para que quede fija */
       touch-action: none;
       overflow: hidden;
     }
@@ -3734,8 +3732,21 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         setTimeout(handleIntroEnd, 4100);
 
         // Al pulsar el botón Jugar, entramos al juego
+        // Al pulsar el botón Jugar, entramos al juego
         playIntroButton.addEventListener('click', () => {
-            unlockAudioWithUserGesture(); // Desbloqueamos audio aquí
+            unlockAudioWithUserGesture(); 
+            playClickSound(); 
+            
+            // --- CORRECCIÓN DE LA FRANJA EN IPHONE ---
+            // Forzamos al navegador a subir arriba del todo inmediatamente
+            window.scrollTo(0, 0);
+            
+            // Lo forzamos otra vez tras una milésima de segundo por si acaso
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 10);
+            // -----------------------------------------
+
             handleContinueFromIntro();
         });
 
