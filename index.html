@@ -81,6 +81,11 @@
       padding: 20px;
       padding-top: max(20px, env(safe-area-inset-top));
       padding-bottom: max(20px, env(safe-area-inset-bottom));
+
+      -webkit-user-select: none; /* Para Safari/Chrome (iPhone) */
+      -moz-user-select: none;    /* Para Firefox */
+      -ms-user-select: none;     /* Para Internet Explorer/Edge */
+      user-select: none;         /* Estándar */
     }
 
     html {
