@@ -3176,6 +3176,11 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       }
 
       // 3. Asignar roles
+      
+      // --- LÍNEA AÑADIDA: Resetear a todos los jugadores a 'civil' primero ---
+      players.forEach(p => p.role = 'civil'); 
+      // -----------------------------------------------------------------------
+
       let available = [...Array(numPlayers).keys()];
       for(let k=0;k<numImpostors;k++){
         const pickIdx = randInt(available.length);
