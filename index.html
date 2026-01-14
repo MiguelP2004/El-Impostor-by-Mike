@@ -43,36 +43,31 @@
       font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: #1a1635;
 
-      /* Altura de pantalla móvil real */
+      /* Ocupa toda la pantalla */
       min-height: 100vh;
       min-height: 100dvh;
 
       display: flex;
       flex-direction: column;
       
-      /* Centrado */
+      /* Centra el juego en medio de la pantalla */
       justify-content: center; 
       align-items: center;
 
+      /* Permite moverlo (scroll) */
       overflow-x: hidden;
       overflow-y: auto;
-      
       -webkit-overflow-scrolling: touch;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
+      
+      /* Comportamiento táctil normal para el juego */
       touch-action: pan-y;
 
-      /* Padding lateral */
+      /* MÁRGENES DE SEGURIDAD (Arriba y Abajo) para iPhone */
+      /* Usamos 'max' para asegurar un mínimo de espacio si el móvil no reporta 'env' */
+      padding-top: max(40px, env(safe-area-inset-top));
+      padding-bottom: max(40px, env(safe-area-inset-bottom));
       padding-left: 20px;
       padding-right: 20px;
-      
-      /* --- AQUÍ ESTÁ EL TRUCO PARA BAJARLO --- */
-      /* Al poner el mismo (o más) padding arriba que abajo, el contenido baja al centro real */
-      padding-top: 80px; 
-      
-      /* Margen de seguridad abajo para iPhone */
-      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
     }
    
     html {
@@ -503,22 +498,28 @@
 
     .intro-screen {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Asegura que tape todo sin huecos */
+      min-height: 100dvh; 
+      
       background: radial-gradient(circle at top, #2d1b4e 0, #1a1635 45%, #05020a 100%);
       z-index: 10000;
+      
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: center;     /* Centrado Vertical */
+      justify-content: center; /* Centrado Horizontal */
       flex-direction: column;
       gap: 18px;
       text-align: center;
-
-      /* --- CAMBIO AQUÍ: --- */
-      /* Quitamos el padding: 20px genérico y ponemos esto para bajarlo */
-      padding-left: 20px;
-      padding-right: 20px;
-      padding-bottom: 20px;
-      padding-top: 150px; /* <--- ESTO ES LO QUE BAJA LA INTRO */
+      
+      padding: 20px; /* Padding normal */
+      
+      /* ESTO BLOQUEA QUE SE PUEDA MOVER LA INTRO EN EL IPHONE */
+      touch-action: none;
+      overflow: hidden;
     }
     .intro-screen::before{
       content:'';
