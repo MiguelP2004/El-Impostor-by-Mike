@@ -45,8 +45,11 @@
       min-height:100vh;
       min-height:-webkit-fill-available;
       display:flex;
-      align-items:center;
+      
+      /* CAMBIO 1: Alineamos arriba en vez de al centro para evitar cortes */
+      align-items: flex-start; 
       justify-content:center;
+      
       overflow-x:hidden;
       overflow-y:auto;
       -webkit-overflow-scrolling:touch;
@@ -54,7 +57,12 @@
       -webkit-user-select: none;
       user-select: none;
       touch-action: pan-y;
-      padding-bottom: calc(env(safe-area-inset-bottom) + 40px);
+      
+      /* CAMBIO 2: Lo bajamos 60px desde arriba (ajústalo si quieres más o menos) */
+      padding-top: 60px;
+      
+      /* CAMBIO 3: Damos más espacio abajo para asegurar que no se corte en iPhone */
+      padding-bottom: 100px; 
     }
    
     html {
