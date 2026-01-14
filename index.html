@@ -43,11 +43,12 @@
       font-family:'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: #1a1635;
       min-height:100vh;
-      min-height:-webkit-fill-available;
-      display:flex;
+      /* Asegura que ocupe toda la altura disponible en móviles */
+      min-height: -webkit-fill-available;
       
-      /* CAMBIO 1: Alineamos arriba en vez de al centro para evitar cortes */
-      align-items: flex-start; 
+      display:flex;
+      /* Esto lo vuelve a CENTRAR verticalmente */
+      align-items:center; 
       justify-content:center;
       
       overflow-x:hidden;
@@ -58,11 +59,8 @@
       user-select: none;
       touch-action: pan-y;
       
-      /* CAMBIO 2: Lo bajamos 60px desde arriba (ajústalo si quieres más o menos) */
-      padding-top: 60px;
-      
-      /* CAMBIO 3: Damos más espacio abajo para asegurar que no se corte en iPhone */
-      padding-bottom: 100px; 
+      /* Esta línea es la CLAVE para iPhone: añade espacio abajo si es necesario */
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
    
     html {
