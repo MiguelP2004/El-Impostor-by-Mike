@@ -65,7 +65,6 @@
 
       /* Permite scroll pero oculta la barra (con el código de arriba) */
       overflow-x: hidden;
-      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       
       touch-action: pan-y;
@@ -3733,19 +3732,24 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
         // Al pulsar el botón Jugar, entramos al juego
         // Al pulsar el botón Jugar, entramos al juego
+        // Al pulsar el botón Jugar, entramos al juego
         playIntroButton.addEventListener('click', () => {
             unlockAudioWithUserGesture(); 
             playClickSound(); 
             
-            // --- CORRECCIÓN DE LA FRANJA EN IPHONE ---
-            // Forzamos al navegador a subir arriba del todo inmediatamente
+            // --- CORRECCIÓN DEFINITIVA IPHONE ---
+            
+            // 1. Forzamos al navegador a ir arriba (0,0)
             window.scrollTo(0, 0);
             
-            // Lo forzamos otra vez tras una milésima de segundo por si acaso
+            // 2. DESBLOQUEAMOS el scroll del cuerpo para que ahora sí puedas mover el juego
+            document.body.style.overflowY = 'auto';
+            document.body.style.overflowX = 'hidden'; // Mantenemos oculto el lateral
+
+            // 3. Pequeño timeout de seguridad por si el teclado estaba abierto o algo
             setTimeout(() => {
                 window.scrollTo(0, 0);
-            }, 10);
-            // -----------------------------------------
+            }, 50);
 
             handleContinueFromIntro();
         });
