@@ -511,26 +511,29 @@
 
     .intro-screen {
       position: fixed;
-      top: 0;
+      /* TRUCO: Estiramos la intro 100px por arriba y por abajo para tapar cualquier hueco o rebote */
+      top: -100px;
+      bottom: -100px;
       left: 0;
+      right: 0;
       width: 100%;
-      height: 100%;
-      /* Asegura que tape todo sin huecos */
-      min-height: 100dvh; 
+      height: auto; 
       
-      background: radial-gradient(circle at top, #2d1b4e 0, #1a1635 45%, #05020a 100%);
+      /* Fondo NEGRO puro para que no se vea nada morado */
+      background: #000000; 
+      
       z-index: 10000;
       
       display: flex;
-      align-items: center;     /* Centrado Vertical */
-      justify-content: center; /* Centrado Horizontal */
+      align-items: center;
+      justify-content: center;
       flex-direction: column;
       gap: 18px;
       text-align: center;
       
-      padding: 20px; /* Padding normal */
+      padding: 20px;
       
-      /* ESTO BLOQUEA QUE SE PUEDA MOVER LA INTRO EN EL IPHONE */
+      /* Bloqueamos el movimiento en la intro */
       touch-action: none;
       overflow: hidden;
     }
@@ -825,7 +828,7 @@
           <p class="muted" style="font-weight:700">Selecciona al jugador que queréis expulsar:</p>
           <div class="players-list" id="discussionVoteList" style="margin-top:10px"></div>
           <div style="height:12px"></div>
-          <button class="btn big" id="submitGroupVoteBtn">Confirmar votación</button>
+        <button class="btn medium" id="submitGroupVoteBtn" style="width: auto; padding: 12px 30px; font-size: 18px;">Confirmar votación</button>
         </div>
       </section>
 
