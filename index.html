@@ -223,7 +223,14 @@
     }
 
     /* Voting list */
-    .players-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:10px}
+    .players-list {
+      display: grid;
+      /* CAMBIO CLAVE: Reducimos 120px a 90px o 100px para que quepan más en una fila */
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+      gap: 8px;
+      margin-top: 10px;
+      width: 100%; /* Asegura que use todo el ancho */
+    }
     .player-pill{padding:12px;border-radius:12px;background:linear-gradient(180deg,var(--card-light),var(--card));color:#f0f1f5;text-align:center;border:1px solid rgba(255,193,7,0.2);cursor:pointer;transition:all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);font-weight:600;position:relative;overflow:hidden}
     .player-pill::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,193,7,0.2);transition:width 0.3s ease, height 0.3s ease;transform:translate(-50%,-50%)}
     .player-pill:hover{border-color:rgba(255,193,7,0.6);transform:translateY(-4px) scale(1.05);box-shadow:0 6px 18px rgba(255,193,7,0.3)}
