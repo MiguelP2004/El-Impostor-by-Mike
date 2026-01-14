@@ -501,19 +501,24 @@
       }
     }
 
-    .intro-screen{
-      position:fixed;
-      inset:0;
-      background:radial-gradient(circle at top, #2d1b4e 0, #1a1635 45%, #05020a 100%);
-      z-index:10000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      gap:18px;
-      /* NUEVO: Asegura el centrado del texto y márgenes seguros */
+    .intro-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #2d1b4e 0, #1a1635 45%, #05020a 100%);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 18px;
       text-align: center;
-      padding: 20px;
+
+      /* --- CAMBIO AQUÍ: --- */
+      /* Quitamos el padding: 20px genérico y ponemos esto para bajarlo */
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 20px;
+      padding-top: 150px; /* <--- ESTO ES LO QUE BAJA LA INTRO */
     }
     .intro-screen::before{
       content:'';
