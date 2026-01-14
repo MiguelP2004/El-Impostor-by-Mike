@@ -622,10 +622,14 @@
       to{opacity:1;transform:translate(-50%,-50%) scale(1);}
     }
     .intro-screen.fade-out{
-      animation:introFadeOut 0.4s ease-out forwards;
+      animation:introFadeOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
-    @keyframes introFadeOut{
-      to{opacity:0;visibility:hidden;}
+
+    /* NUEVO: Oculta la barra de progreso cuando la intro termina */
+    .intro-screen.intro-finished .intro-progress {
+      display: none;
+      opacity: 0;
+      display: none !important;
     }
     .mode-buttons{
       display:flex;
@@ -715,7 +719,9 @@
     <div class="intro-progress">
       <div class="intro-progress-fill"></div>
     </div>
-  </div>
+    
+    <button id="playIntroButton" class="btn big" style="display:none; margin-top:24px; z-index:20; position:relative;">¡JUGAR!</button>
+    </div>
 
   <button id="backArrowBtn" class="back-arrow-btn">
     <svg viewBox="0 0 24 24">
@@ -911,6 +917,51 @@
           console.log('ServiceWorker registro fallido:', err);
         });
       });
+    }
+    // --- LÓGICA DE INICIO Y BOTÓN JUGAR ---
+    
+    // 1. Referencias
+    const introFill = document.querySelector('.intro-progress-fill');
+    const playBtn = document.getElementById('playIntroButton');
+
+    // 2. Función que se ejecuta al terminar la carga
+    function onIntroAnimationEnd() {
+      // Ocultar barra de progreso
+      if(introScreenEl) introScreenEl.classList.add('intro-finished');
+      
+      // Mostrar botón de jugar
+      if(playBtn) {
+        playBtn.style.display = 'inline-block';
+        playBtn.style.animation = 'popIn 0.5s ease-out forwards';
+        playBtn.style.opacity = '1';
+      }
+    }
+
+    // 3. Detectar fin de animación o forzarlo por tiempo
+    if (introFill) {
+      introFill.addEventListener('animationend', onIntroAnimationEnd);
+    }
+    // Fallback de seguridad: si en 4 segundos no ha acabado, forzarlo
+    setTimeout(onIntroAnimationEnd, 4000);
+
+    // 4. Acción del botón JUGAR
+    if(playBtn) {
+      playBtn.addEventListener('click', () => {
+        // Desbloquear audio con el click
+        unlockAudioWithUserGesture();
+        playClickSound(); // Sonido de confirmación
+        
+        // Quitar intro y entrar al juego
+        handleContinueFromIntro();
+      });
+    }
+
+    // Si no existe la intro (por si acaso), entrar directo
+    if (!document.getElementById('introScreen')) {
+        window.addEventListener('load', () => {
+           const main = document.getElementById('mainContainer');
+           if(main) main.style.opacity = '1';
+        });
     }
 
     // --- CÍRCULOS DE FONDO ANIMADOS ---
@@ -3635,17 +3686,56 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         updateArrowVisibility();
     });
 
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const introScreen = document.getElementById('introScreen');
-        const mainContainer = document.getElementById('mainContainer');
-        if(introScreen){
-          handleContinueFromIntro();
-        } else if(mainContainer && mainContainer.style.opacity === '0'){
-          mainContainer.style.opacity = '1';
+    // --- LÓGICA DE INICIO (NUEVA) ---
+    // Definimos las variables necesarias
+    const introProgressFill = document.querySelector('.intro-progress-fill');
+    const playIntroButton = document.getElementById('playIntroButton');
+    const introScreenEl = document.getElementById('introScreen');
+
+    if (introProgressFill && playIntroButton) {
+        
+        // Función que se ejecuta cuando la barra termina de cargarse
+        let introEnded = false;
+        function handleIntroEnd() {
+            if (introEnded) return;
+            introEnded = true;
+
+            // 1. Añadimos clase para que CSS oculte la barra (asegúrate de haber puesto el CSS que te pasé antes)
+            introScreenEl.classList.add('intro-finished');
+
+            // 2. Mostramos el botón de Jugar
+            setTimeout(() => {
+                playIntroButton.style.display = 'inline-block';
+                // Pequeña animación manual para que aparezca suave
+                playIntroButton.style.transition = 'opacity 0.5s ease';
+                
+                // Forzamos un reflow para que la transición funcione
+                requestAnimationFrame(() => {
+                    playIntroButton.style.opacity = '1';
+                    playIntroButton.style.transform = 'scale(1.1)';
+                });
+            }, 100);
         }
-      }, 3000);
-    });
+
+        // Escuchamos cuando termina la animación de la barra
+        introProgressFill.addEventListener('animationend', handleIntroEnd);
+        
+        // Fallback por si acaso (4.1 segundos)
+        setTimeout(handleIntroEnd, 4100);
+
+        // Al pulsar el botón Jugar, entramos al juego
+        playIntroButton.addEventListener('click', () => {
+            unlockAudioWithUserGesture(); // Desbloqueamos audio aquí
+            handleContinueFromIntro();
+        });
+
+    } else {
+        // Si no hay intro (modo desarrollo o recarga rápida), mostramos el juego directo
+        window.addEventListener('load', () => {
+             const main = document.getElementById('mainContainer');
+             if(main) main.style.opacity = '1';
+        });
+    }
   </script>
 </body>
 </html>
