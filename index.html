@@ -3303,67 +3303,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
 
   function showCountdown() {
       // OCULTAR FLECHA AL EMPEZAR LA CUENTA ATRÁS
-    // --- LÓGICA DE LA FLECHA DE RETROCESO ---
-    if (backArrowBtn) {
-      backArrowBtn.addEventListener('click', () => {
-        playClickSound();
-        
-        // 1. Si estamos en Tabú -> Volver a menú
-        if (tabooGame.style.display === 'block') {
-          if (isTabooTimerRunning) {
-            clearInterval(tabooTimerInterval);
-            isTabooTimerRunning = false;
-            tabooTimerDisplay.textContent = '1:30';
-            startTabooTurnBtn.disabled = false;
-            startTabooTurnBtn.style.opacity = '1';
-            startTabooTurnBtn.style.display = 'inline-block';
-            tabooCardArea.style.display = 'none';
-          }
-          tabooGame.style.display = 'none';
-          gameModeSelection.style.display = 'block';
-        }
-        // 2. Si estamos en Setup -> Volver a menú
-        else if (setup.style.display === 'block') {
-          setup.style.display = 'none';
-          gameModeSelection.style.display = 'block';
-        }
-        // 3. Si estamos en Categorías -> Volver a Setup
-        else if (categorySelection.style.display === 'block') {
-          categorySelection.style.display = 'none';
-          setup.style.display = 'block';
-          // Restaurar valores visuales
-          const impDisplay = document.getElementById('impostorsDisplay');
-          const plDisplay = document.getElementById('playersDisplay');
-          if(plDisplay) plDisplay.textContent = numPlayers;
-          if(impDisplay) impDisplay.textContent = numImpostors;
-        }
-        // 4. Si estamos en Nombres -> Volver atrás
-        else if (namesSection.style.display === 'block') {
-          namesSection.style.display = 'none';
-          if (selectedCategoryFilter !== null) {
-             categorySelection.style.display = 'block';
-          } else {
-             setup.style.display = 'block';
-             const impDisplay = document.getElementById('impostorsDisplay');
-             const plDisplay = document.getElementById('playersDisplay');
-             if(plDisplay) plDisplay.textContent = numPlayers;
-             if(impDisplay) impDisplay.textContent = numImpostors;
-          }
-        }
-        // 5. Si estamos viendo roles (Pass) -> Cancelar partida y volver a nombres
-        else if (pass.style.display === 'block') {
-          pass.style.display = 'none';
-          namesSection.style.display = 'block';
-        }
-        // 6. Si estamos en VOTACIÓN (Discussion) -> Cancelar y volver al menú
-        else if (discussion.style.display === 'block') {
-          discussion.style.display = 'none';
-          gameModeSelection.style.display = 'block';
-        }
-
-        updateArrowVisibility();
-      });
-    }
+      if(backArrowBtn) backArrowBtn.style.display = 'none';
 
       const countdownScreen = document.createElement('div');
       countdownScreen.className = 'countdown-screen';
@@ -3591,7 +3531,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       if(backArrowBtn) backArrowBtn.style.display = 'none';
     }
 
-    // --- LÓGICA DE LA FLECHA DE RETROCESO (CORREGIDA) ---
+    // --- LÓGICA DE LA FLECHA DE RETROCESO (AHORA FUERA Y CORRECTA) ---
     if (backArrowBtn) {
       backArrowBtn.addEventListener('click', () => {
         playClickSound();
@@ -3601,7 +3541,7 @@ const defaultWords = classifiedWords.map(entry => entry.word);
           if (isTabooTimerRunning) {
             clearInterval(tabooTimerInterval);
             isTabooTimerRunning = false;
-            tabooTimerDisplay.textContent = '1:30'; // O 2:00
+            tabooTimerDisplay.textContent = '1:30'; 
             startTabooTurnBtn.disabled = false;
             startTabooTurnBtn.style.opacity = '1';
             startTabooTurnBtn.style.display = 'inline-block';
@@ -3619,7 +3559,6 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         else if (categorySelection.style.display === 'block') {
           categorySelection.style.display = 'none';
           setup.style.display = 'block';
-          // Restaurar valores visuales si existen
           const impDisplay = document.getElementById('impostorsDisplay');
           const plDisplay = document.getElementById('playersDisplay');
           if(plDisplay) plDisplay.textContent = numPlayers;
@@ -3647,6 +3586,11 @@ const defaultWords = classifiedWords.map(entry => entry.word);
         else if (discussion.style.display === 'block') {
           discussion.style.display = 'none';
           gameModeSelection.style.display = 'block';
+          // Resetear valores por defecto al salir
+          numPlayers = 4;
+          numImpostors = 1;
+          if(typeof playersDisplay !== 'undefined') playersDisplay.textContent = numPlayers;
+          if(typeof impostorsDisplay !== 'undefined') impostorsDisplay.textContent = numImpostors;
         }
 
         updateArrowVisibility();
