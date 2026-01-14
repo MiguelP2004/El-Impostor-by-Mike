@@ -43,28 +43,31 @@
       font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: #1a1635;
 
-      /* Asegura que ocupe toda la altura real del móvil (truco para iOS) */
+      /* TRUCO IPHONE: 100dvh ignora las barras de navegación de Safari */
       min-height: 100vh;
-      min-height: -webkit-fill-available;
+      min-height: 100dvh; 
 
       display: flex;
-      /* VUELVE A ESTAR CENTRADO VERTICALMENTE */
-      align-items: center;
+      flex-direction: column;
+      
+      /* ESTO LO CENTRA VERTICAL Y HORIZONTALMENTE */
       justify-content: center;
+      align-items: center;
 
       overflow-x: hidden;
       overflow-y: auto;
+      
       -webkit-overflow-scrolling: touch;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
       touch-action: pan-y;
 
-      /* Márgenes de seguridad: */
-      padding: 20px; /* Un poco de aire alrededor de todo */
+      /* MÁRGENES DE SEGURIDAD */
+      padding: 20px;
       
-      /* ESTA LÍNEA ARREGLA EL IPHONE: Suma el área segura del móvil + 30px extra */
-      padding-bottom: calc(env(safe-area-inset-bottom) + 30px);
+      /* MUCHO ESPACIO ABAJO para que la barra del iPhone no tape nada */
+      padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
     }
    
     html {
