@@ -2869,100 +2869,34 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       }
     });
     
-    // --- LÓGICA DE VISIBILIDAD DE FLECHA Y NAVEGACIÓN ---
     function updateArrowVisibility() {
       if (!backArrowBtn) return;
       
-      // 1. Menú Selección de Modo -> OCULTA
+      // 1. Menú Principal -> OCULTA
       if (gameModeSelection.style.display === 'block') {
         backArrowBtn.style.display = 'none';
       }
-      // 2. Setup Impostor -> VISIBLE
-      else if (setup.style.display === 'block') {
+      // 2. Pantallas de Configuración (Setup, Categoría, Nombres) -> VISIBLE
+      else if (setup.style.display === 'block' || 
+               categorySelection.style.display === 'block' || 
+               namesSection.style.display === 'block') {
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
-      // 3. Categoría -> VISIBLE
-      else if (categorySelection.style.display === 'block') {
-        backArrowBtn.style.display = 'flex';
-        backArrowBtn.style.opacity = '1';
-      }
-      // 4. Nombres -> VISIBLE
-      else if (namesSection.style.display === 'block') {
-        backArrowBtn.style.display = 'flex';
-        backArrowBtn.style.opacity = '1';
-      }
-      // 5. Juego Impostor (Pass, jugador 1) -> VISIBLE
-      else if (pass.style.display === 'block') {
-        if (revealIndex === 0 && roleArea.style.display === 'none') {
-           backArrowBtn.style.display = 'flex';
-           backArrowBtn.style.opacity = '1';
-        } else {
-           backArrowBtn.style.display = 'none';
-        }
-      }
-      // 6. Tabú -> SIEMPRE VISIBLE (AQUÍ ESTÁ EL CAMBIO)
-      else if (tabooGame.style.display === 'block') {
-         // Eliminamos la condición "if (isTabooTimerRunning)" para que siempre se vea
+      // 3. Juego Impostor (Roles y Discusión) -> VISIBLE
+      else if (pass.style.display === 'block' || discussion.style.display === 'block') {
          backArrowBtn.style.display = 'flex';
          backArrowBtn.style.opacity = '1';
       }
-      // Resto -> OCULTA
+      // 4. Juego Tabú (Jugando) -> VISIBLE
+      else if (tabooGame.style.display === 'block') {
+         backArrowBtn.style.display = 'flex';
+         backArrowBtn.style.opacity = '1';
+      }
+      // 5. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
       else {
         backArrowBtn.style.display = 'none';
       }
-    }
-
-    // Listener de la flecha
-    if (backArrowBtn) {
-      backArrowBtn.addEventListener('click', () => {
-        playClickSound();
-        
-        // Tabú -> Selección
-        if (tabooGame.style.display === 'block') {
-          if (isTabooTimerRunning) {
-            clearInterval(tabooTimerInterval);
-            isTabooTimerRunning = false;
-            tabooTimerDisplay.textContent = '2:00';
-            startTabooTurnBtn.disabled = false;
-            startTabooTurnBtn.style.opacity = '1';
-            startTabooTurnBtn.style.display = 'inline-block';
-            tabooCardArea.style.display = 'none';
-          }
-          tabooGame.style.display = 'none';
-          gameModeSelection.style.display = 'block';
-        }
-        // Setup Impostor -> Selección
-        else if (setup.style.display === 'block') {
-          setup.style.display = 'none';
-          gameModeSelection.style.display = 'block';
-        }
-        // Categoría -> Setup
-        else if (categorySelection.style.display === 'block') {
-          categorySelection.style.display = 'none';
-          setup.style.display = 'block';
-          playersDisplay.textContent = numPlayers;
-          impostorsDisplay.textContent = numImpostors;
-        }
-        // Nombres -> Setup o Categoría
-        else if (namesSection.style.display === 'block') {
-          namesSection.style.display = 'none';
-          if (selectedCategoryFilter !== null) {
-             categorySelection.style.display = 'block';
-          } else {
-             setup.style.display = 'block';
-             playersDisplay.textContent = numPlayers;
-             impostorsDisplay.textContent = numImpostors;
-          }
-        }
-        // Pass (Jugador 1) -> Nombres
-        else if (pass.style.display === 'block') {
-          pass.style.display = 'none';
-          namesSection.style.display = 'block';
-        }
-        
-        updateArrowVisibility();
-      });
     }
 
     // --- SELECCIÓN DE MODO ---
@@ -3221,8 +3155,8 @@ const defaultWords = classifiedWords.map(entry => entry.word);
       updateArrowVisibility();
     }
 
-function startGame(){
-      // 1. Guardar nombres
+    function startGame(){
+      // 1. Guardar nombres de los inputs
       savedPlayerNames = [];
       Array.from(namesList.children).forEach(wrapper => {
         const input = wrapper.querySelector('input');
@@ -3241,7 +3175,7 @@ function startGame(){
         if(impDisplay) impDisplay.textContent = numImpostors;
       }
 
-      // 3. Asignar roles (Impostores vs Civiles)
+      // 3. Asignar roles
       let available = [...Array(numPlayers).keys()];
       for(let k=0;k<numImpostors;k++){
         const pickIdx = randInt(available.length);
@@ -3249,18 +3183,17 @@ function startGame(){
         players[pidx].role = 'impostor';
       }
 
-      // 4. LÓGICA DE SELECCIÓN DE PALABRAS (Aquí está la clave)
+      // 4. LÓGICA DE SELECCIÓN DE PALABRAS
       let wordPoolSource;
 
       if (selectedCategoryFilter === 'CLASH_ROYALE') {
-        // A) Si elegiste el botón de Clash Royale, usa SOLO ese array
+        // A) Si es Clash Royale, usa SOLO ese array
         wordPoolSource = clashRoyaleWords;
       } else if (selectedCategoryFilter) {
-        // B) Si elegiste otra categoría (Animales, etc), filtra del array general
+        // B) Si es otra categoría, filtra del array general
         wordPoolSource = classifiedWords.filter(entry => entry.category === selectedCategoryFilter);
       } else {
-        // C) MODO ESTÁNDAR / PISTA: Usa el array general (classifiedWords)
-        // Como el array de Clash Royale es una variable aparte, NO saldrán aquí.
+        // C) Estándar/Pista: Usar array general (SIN Clash Royale)
         wordPoolSource = classifiedWords;
       }
       
@@ -3272,7 +3205,7 @@ function startGame(){
       const word = wordEntry.word;
       currentWordCategory = wordEntry.category;
 
-      // 5. Asignar palabra a los jugadores civiles
+      // 5. Asignar palabra a civiles (AQUÍ ESTABA EL ERROR)
       players.forEach(p => {
         if(p.role === 'civil') p.word = word;
         else p.word = null;
@@ -3291,6 +3224,9 @@ function startGame(){
       updateArrowVisibility(); 
       updatePlayerIndicator();
 
+      // ESTA ES LA LÍNEA QUE FALTA PARA QUE EL BOTÓN VUELVA A SALIR:
+      revealBtn.style.display = 'inline-block'; 
+      
       revealBtn.disabled = false;
       revealBtn.textContent = 'Ver mi rol';
     }
@@ -3359,7 +3295,70 @@ function startGame(){
       }
     }
 
-    function showCountdown() {
+  function showCountdown() {
+      // OCULTAR FLECHA AL EMPEZAR LA CUENTA ATRÁS
+    // --- LÓGICA DE LA FLECHA DE RETROCESO ---
+    if (backArrowBtn) {
+      backArrowBtn.addEventListener('click', () => {
+        playClickSound();
+        
+        // 1. Si estamos en Tabú -> Volver a menú
+        if (tabooGame.style.display === 'block') {
+          if (isTabooTimerRunning) {
+            clearInterval(tabooTimerInterval);
+            isTabooTimerRunning = false;
+            tabooTimerDisplay.textContent = '1:30';
+            startTabooTurnBtn.disabled = false;
+            startTabooTurnBtn.style.opacity = '1';
+            startTabooTurnBtn.style.display = 'inline-block';
+            tabooCardArea.style.display = 'none';
+          }
+          tabooGame.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+        }
+        // 2. Si estamos en Setup -> Volver a menú
+        else if (setup.style.display === 'block') {
+          setup.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+        }
+        // 3. Si estamos en Categorías -> Volver a Setup
+        else if (categorySelection.style.display === 'block') {
+          categorySelection.style.display = 'none';
+          setup.style.display = 'block';
+          // Restaurar valores visuales
+          const impDisplay = document.getElementById('impostorsDisplay');
+          const plDisplay = document.getElementById('playersDisplay');
+          if(plDisplay) plDisplay.textContent = numPlayers;
+          if(impDisplay) impDisplay.textContent = numImpostors;
+        }
+        // 4. Si estamos en Nombres -> Volver atrás
+        else if (namesSection.style.display === 'block') {
+          namesSection.style.display = 'none';
+          if (selectedCategoryFilter !== null) {
+             categorySelection.style.display = 'block';
+          } else {
+             setup.style.display = 'block';
+             const impDisplay = document.getElementById('impostorsDisplay');
+             const plDisplay = document.getElementById('playersDisplay');
+             if(plDisplay) plDisplay.textContent = numPlayers;
+             if(impDisplay) impDisplay.textContent = numImpostors;
+          }
+        }
+        // 5. Si estamos viendo roles (Pass) -> Cancelar partida y volver a nombres
+        else if (pass.style.display === 'block') {
+          pass.style.display = 'none';
+          namesSection.style.display = 'block';
+        }
+        // 6. Si estamos en VOTACIÓN (Discussion) -> Cancelar y volver al menú
+        else if (discussion.style.display === 'block') {
+          discussion.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+        }
+
+        updateArrowVisibility();
+      });
+    }
+
       const countdownScreen = document.createElement('div');
       countdownScreen.className = 'countdown-screen';
       document.body.appendChild(countdownScreen);
@@ -3384,7 +3383,10 @@ function startGame(){
             setTimeout(() => {
               countdownScreen.remove();
               discussion.style.display = 'block';
-              updateArrowVisibility();
+              
+              // MOSTRAR FLECHA AL TERMINAR LA CUENTA ATRÁS
+              updateArrowVisibility(); 
+              
               const activePlayers = players.filter(p => !p.eliminated);
               const firstSpeaker = activePlayers[randInt(activePlayers.length)];
               const firstSpeakerElement = document.getElementById('firstSpeakerName');
@@ -3579,10 +3581,73 @@ function startGame(){
         }
         
         // Ocultar flecha para obligar a usar el botón de menú
-        if(backArrowBtn) backArrowBtn.style.display = 'none';
+// Ocultar flecha para obligar a usar el botón de menú
+      if(backArrowBtn) backArrowBtn.style.display = 'none';
     }
 
-    // Botón para volver al menú desde resultados
+    // --- LÓGICA DE LA FLECHA DE RETROCESO (CORREGIDA) ---
+    if (backArrowBtn) {
+      backArrowBtn.addEventListener('click', () => {
+        playClickSound();
+
+        // 1. Si estamos en Tabú -> Volver a menú
+        if (tabooGame.style.display === 'block') {
+          if (isTabooTimerRunning) {
+            clearInterval(tabooTimerInterval);
+            isTabooTimerRunning = false;
+            tabooTimerDisplay.textContent = '1:30'; // O 2:00
+            startTabooTurnBtn.disabled = false;
+            startTabooTurnBtn.style.opacity = '1';
+            startTabooTurnBtn.style.display = 'inline-block';
+            tabooCardArea.style.display = 'none';
+          }
+          tabooGame.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+        }
+        // 2. Si estamos en Setup -> Volver a menú
+        else if (setup.style.display === 'block') {
+          setup.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+        }
+        // 3. Si estamos en Categorías -> Volver a Setup
+        else if (categorySelection.style.display === 'block') {
+          categorySelection.style.display = 'none';
+          setup.style.display = 'block';
+          // Restaurar valores visuales si existen
+          const impDisplay = document.getElementById('impostorsDisplay');
+          const plDisplay = document.getElementById('playersDisplay');
+          if(plDisplay) plDisplay.textContent = numPlayers;
+          if(impDisplay) impDisplay.textContent = numImpostors;
+        }
+        // 4. Si estamos en Nombres -> Volver atrás
+        else if (namesSection.style.display === 'block') {
+          namesSection.style.display = 'none';
+          if (selectedCategoryFilter !== null) {
+             categorySelection.style.display = 'block';
+          } else {
+             setup.style.display = 'block';
+             const impDisplay = document.getElementById('impostorsDisplay');
+             const plDisplay = document.getElementById('playersDisplay');
+             if(plDisplay) plDisplay.textContent = numPlayers;
+             if(impDisplay) impDisplay.textContent = numImpostors;
+          }
+        }
+        // 5. Si estamos viendo roles (Pass) -> Cancelar partida
+        else if (pass.style.display === 'block') {
+          pass.style.display = 'none';
+          namesSection.style.display = 'block';
+        }
+        // 6. Si estamos en VOTACIÓN (Discussion) -> Cancelar y menú
+        else if (discussion.style.display === 'block') {
+          discussion.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+        }
+
+        updateArrowVisibility();
+      });
+    }
+
+    // Botón para volver al menú desde resultados Tabú
     document.getElementById('tabooBackToMenuBtn').addEventListener('click', () => {
         playClickSound();
         document.getElementById('tabooResults').style.display = 'none';
