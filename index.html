@@ -43,15 +43,15 @@
       font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: #1a1635;
 
-      /* TRUCO IPHONE: 100dvh ignora las barras de navegación de Safari */
+      /* Altura de pantalla móvil real */
       min-height: 100vh;
-      min-height: 100dvh; 
+      min-height: 100dvh;
 
       display: flex;
       flex-direction: column;
       
-      /* ESTO LO CENTRA VERTICAL Y HORIZONTALMENTE */
-      justify-content: center;
+      /* Centrado */
+      justify-content: center; 
       align-items: center;
 
       overflow-x: hidden;
@@ -63,10 +63,15 @@
       user-select: none;
       touch-action: pan-y;
 
-      /* MÁRGENES DE SEGURIDAD */
-      padding: 20px;
+      /* Padding lateral */
+      padding-left: 20px;
+      padding-right: 20px;
       
-      /* MUCHO ESPACIO ABAJO para que la barra del iPhone no tape nada */
+      /* --- AQUÍ ESTÁ EL TRUCO PARA BAJARLO --- */
+      /* Al poner el mismo (o más) padding arriba que abajo, el contenido baja al centro real */
+      padding-top: 80px; 
+      
+      /* Margen de seguridad abajo para iPhone */
       padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
     }
    
