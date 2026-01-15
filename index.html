@@ -3715,13 +3715,21 @@
       showNamesScreen();
     }
 
-    function showCategorySelection() {
+    function showCategorySelection(){
       playSuccessSound();
       clueModeEnabled = false;
       selectedCategoryFilter = null;
       setup.style.display = 'none';
       namesSection.style.display = 'none';
+      
       categorySelection.style.display = 'block';
+      
+      categorySelection.style.pointerEvents = 'none';
+      setTimeout(() => {
+          categorySelection.style.pointerEvents = 'auto';
+      }, 400); 
+      // ---------------------------------
+
       updateArrowVisibility();
       buildCategoryButtons();
     }
