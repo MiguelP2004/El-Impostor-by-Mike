@@ -1208,6 +1208,10 @@
       text-align: center;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     }
+    /* CLASE PARA BLOQUEAR TODO TEMPORALMENTE */
+    body.locked-interactions * {
+      pointer-events: none !important;
+    }
   </style>
 </head>
 
@@ -1422,6 +1426,12 @@
 
   <script>
     // Register Service Worker
+    function lockScreenTransition() {
+      document.body.classList.add('locked-interactions');
+      setTimeout(() => {
+        document.body.classList.remove('locked-interactions');
+      }, 400); // 0.4 segundos de protección
+    }
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
         navigator.serviceWorker.register('sw.js').then(function (registration) {
