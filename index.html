@@ -35,10 +35,11 @@
     }
 
     html {
+      width: 100%;
       height: 100%;
-      /* PINTAMOS EL HUECO DE ABAJO DEL MISMO COLOR */
-      background-color: #1a1635;
-      overflow: hidden;
+      /* PINTAMOS EL FONDO DEL NAVEGADOR PARA TAPAR LA FRANJA BLANCA */
+      background-color: #1a1635; 
+      overflow-x: hidden; /* Evita el scroll horizontal (la barra de lado) */
     }
 
     :root {
@@ -60,10 +61,10 @@
     body {
       margin: 0;
       font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background-color: #1a1635;
 
-      /* FONDO REAL APLICADO AQUÍ */
-      background: #1a1635;
-      /* Usamos dvh (Dynamic Viewport Height) para que se adapte a la barra del iPhone */
+      /* Asegura altura completa */
+      min-height: 100vh;
       min-height: 100dvh;
       width: 100%;
 
@@ -72,19 +73,18 @@
       justify-content: center;
       align-items: center;
 
-      /* PERMITIR MOVIMIENTO VERTICAL */
+      /* DESBLOQUEO: Permite mover la pantalla verticalmente */
+      overflow-y: auto; 
       overflow-x: hidden;
-      overflow-y: auto;
 
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-
-      padding: 10px;
-      padding-top: max(20px, env(safe-area-inset-top));
-      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      /* Padding ajustado para evitar cortes abajo */
+      padding: 15px;
+      padding-top: max(15px, env(safe-area-inset-top));
+      padding-bottom: max(60px, env(safe-area-inset-bottom)); /* Más espacio abajo */
 
       -webkit-user-select: none;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ESTE ES EL TRUCO PARA IPHONE: */
@@ -1490,48 +1490,31 @@
         if (hasGameStarted) return;
         hasGameStarted = true;
 
-        // 1. Audio (silencioso) y Correcciones iniciales
-        if (typeof unlockAudioWithUserGesture === 'function') { unlockAudioWithUserGesture().catch(() => { }); }
-        window.scrollTo(0, 0);
-        document.body.style.overflowY = 'auto';
-        document.body.style.overflowX = 'hidden';
-
-        // 2. PREPARAR EL MENÚ PRINCIPAL DETRÁS
-        const main = document.getElementById('mainContainer');
-        if (main) {
-          if (typeof handleContinueFromIntro === 'function') handleContinueFromIntro();
-          // Hacemos visible el menú detrás de la intro que se va a desvanecer
-          main.style.transition = 'opacity 0.5s ease-in';
-          main.style.opacity = '1';
+        // 1. Ocultar barra de carga
+        if (introFill && introFill.parentElement) {
+            introFill.parentElement.style.display = 'none';
         }
 
-        if (typeof updateArrowVisibility === 'function') updateArrowVisibility();
+        // 2. Audio
+        if (typeof unlockAudioWithUserGesture === 'function') {
+             unlockAudioWithUserGesture().catch(()=>{});
+        }
 
-        // 3. EJECUTAR EL DESVANECIMIENTO "BONITO"
-        if (introScreenEl) {
-          // Ocultar la barra de progreso inmediatamente para que no se vea mientras se desvanece el fondo
-          if (introFill && introFill.parentElement) introFill.parentElement.style.display = 'none';
+        // 3. --- EL BALANCEO RÁPIDO (MICRO-SCROLL) ---
+        // Forzamos un movimiento minúsculo para que el iPhone "despierte" y pinte el fondo
+        window.scrollTo(0, 1); // Bajamos 1 pixel
+        setTimeout(() => {
+            window.scrollTo(0, 0); // Subimos inmediatamente
+        }, 50);
 
-          // Aplicamos la transición suave de 0.5 segundos
-          introScreenEl.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
-          introScreenEl.style.opacity = '0';
-          introScreenEl.style.transform = 'scale(1.1)'; // Un pequeño zoom al desvanecerse queda bien
-
-          // ESPERAMOS EXACTAMENTE 500ms (lo que dura la transición) PARA BORRARLO DEL HTML
-          setTimeout(() => {
-            introScreenEl.remove();
-
-            // Balanceo final imperceptible una vez que la intro ha desaparecido por completo
-            setTimeout(() => window.scrollTo(0, 1), 10);
-            setTimeout(() => window.scrollTo(0, 0), 30);
-          }, 500);
-
+        // 4. Transición visual
+        if (typeof handleContinueFromIntro === 'function') {
+            handleContinueFromIntro();
         } else {
-          // Si no había intro, hacemos el balanceo directo
-          setTimeout(() => window.scrollTo(0, 1), 10);
-          setTimeout(() => window.scrollTo(0, 0), 30);
+            if (introScreenEl) introScreenEl.remove();
+            document.getElementById('mainContainer').style.opacity = '1';
         }
-      }
+    }
 
       // EJECUCIÓN
       if (introFill && introScreenEl) {
