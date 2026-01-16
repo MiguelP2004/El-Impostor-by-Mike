@@ -36,10 +36,9 @@
 
     html {
       height: 100%;
-      overflow: hidden;
-      /* Evitamos scroll doble */
+      /* PINTAMOS EL HUECO DE ABAJO DEL MISMO COLOR */
       background-color: #1a1635;
-      /* Color de seguridad */
+      overflow: hidden;
     }
 
     :root {
@@ -62,10 +61,10 @@
       margin: 0;
       font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
-      /* Fondo transparente (para que se vea el truco del body::after) */
-      background-color: transparent;
-
-      height: 100%;
+      /* FONDO REAL APLICADO AQUÍ */
+      background: #1a1635;
+      /* Usamos dvh (Dynamic Viewport Height) para que se adapte a la barra del iPhone */
+      min-height: 100dvh;
       width: 100%;
 
       display: flex;
@@ -73,16 +72,14 @@
       justify-content: center;
       align-items: center;
 
-      /* --- CAMBIO AQUÍ: --- */
+      /* PERMITIR MOVIMIENTO VERTICAL */
       overflow-x: hidden;
       overflow-y: auto;
-      /* <--- IMPORTANTE: AUTO en lugar de hidden para poder mover */
-      /* -------------------- */
 
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
 
-      padding: 20px;
+      padding: 10px;
       padding-top: max(20px, env(safe-area-inset-top));
       padding-bottom: max(20px, env(safe-area-inset-bottom));
 
@@ -1482,58 +1479,68 @@
     // --- LÓGICA DE INICIO AUTOMÁTICA (SINCRONIZADA) ---
     window.addEventListener('load', () => {
 
-      // --- LÓGICA DE INICIO INSTANTÁNEA (SIN DELAY NI BOTÓN) ---
-
-      // NOTA: Quitamos el window.addEventListener('load') para que se sincronice 
-      // perfectamente con la barra CSS desde el milisegundo 0.
+      // --- LÓGICA DE INICIO CON TRANSICIÓN SUAVE (SIN DELAY) ---
 
       const introScreenEl = document.getElementById('introScreen');
       const introFill = document.querySelector('.intro-progress-fill');
       let hasGameStarted = false;
 
-      // Función que arranca el juego
+      // Función que arranca el juego con desvanecimiento
       function launchGame() {
         if (hasGameStarted) return;
         hasGameStarted = true;
 
-        // 1. Ocultar la barra de carga
-        if (introFill && introFill.parentElement) {
-          introFill.parentElement.style.display = 'none';
+        // 1. Audio (silencioso) y Correcciones iniciales
+        if (typeof unlockAudioWithUserGesture === 'function') { unlockAudioWithUserGesture().catch(() => { }); }
+        window.scrollTo(0, 0);
+        document.body.style.overflowY = 'auto';
+        document.body.style.overflowX = 'hidden';
+
+        // 2. PREPARAR EL MENÚ PRINCIPAL DETRÁS
+        const main = document.getElementById('mainContainer');
+        if (main) {
+          if (typeof handleContinueFromIntro === 'function') handleContinueFromIntro();
+          // Hacemos visible el menú detrás de la intro que se va a desvanecer
+          main.style.transition = 'opacity 0.5s ease-in';
+          main.style.opacity = '1';
         }
 
-        // 2. Intentar desbloquear audio
-        if (typeof unlockAudioWithUserGesture === 'function') {
-          unlockAudioWithUserGesture().catch(() => { });
-        }
+        if (typeof updateArrowVisibility === 'function') updateArrowVisibility();
 
-        // 3. --- EL BALANCEO RÁPIDO (TRUCO IPHONE) ---
-        // Esto hace un "scroll falso" muy rápido para ajustar la pantalla
-        document.body.style.overflowY = 'auto'; // Aseguramos scroll
+        // 3. EJECUTAR EL DESVANECIMIENTO "BONITO"
+        if (introScreenEl) {
+          // Ocultar la barra de progreso inmediatamente para que no se vea mientras se desvanece el fondo
+          if (introFill && introFill.parentElement) introFill.parentElement.style.display = 'none';
 
-        // Bajamos un poco...
-        window.scrollTo(0, 50);
+          // Aplicamos la transición suave de 0.5 segundos
+          introScreenEl.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+          introScreenEl.style.opacity = '0';
+          introScreenEl.style.transform = 'scale(1.1)'; // Un pequeño zoom al desvanecerse queda bien
 
-        // Y subimos de inmediato (casi invisible)
-        setTimeout(() => {
-          window.scrollTo(0, 0);
-        }, 100);
+          // ESPERAMOS EXACTAMENTE 500ms (lo que dura la transición) PARA BORRARLO DEL HTML
+          setTimeout(() => {
+            introScreenEl.remove();
 
-        // 4. Ejecutar la transición visual
-        if (typeof handleContinueFromIntro === 'function') {
-          handleContinueFromIntro();
+            // Balanceo final imperceptible una vez que la intro ha desaparecido por completo
+            setTimeout(() => window.scrollTo(0, 1), 10);
+            setTimeout(() => window.scrollTo(0, 0), 30);
+          }, 500);
+
         } else {
-          if (introScreenEl) introScreenEl.remove();
-          document.getElementById('mainContainer').style.opacity = '1';
+          // Si no había intro, hacemos el balanceo directo
+          setTimeout(() => window.scrollTo(0, 1), 10);
+          setTimeout(() => window.scrollTo(0, 0), 30);
         }
       }
 
       // EJECUCIÓN
       if (introFill && introScreenEl) {
-        // Usamos 'animationend' para disparar justo al tocar el final
+        // Usamos el evento para que sea exacto al terminar la barra
         introFill.addEventListener('animationend', launchGame);
 
-        // Fallback ajustado a la duración exacta del CSS (3s + margen mínimo)
-        setTimeout(launchGame, 3100);
+        // Fallback de seguridad: 3050ms (3s de la barra + 50ms de margen mínimo)
+        // Es un delay casi imperceptible si falla el evento.
+        setTimeout(launchGame, 3050);
       } else {
         launchGame();
       }
