@@ -36,8 +36,10 @@
 
     html {
       height: 100%;
-      overflow: hidden; /* Evitamos scroll doble */
-      background-color: #1a1635; /* Color de seguridad */
+      overflow: hidden;
+      /* Evitamos scroll doble */
+      background-color: #1a1635;
+      /* Color de seguridad */
     }
 
     :root {
@@ -59,21 +61,24 @@
     body {
       margin: 0;
       font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      
-      /* CAMBIO CLAVE: Fondo transparente aquí, lo ponemos fijo abajo */
-      background-color: transparent; 
-      
+
+      /* Fondo transparente (para que se vea el truco del body::after) */
+      background-color: transparent;
+
       height: 100%;
       width: 100%;
 
       display: flex;
       flex-direction: column;
-      justify-content: center; 
+      justify-content: center;
       align-items: center;
 
-      /* Scroll suave */
+      /* --- CAMBIO AQUÍ: --- */
       overflow-x: hidden;
-      overflow-y: auto; 
+      overflow-y: auto;
+      /* <--- IMPORTANTE: AUTO en lugar de hidden para poder mover */
+      /* -------------------- */
+
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
 
@@ -81,7 +86,6 @@
       padding-top: max(20px, env(safe-area-inset-top));
       padding-bottom: max(20px, env(safe-area-inset-bottom));
 
-      /* Bloqueo de texto */
       -webkit-user-select: none;
       user-select: none;
     }
@@ -96,13 +100,17 @@
       left: 0;
       width: 100vw;
       height: 120vh;
-      background: #1a1635; /* Tu color morado */
-      z-index: -999; /* Se pone detrás de todo */
+      background: #1a1635;
+      /* Tu color morado */
+      z-index: -999;
+      /* Se pone detrás de todo */
       pointer-events: none;
     }
-    
+
     /* Input select text fix */
-    input[type=number], input[type=text], select {
+    input[type=number],
+    input[type=text],
+    select {
       -webkit-user-select: text;
       user-select: text;
     }
@@ -185,15 +193,17 @@
 
     .container {
       /* ANCHURA AJUSTADA: Ni muy ancha ni muy estrecha */
-      width: 92%; 
-      max-width: 500px; /* Tamaño ideal para móvil y PC */
-      
-      background: linear-gradient(180deg, rgba(42,45,58,0.98), rgba(35,38,48,0.95));
+      width: 92%;
+      max-width: 500px;
+      /* Tamaño ideal para móvil y PC */
+
+      background: linear-gradient(180deg, rgba(42, 45, 58, 0.98), rgba(35, 38, 48, 0.95));
       border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      
-      padding: 20px; /* Padding equilibrado */
-      
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+      padding: 20px;
+      /* Padding equilibrado */
+
       animation: float 6s ease-in-out infinite;
       position: relative;
       z-index: 1;
@@ -956,9 +966,10 @@
         width: 100%;
         max-width: none;
         margin: 0;
-        padding-inline: 14px; /* Un poco de aire a los lados */
+        padding-inline: 14px;
+        /* Un poco de aire a los lados */
       }
-      
+
       /* Ajustamos el body para que no quite espacio extra en móviles */
       body {
         padding-left: 5px;
@@ -1233,6 +1244,7 @@
       text-align: center;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     }
+
     /* CLASE PARA BLOQUEAR TODO TEMPORALMENTE */
     body.locked-interactions * {
       pointer-events: none !important;
@@ -1484,41 +1496,34 @@
         if (hasGameStarted) return;
         hasGameStarted = true;
 
-        // 1. Ocultar la barra de carga YA
+        // 1. Ocultar la barra de carga
         if (introFill && introFill.parentElement) {
           introFill.parentElement.style.display = 'none';
         }
 
-        // 2. Desbloquear audio
+        // 2. Intentar desbloquear audio
         if (typeof unlockAudioWithUserGesture === 'function') {
           unlockAudioWithUserGesture().catch(() => { });
         }
 
-        // 3. --- CORRECCIÓN SCROLL IPHONE ---
-        window.scrollTo(0, 0);
-        document.body.style.overflowY = 'auto';
-        document.body.style.overflowX = 'hidden';
-        setTimeout(() => window.scrollTo(0, 0), 10);
+        // 3. --- EL BALANCEO RÁPIDO (TRUCO IPHONE) ---
+        // Esto hace un "scroll falso" muy rápido para ajustar la pantalla
+        document.body.style.overflowY = 'auto'; // Aseguramos scroll
 
-        // 4. TRANSICIÓN RÁPIDA (0.2s en vez de 0.5s)
-        // Ignoramos la función antigua y lo hacemos manual aquí para que sea veloz
-        if (introScreenEl) {
-          introScreenEl.style.transition = 'opacity 0.2s ease-out';
-          introScreenEl.style.opacity = '0';
+        // Bajamos un poco...
+        window.scrollTo(0, 50);
 
-          // Mostrar el juego
-          const main = document.getElementById('mainContainer');
-          if (main) main.style.opacity = '1';
+        // Y subimos de inmediato (casi invisible)
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
 
-          const gameMode = document.getElementById('gameModeSelection');
-          if (gameMode) gameMode.style.display = 'block';
-
-          if (typeof updateArrowVisibility === 'function') updateArrowVisibility();
-
-          // Borrar la intro del HTML en cuanto acabe la transición rápida
-          setTimeout(() => {
-            introScreenEl.remove();
-          }, 200);
+        // 4. Ejecutar la transición visual
+        if (typeof handleContinueFromIntro === 'function') {
+          handleContinueFromIntro();
+        } else {
+          if (introScreenEl) introScreenEl.remove();
+          document.getElementById('mainContainer').style.opacity = '1';
         }
       }
 
@@ -3750,19 +3755,19 @@
       showNamesScreen();
     }
 
-    function showCategorySelection(){
+    function showCategorySelection() {
       playSuccessSound();
       clueModeEnabled = false;
       selectedCategoryFilter = null;
       setup.style.display = 'none';
       namesSection.style.display = 'none';
-      
+
       categorySelection.style.display = 'block';
-      
+
       categorySelection.style.pointerEvents = 'none';
       setTimeout(() => {
-          categorySelection.style.pointerEvents = 'auto';
-      }, 400); 
+        categorySelection.style.pointerEvents = 'auto';
+      }, 400);
       // ---------------------------------
 
       updateArrowVisibility();
