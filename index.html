@@ -363,10 +363,7 @@
       box-shadow: 0 5px 16px rgba(255, 193, 7, 0.6)
     }
 
-    .counter-btn:active {
-      transform: scale(0.95);
-      box-shadow: 0 2px 6px rgba(255, 193, 7, 0.5)
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     .counter-value {
       font-size: 28px;
@@ -396,10 +393,7 @@
       box-shadow: 0 10px 24px rgba(255, 193, 7, 0.6)
     }
 
-    .btn:active {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 5px 12px rgba(255, 193, 7, 0.5)
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     .btn.big {
       padding: 16px 32px;
@@ -423,9 +417,7 @@
       box-shadow: 0 10px 24px rgba(255, 235, 59, 0.5)
     }
 
-    .btn.secondary:active {
-      box-shadow: 0 5px 12px rgba(255, 235, 59, 0.4)
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     .center {
       text-align: center
@@ -979,12 +971,15 @@
     .intro-screen {
       position: fixed;
       /* TRUCO FINAL IPHONE: Hacemos la intro GIGANTE */
-      top: -20vh;
-      /* Empieza muy arriba */
+      top: 0;
+      /* Centrado vertical correcto */
       left: 0;
       width: 100%;
-      height: 140vh;
-      /* Mide mucho más que la pantalla */
+      height: 100%;
+      /* Altura completa de viewport */
+      min-height: 100vh;
+      min-height: 100dvh;
+      /* dvh para dispositivos móviles modernos */
 
       /* Tu fondo original */
       background: radial-gradient(circle at 50% 50%, #2d1b4e 0, #1a1635 45%, #05020a 100%);
@@ -999,10 +994,16 @@
       text-align: center;
 
       padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(40px, env(safe-area-inset-bottom));
+      /* Respeta safe areas de iPhone */
 
       /* IMPRESCINDIBLE: Bloquea que el dedo mueva la intro */
       touch-action: none;
       pointer-events: auto;
+      
+      /* Evita que se vea contenido fuera del viewport */
+      overflow: hidden;
     }
 
     /* Arreglo para que salgan 3 columnas (aprox) en vez de una lista larga */
@@ -3848,16 +3849,19 @@
         if (impDisplay) impDisplay.textContent = numImpostors;
       }
 
-      // 3. Asignar roles
+      // 3. Asignar roles de forma COMPLETAMENTE ALEATORIA
 
       // --- LÍNEA AÑADIDA: Resetear a todos los jugadores a 'civil' primero ---
       players.forEach(p => p.role = 'civil');
       // -----------------------------------------------------------------------
 
+      // SELECCIÓN ALEATORIA DE IMPOSTORES:
+      // Se crea un array con índices de todos los jugadores [0,1,2,...,numPlayers-1]
+      // y se van eligiendo aleatoriamente, garantizando que cada impostor es único
       let available = [...Array(numPlayers).keys()];
       for (let k = 0; k < numImpostors; k++) {
-        const pickIdx = randInt(available.length);
-        const pidx = available.splice(pickIdx, 1)[0];
+        const pickIdx = randInt(available.length); // Índice aleatorio en array disponible
+        const pidx = available.splice(pickIdx, 1)[0]; // Extrae ese jugador y lo elimina de disponibles
         players[pidx].role = 'impostor';
       }
 
@@ -4005,8 +4009,10 @@
               // MOSTRAR FLECHA AL TERMINAR LA CUENTA ATRÁS
               updateArrowVisibility();
 
+              // SELECCIÓN ALEATORIA DEL PRIMER JUGADOR EN HABLAR:
+              // Se elige completamente al azar entre los jugadores activos (no eliminados)
               const activePlayers = players.filter(p => !p.eliminated);
-              const firstSpeaker = activePlayers[randInt(activePlayers.length)];
+              const firstSpeaker = activePlayers[randInt(activePlayers.length)]; // Aleatorio total
               const firstSpeakerElement = document.getElementById('firstSpeakerName');
               firstSpeakerElement.innerHTML = `🎤 Empieza hablando: <span style="font-size:28px;color:#ffffff;text-shadow:0 4px 14px rgba(255,255,255,0.8)">${firstSpeaker.name}</span>`;
               firstSpeakerElement.style.display = 'block';
@@ -4326,6 +4332,20 @@
       // Si no hay intro, arrancar directo
       launchGame();
     }
+
+    // --- FIX: PREVENIR ANIMACIÓN PEGAJOSA DE BOTONES ---
+    // En dispositivos táctiles, los botones pueden mantener el estado :active
+    // incluso después de soltar. Forzamos blur() en todos los botones tras cualquier interacción.
+    document.addEventListener('pointerup', (e) => {
+      if (e.target && typeof e.target.blur === 'function') {
+        e.target.blur();
+      }
+    });
+    document.addEventListener('touchend', (e) => {
+      if (e.target && typeof e.target.blur === 'function') {
+        e.target.blur();
+      }
+    });
   </script>
 </body>
 
