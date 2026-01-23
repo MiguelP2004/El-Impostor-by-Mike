@@ -876,11 +876,7 @@
       box-shadow: 0 8px 0 #b33939, 0 15px 20px rgba(0, 0, 0, 0.3);
     }
 
-    .btn-skip:active {
-      transform: translateY(8px);
-      /* Se hunde */
-      box-shadow: 0 0 0 #b33939, inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     /* ESTILO BOTÓN VERDE (CHECK) */
     .btn-correct {
@@ -889,11 +885,7 @@
       box-shadow: 0 8px 0 #0c7457, 0 15px 20px rgba(0, 0, 0, 0.3);
     }
 
-    .btn-correct:active {
-      transform: translateY(8px);
-      /* Se hunde */
-      box-shadow: 0 0 0 #0c7457, inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     /* ESTILO DE LOS ICONOS SVG */
     .action-btn svg {
@@ -909,10 +901,7 @@
       /* Sombra interna al icono */
     }
 
-    .action-btn:active svg {
-      transform: scale(0.9);
-      /* Pequeño rebote al pulsar */
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     .btn-correct {
       background: linear-gradient(180deg, #4caf50, #2e7d32);
@@ -3416,6 +3405,7 @@
     let tabooTimerInterval = null;
     let isTabooTimerRunning = false;
     let currentTabooTeam = null;
+    let usedTabooWords = []; // Track used words to prevent repetition in same game
 
     // --- VARIABLES DE RONDAS (AGREGAR ESTO) ---
     let currentTabooRound = 1;
@@ -3590,6 +3580,7 @@
       scoreRedDisplay.textContent = '0';
       scoreBlueDisplay.textContent = '0';
       tabooTimerDisplay.textContent = '2:00';
+      usedTabooWords = []; // Reset used words for new game
 
       // RESETEAR RONDAS
       currentTabooRound = 1;
@@ -3624,7 +3615,18 @@
     }
 
     function loadTabooCard() {
-      const card = tabooWords[Math.floor(Math.random() * tabooWords.length)];
+      // Get available words (not used yet)
+      let availableWords = tabooWords.filter(word => !usedTabooWords.includes(word.word));
+      
+      // If all words have been used, reset the used words array
+      if (availableWords.length === 0) {
+        usedTabooWords = [];
+        availableWords = tabooWords;
+      }
+      
+      const card = availableWords[Math.floor(Math.random() * availableWords.length)];
+      usedTabooWords.push(card.word); // Mark this word as used
+      
       tabooMainWord.textContent = card.word;
       tabooForbiddenList.innerHTML = '';
       card.forbidden.forEach(word => {
@@ -4344,6 +4346,22 @@
     document.addEventListener('touchend', (e) => {
       if (e.target && typeof e.target.blur === 'function') {
         e.target.blur();
+      }
+    });
+    
+    // Additional fix: Prevent any button from maintaining focus/active state
+    document.addEventListener('touchcancel', (e) => {
+      if (e.target && typeof e.target.blur === 'function') {
+        e.target.blur();
+      }
+    });
+    
+    // Ensure buttons lose focus after mouseup as well
+    document.addEventListener('mouseup', (e) => {
+      if (e.target && typeof e.target.blur === 'function' && 
+          (e.target.tagName === 'BUTTON' || e.target.closest('button'))) {
+        const btn = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
+        if (btn) btn.blur();
       }
     });
   </script>
