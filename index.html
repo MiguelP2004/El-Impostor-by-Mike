@@ -3621,7 +3621,7 @@
     let tabooTimerInterval = null;
     let isTabooTimerRunning = false;
     let currentTabooTeam = null;
-    let usedTabooWords = []; // Track used words to prevent repetition in same game
+    let usedTabooWords = new Set(); // Track used words to prevent repetition in same game (using Set for O(1) lookup)
 
     // --- VARIABLES DE RONDAS (AGREGAR ESTO) ---
     let currentTabooRound = 1;
@@ -3796,7 +3796,7 @@
       scoreRedDisplay.textContent = '0';
       scoreBlueDisplay.textContent = '0';
       tabooTimerDisplay.textContent = '2:00';
-      usedTabooWords = []; // Reset used words for new game
+      usedTabooWords = new Set(); // Reset used words for new game
 
       // RESETEAR RONDAS
       currentTabooRound = 1;
@@ -3831,17 +3831,17 @@
     }
 
     function loadTabooCard() {
-      // Get available words (not used yet)
-      let availableWords = tabooWords.filter(word => !usedTabooWords.includes(word.word));
+      // Get available words (not used yet) - using Set for O(1) lookup
+      let availableWords = tabooWords.filter(word => !usedTabooWords.has(word.word));
       
-      // If all words have been used, reset the used words array
+      // If all words have been used, reset the used words set
       if (availableWords.length === 0) {
-        usedTabooWords = [];
+        usedTabooWords = new Set();
         availableWords = tabooWords;
       }
       
       const card = availableWords[Math.floor(Math.random() * availableWords.length)];
-      usedTabooWords.push(card.word); // Mark this word as used
+      usedTabooWords.add(card.word); // Mark this word as used
       
       tabooMainWord.textContent = card.word;
       tabooForbiddenList.innerHTML = '';
@@ -4574,11 +4574,8 @@
     
     // Ensure buttons lose focus after mouseup as well
     document.addEventListener('mouseup', (e) => {
-      if (e.target && typeof e.target.blur === 'function' && 
-          (e.target.tagName === 'BUTTON' || e.target.closest('button'))) {
-        const btn = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
-        if (btn) btn.blur();
-      }
+      const btn = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
+      if (btn) btn.blur();
     });
   </script>
 </body>
