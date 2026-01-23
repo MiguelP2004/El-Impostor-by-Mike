@@ -876,11 +876,7 @@
       box-shadow: 0 8px 0 #b33939, 0 15px 20px rgba(0, 0, 0, 0.3);
     }
 
-    .btn-skip:active {
-      transform: translateY(8px);
-      /* Se hunde */
-      box-shadow: 0 0 0 #b33939, inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     /* ESTILO BOTÓN VERDE (CHECK) */
     .btn-correct {
@@ -889,11 +885,7 @@
       box-shadow: 0 8px 0 #0c7457, 0 15px 20px rgba(0, 0, 0, 0.3);
     }
 
-    .btn-correct:active {
-      transform: translateY(8px);
-      /* Se hunde */
-      box-shadow: 0 0 0 #0c7457, inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     /* ESTILO DE LOS ICONOS SVG */
     .action-btn svg {
@@ -909,10 +901,7 @@
       /* Sombra interna al icono */
     }
 
-    .action-btn:active svg {
-      transform: scale(0.9);
-      /* Pequeño rebote al pulsar */
-    }
+    /* Removed :active state to prevent sticky button animations on mobile */
 
     .btn-correct {
       background: linear-gradient(180deg, #4caf50, #2e7d32);
@@ -3389,7 +3378,223 @@
       { word: "JARDÍN", forbidden: ["Casa", "Flores", "Hierba", "Fuera"] },
       { word: "PARQUE", forbidden: ["Jugar", "Niños", "Árboles", "Banco"] },
       { word: "ASEO", forbidden: ["Baño", "Higiene", "Ducha", "Lavabo"] },
-      { word: "BAÑO", forbidden: ["Ducha", "Agua", "Lavabo", "Aseo"] }
+      { word: "BAÑO", forbidden: ["Ducha", "Agua", "Lavabo", "Aseo"] },
+
+      // PALABRAS ADICIONALES - COMIDA
+      { word: "ABANICO", forbidden: ["Calor", "Aire", "Mover", "Abrir"] },
+      { word: "ACEITE", forbidden: ["Cocinar", "Oliva", "Líquido", "Fritar"] },
+      { word: "ALICATE", forbidden: ["Agarrar", "Cortar", "Herramienta", "Pinza"] },
+      { word: "ANILLO", forbidden: ["Dedo", "Joya", "Boda", "Aro"] },
+      { word: "ARCILLA", forbidden: ["Barro", "Moldear", "Cerámica", "Material"] },
+      { word: "ARCOÍRIS", forbidden: ["Colores", "Lluvia", "Sol", "Cielo"] },
+      { word: "ARMÓNICA", forbidden: ["Música", "Soplar", "Pequeña", "Instrumento"] },
+      { word: "ARPA", forbidden: ["Música", "Cuerdas", "Ángel", "Instrumento"] },
+      { word: "ARROZ", forbidden: ["Grano", "Blanco", "Comida", "Asiático"] },
+      { word: "ASCENSOR", forbidden: ["Subir", "Piso", "Botón", "Cabina"] },
+      { word: "ASPIRADORA", forbidden: ["Limpiar", "Suelo", "Polvo", "Succión"] },
+      { word: "ASTEROIDE", forbidden: ["Espacio", "Roca", "Cinturón", "Pequeño"] },
+      { word: "AVALANCHA", forbidden: ["Nieve", "Montaña", "Caer", "Rápido"] },
+      { word: "AZÚCAR", forbidden: ["Dulce", "Blanco", "Café", "Endulzar"] },
+      { word: "BARRIL", forbidden: ["Grande", "Líquido", "Madera", "Cerveza"] },
+      { word: "BASTÓN", forbidden: ["Caminar", "Apoyo", "Palo", "Anciano"] },
+      { word: "BATIDO", forbidden: ["Bebida", "Cremoso", "Fruta", "Licuadora"] },
+      { word: "BOLSA", forbidden: ["Plástico", "Llevar", "Compra", "Guardar"] },
+      { word: "BOSTEZO", forbidden: ["Sueño", "Cansancio", "Boca", "Abrir"] },
+      { word: "BOXEAR", forbidden: ["Golpear", "Puños", "Ring", "Deporte"] },
+      { word: "BUCEAR", forbidden: ["Agua", "Profundo", "Oxígeno", "Mar"] },
+      { word: "CADENA", forbidden: ["Eslabón", "Metal", "Atar", "Collar"] },
+      { word: "CAJA", forbidden: ["Cartón", "Guardar", "Rectangular", "Tapa"] },
+      { word: "CALEFACCIÓN", forbidden: ["Calor", "Invierno", "Calentar", "Casa"] },
+      { word: "CANDADO", forbidden: ["Cerrar", "Llave", "Seguridad", "Metal"] },
+      { word: "CARTÓN", forbidden: ["Caja", "Papel", "Grueso", "Material"] },
+      { word: "CEPILLO", forbidden: ["Pelo", "Dientes", "Limpiar", "Cerdas"] },
+      { word: "CERVEZA", forbidden: ["Alcohol", "Bar", "Espuma", "Adultos"] },
+      { word: "CHAMPÁN", forbidden: ["Burbuja", "Celebrar", "Copa", "Fiesta"] },
+      { word: "CHAMPÚ", forbidden: ["Pelo", "Lavar", "Ducha", "Espuma"] },
+      { word: "CINCEL", forbidden: ["Tallar", "Golpear", "Herramienta", "Madera"] },
+      { word: "CINTURÓN", forbidden: ["Pantalón", "Sujetar", "Hebilla", "Cintura"] },
+      { word: "CLAVO", forbidden: ["Martillo", "Golpear", "Metal", "Pared"] },
+      { word: "COJÍN", forbidden: ["Sofá", "Suave", "Sentarse", "Decoración"] },
+      { word: "COLCHA", forbidden: ["Cama", "Cubrir", "Tela", "Decoración"] },
+      { word: "COLLAR", forbidden: ["Cuello", "Joya", "Cadena", "Colgante"] },
+      { word: "COMETA", forbidden: ["Espacio", "Cola", "Estrella", "Hielo"] },
+      { word: "CORBATA", forbidden: ["Cuello", "Formal", "Nudo", "Traje"] },
+      { word: "CREPE", forbidden: ["Francia", "Fino", "Dulce", "Enrollar"] },
+      { word: "CUBO", forbidden: ["Agua", "Llevar", "Redondo", "Asa"] },
+      { word: "CURRY", forbidden: ["India", "Especias", "Picante", "Salsa"] },
+      { word: "CÓMODA", forbidden: ["Cajones", "Ropa", "Madera", "Dormitorio"] },
+      { word: "DERROTA", forbidden: ["Perder", "Fracaso", "Victoria", "Caer"] },
+      { word: "DIVIDIR", forbidden: ["Matemática", "Entre", "Partir", "División"] },
+      { word: "ESCALAR", forbidden: ["Montaña", "Subir", "Roca", "Altura"] },
+      { word: "ESCRITORIO", forbidden: ["Estudiar", "Mesa", "Trabajar", "Madera"] },
+      { word: "ESQUIAR", forbidden: ["Nieve", "Montaña", "Deslizar", "Invierno"] },
+      { word: "ESTANTERÍA", forbidden: ["Libros", "Madera", "Estantes", "Guardar"] },
+      { word: "ESTORNUDO", forbidden: ["Nariz", "Alergia", "Sonido", "Resfriado"] },
+      { word: "FLAUTA", forbidden: ["Música", "Soplar", "Agujeros", "Instrumento"] },
+      { word: "FRACCIÓN", forbidden: ["Matemática", "Parte", "Numerador", "División"] },
+      { word: "GALAXIA", forbidden: ["Estrellas", "Espacio", "Vía Láctea", "Universo"] },
+      { word: "GALLETA", forbidden: ["Dulce", "Crujiente", "Merienda", "Hornear"] },
+      { word: "GANCHO", forbidden: ["Colgar", "Curvo", "Metal", "Sujetar"] },
+      { word: "GUERRA", forbidden: ["Paz", "Lucha", "Soldado", "Batalla"] },
+      { word: "GUITARRA", forbidden: ["Música", "Cuerdas", "Tocar", "Instrumento"] },
+      { word: "HARINA", forbidden: ["Blanca", "Pan", "Cocinar", "Polvo"] },
+      { word: "HIERBA", forbidden: ["Verde", "Campo", "Cortar", "Crecer"] },
+      { word: "HIPO", forbidden: ["Sonido", "Involuntario", "Molesto", "Diafragma"] },
+      { word: "HOJA", forbidden: ["Árbol", "Verde", "Caer", "Otoño"] },
+      { word: "HORNO", forbidden: ["Cocinar", "Caliente", "Pan", "Asar"] },
+      { word: "HURACÁN", forbidden: ["Viento", "Tormenta", "Destrucción", "Ciclón"] },
+      { word: "INUNDACIÓN", forbidden: ["Agua", "Mucha", "Río", "Desastre"] },
+      { word: "JABÓN", forbidden: ["Lavar", "Espuma", "Limpio", "Manos"] },
+      { word: "JUSTICIA", forbidden: ["Juez", "Ley", "Equidad", "Derecho"] },
+      { word: "LATA", forbidden: ["Metal", "Conserva", "Abrir", "Cilindro"] },
+      { word: "LAVADORA", forbidden: ["Ropa", "Lavar", "Agua", "Centrifugar"] },
+      { word: "LIBERTAD", forbidden: ["Libre", "Escapar", "Independencia", "Prisión"] },
+      { word: "LIMA", forbidden: ["Lijar", "Suave", "Herramienta", "Metal"] },
+      { word: "LLANTO", forbidden: ["Llorar", "Lágrimas", "Tristeza", "Ojos"] },
+      { word: "LUCHAR", forbidden: ["Pelea", "Fuerza", "Combate", "Ring"] },
+      { word: "MERMELADA", forbidden: ["Fruta", "Dulce", "Tostada", "Frasco"] },
+      { word: "MESITA", forbidden: ["Mesa", "Pequeña", "Noche", "Lámpara"] },
+      { word: "METAL", forbidden: ["Duro", "Brillo", "Hierro", "Material"] },
+      { word: "METEORITO", forbidden: ["Espacio", "Caer", "Piedra", "Cielo"] },
+      { word: "MICROONDAS", forbidden: ["Calentar", "Comida", "Rápido", "Cocina"] },
+      { word: "MIEL", forbidden: ["Dulce", "Abeja", "Dorado", "Natural"] },
+      { word: "MULTIPLICAR", forbidden: ["Matemática", "Veces", "Por", "Producto"] },
+      { word: "MUSGO", forbidden: ["Verde", "Húmedo", "Árbol", "Blando"] },
+      { word: "NEVERA", forbidden: ["Frío", "Comida", "Conservar", "Cocina"] },
+      { word: "PAJARITA", forbidden: ["Cuello", "Formal", "Lazo", "Corbata"] },
+      { word: "PARAGUAS", forbidden: ["Lluvia", "Abrir", "Mojado", "Cubrir"] },
+      { word: "PASTA", forbidden: ["Italia", "Cocinar", "Agua", "Espagueti"] },
+      { word: "PASTA DE DIENTES", forbidden: ["Cepillo", "Boca", "Blanquear", "Tubo"] },
+      { word: "PATINAR", forbidden: ["Hielo", "Deslizar", "Patines", "Ruedas"] },
+      { word: "PAZ", forbidden: ["Guerra", "Tranquilo", "Calma", "Armonía"] },
+      { word: "PEINE", forbidden: ["Pelo", "Peinar", "Púas", "Cabeza"] },
+      { word: "PENDIENTES", forbidden: ["Orejas", "Joya", "Colgar", "Aros"] },
+      { word: "PERCHERO", forbidden: ["Abrigo", "Colgar", "Ropa", "Entrada"] },
+      { word: "PIANO", forbidden: ["Música", "Teclas", "Negro", "Instrumento"] },
+      { word: "PLANCHA", forbidden: ["Ropa", "Alisar", "Caliente", "Vapor"] },
+      { word: "PLANETA", forbidden: ["Tierra", "Espacio", "Órbita", "Redondo"] },
+      { word: "PULSERA", forbidden: ["Muñeca", "Joya", "Brazalete", "Adorno"] },
+      { word: "PÉTALO", forbidden: ["Flor", "Hoja", "Caer", "Delicado"] },
+      { word: "RAMA", forbidden: ["Árbol", "Madera", "Romper", "Palo"] },
+      { word: "RAÍZ", forbidden: ["Árbol", "Tierra", "Planta", "Subterránea"] },
+      { word: "REFRESCO", forbidden: ["Bebida", "Gas", "Dulce", "Lata"] },
+      { word: "RELÁMPAGO", forbidden: ["Luz", "Rayo", "Tormenta", "Brillo"] },
+      { word: "RESTA", forbidden: ["Matemática", "Menos", "Quitar", "Diferencia"] },
+      { word: "RISA", forbidden: ["Reír", "Alegría", "Carcajada", "Boca"] },
+      { word: "SACO", forbidden: ["Bolsa", "Grande", "Llevar", "Tela"] },
+      { word: "SAL", forbidden: ["Blanca", "Condimento", "Sabor", "Mar"] },
+      { word: "SATÉLITE", forbidden: ["Espacio", "Órbita", "Luna", "Artificial"] },
+      { word: "SAXOFÓN", forbidden: ["Música", "Soplar", "Jazz", "Instrumento"] },
+      { word: "SECADOR", forbidden: ["Pelo", "Aire", "Caliente", "Secar"] },
+      { word: "SEMILLA", forbidden: ["Plantar", "Pequeña", "Crecer", "Fruto"] },
+      { word: "SUMA", forbidden: ["Matemática", "Más", "Añadir", "Total"] },
+      { word: "SUSPIRO", forbidden: ["Respirar", "Cansancio", "Exhalar", "Aire"] },
+      { word: "SÓTANO", forbidden: ["Abajo", "Casa", "Oscuro", "Bodega"] },
+      { word: "TABURETE", forbidden: ["Sentarse", "Alto", "Barra", "Patas"] },
+      { word: "TACOS", forbidden: ["México", "Tortilla", "Carne", "Picante"] },
+      { word: "TAMBOR", forbidden: ["Música", "Golpear", "Percusión", "Instrumento"] },
+      { word: "TARRO", forbidden: ["Cristal", "Guardar", "Conserva", "Tapa"] },
+      { word: "TARTA", forbidden: ["Dulce", "Cumpleaños", "Pastel", "Horno"] },
+      { word: "TEJADO", forbidden: ["Casa", "Arriba", "Techo", "Tejas"] },
+      { word: "TELA", forbidden: ["Ropa", "Suave", "Coser", "Material"] },
+      { word: "TIRANTES", forbidden: ["Pantalón", "Hombros", "Sujetar", "Elástico"] },
+      { word: "TOALLA", forbidden: ["Secar", "Baño", "Tela", "Ducha"] },
+      { word: "TORNILLO", forbidden: ["Rosca", "Girar", "Metal", "Tuerca"] },
+      { word: "TOS", forbidden: ["Garganta", "Enfermo", "Sonido", "Pecho"] },
+      { word: "TROMPETA", forbidden: ["Música", "Soplar", "Metal", "Instrumento"] },
+      { word: "TRONCO", forbidden: ["Árbol", "Madera", "Grueso", "Cortar"] },
+      { word: "TSUNAMI", forbidden: ["Ola", "Mar", "Grande", "Desastre"] },
+      { word: "TUERCA", forbidden: ["Tornillo", "Rosca", "Metal", "Apretar"] },
+      { word: "VICTORIA", forbidden: ["Ganar", "Triunfo", "Éxito", "Vencer"] },
+      { word: "VINAGRE", forbidden: ["Ácido", "Ensalada", "Líquido", "Condimento"] },
+      { word: "VINO", forbidden: ["Alcohol", "Uva", "Copa", "Tinto"] },
+      { word: "VIOLÍN", forbidden: ["Música", "Cuerdas", "Arco", "Instrumento"] },
+      { word: "YOGUR", forbidden: ["Lácteo", "Cremoso", "Desayuno", "Probiótico"] },
+      { word: "ZUMO", forbidden: ["Fruta", "Líquido", "Beber", "Naranja"] },
+      { word: "ÁNGULO", forbidden: ["Matemática", "Esquina", "Grados", "Recto"] },
+      { word: "ÁTICO", forbidden: ["Arriba", "Casa", "Techo", "Piso"] },
+
+      // LIMPIEZA Y HOGAR
+      { word: "BROCHA", forbidden: ["Pincel", "Pintar", "Pelo", "Mango"] },
+      { word: "ESPONJA", forbidden: ["Lavar", "Absorber", "Suave", "Jabón"] },
+      { word: "ESCOBA", forbidden: ["Barrer", "Suelo", "Palo", "Limpiar"] },
+      { word: "FREGONA", forbidden: ["Suelo", "Cubo", "Limpiar", "Mojado"] },
+      { word: "ALMACÉN", forbidden: ["Guardar", "Grande", "Depósito", "Mercancía"] },
+      { word: "DESPENSA", forbidden: ["Comida", "Guardar", "Alacena", "Cocina"] },
+      { word: "BUZÓN", forbidden: ["Cartas", "Correo", "Echar", "Puerta"] },
+      { word: "CENICERO", forbidden: ["Ceniza", "Cigarrillo", "Fumar", "Recipiente"] },
+      { word: "MACETERO", forbidden: ["Plantas", "Maceta", "Flores", "Decoración"] },
+      { word: "PECERA", forbidden: ["Peces", "Agua", "Cristal", "Acuario"] },
+      { word: "FLORERO", forbidden: ["Flores", "Agua", "Decoración", "Cristal"] },
+
+      // COSTURA Y TEJIDO
+      { word: "ALFILER", forbidden: ["Pinchar", "Coser", "Punta", "Pequeño"] },
+      { word: "DEDAL", forbidden: ["Dedo", "Coser", "Metal", "Proteger"] },
+      { word: "HILOS", forbidden: ["Coser", "Aguja", "Carrete", "Delgado"] },
+      { word: "BOTONES", forbidden: ["Ropa", "Coser", "Redondo", "Cerrar"] },
+      { word: "COSTURA", forbidden: ["Coser", "Aguja", "Tela", "Hilo"] },
+      { word: "PARCHES", forbidden: ["Ropa", "Tapar", "Agujero", "Coser"] },
+      { word: "REMIENDO", forbidden: ["Reparar", "Coser", "Agujero", "Parche"] },
+
+      // COMIDA Y FORMAS DE COCINAR
+      { word: "PUCHERO", forbidden: ["Cocinar", "Olla", "Guiso", "Caldo"] },
+      { word: "GUISO", forbidden: ["Cocinar", "Carne", "Cocido", "Olla"] },
+      { word: "ESTOFADO", forbidden: ["Carne", "Cocinar", "Lento", "Salsa"] },
+      { word: "FRITURA", forbidden: ["Freír", "Aceite", "Caliente", "Dorado"] },
+      { word: "REBOZADO", forbidden: ["Freír", "Harina", "Huevo", "Empanado"] },
+      { word: "EMPANADO", forbidden: ["Freír", "Pan", "Rallado", "Crujiente"] },
+      { word: "CONSOMÉ", forbidden: ["Caldo", "Claro", "Carne", "Líquido"] },
+      { word: "CALDO", forbidden: ["Líquido", "Cocinar", "Sopa", "Hervir"] },
+      { word: "POTAJE", forbidden: ["Legumbres", "Cocinar", "Guiso", "Cuchara"] },
+      { word: "COCIDO", forbidden: ["Guiso", "Hervir", "Legumbres", "Carne"] },
+      { word: "PARRILLA", forbidden: ["Asar", "Fuego", "Carne", "Barbacoa"] },
+      { word: "BRASA", forbidden: ["Carbón", "Fuego", "Rojo", "Caliente"] },
+
+      // VERBOS DE COCINA
+      { word: "ASAR", forbidden: ["Cocinar", "Horno", "Fuego", "Calor"] },
+      { word: "COCER", forbidden: ["Cocinar", "Agua", "Hervir", "Olla"] },
+      { word: "HERVIR", forbidden: ["Agua", "Burbuja", "Caliente", "Vapor"] },
+      { word: "FREÍR", forbidden: ["Aceite", "Caliente", "Sartén", "Dorar"] },
+      { word: "HORNEAR", forbidden: ["Horno", "Cocinar", "Pan", "Calor"] },
+      { word: "GUISAR", forbidden: ["Cocinar", "Olla", "Salsa", "Lento"] },
+
+      // LUGARES RURALES Y NATURALES
+      { word: "ALDEA", forbidden: ["Pequeño", "Pueblo", "Rural", "Campo"] },
+      { word: "HUERTO", forbidden: ["Cultivar", "Verduras", "Plantas", "Regar"] },
+      { word: "INVERNADERO", forbidden: ["Plantas", "Cristal", "Cultivar", "Calor"] },
+      { word: "VIVERO", forbidden: ["Plantas", "Vender", "Cultivar", "Flores"] },
+      { word: "PUERTO", forbidden: ["Barcos", "Mar", "Muelle", "Anclar"] },
+      { word: "MUELLE", forbidden: ["Puerto", "Barcos", "Atracar", "Mar"] },
+      { word: "EMBARCADERO", forbidden: ["Barcos", "Agua", "Atracar", "Puerto"] },
+      { word: "COSTA", forbidden: ["Mar", "Playa", "Orilla", "Litoral"] },
+      { word: "ACANTILADO", forbidden: ["Mar", "Altura", "Roca", "Precipicio"] },
+      { word: "BAHÍA", forbidden: ["Mar", "Entrada", "Agua", "Protegida"] },
+      { word: "PANTANO", forbidden: ["Agua", "Presa", "Embalse", "Río"] },
+      { word: "LAGUNA", forbidden: ["Agua", "Pequeña", "Estancada", "Lago"] },
+      { word: "ESTANQUE", forbidden: ["Agua", "Artificial", "Pequeño", "Peces"] },
+      { word: "ARROYO", forbidden: ["Agua", "Pequeño", "Corriente", "Río"] },
+      { word: "MANANTIAL", forbidden: ["Agua", "Brotar", "Nacimiento", "Fuente"] },
+
+      // VEHÍCULOS Y TRANSPORTE
+      { word: "TRICICLO", forbidden: ["Tres", "Ruedas", "Pedal", "Niño"] },
+      { word: "CARRETILLA", forbidden: ["Empujar", "Rueda", "Transportar", "Obra"] },
+      { word: "CAMIONETA", forbidden: ["Vehículo", "Pequeño", "Camión", "Transportar"] },
+      { word: "FURGONETA", forbidden: ["Vehículo", "Carga", "Transportar", "Comercial"] },
+      { word: "TRÁILER", forbidden: ["Camión", "Grande", "Remolque", "Mercancía"] },
+      { word: "REMOLQUE", forbidden: ["Arrastrar", "Vehículo", "Carga", "Enganchar"] },
+      { word: "GÓNDOLA", forbidden: ["Venecia", "Barco", "Agua", "Remo"] },
+
+      // MÁS PROFESIONES
+      { word: "MECÁNICO", forbidden: ["Coches", "Reparar", "Motor", "Taller"] },
+      { word: "ELECTRICISTA", forbidden: ["Cables", "Corriente", "Luz", "Reparar"] },
+      { word: "FONTANERO", forbidden: ["Agua", "Tuberías", "Reparar", "Grifos"] },
+      { word: "HERRERO", forbidden: ["Hierro", "Forjar", "Martillo", "Metal"] },
+      { word: "SASTRE", forbidden: ["Ropa", "Coser", "Traje", "Medidas"] },
+      { word: "COSTURERA", forbidden: ["Coser", "Ropa", "Aguja", "Tela"] },
+      { word: "PANADERO", forbidden: ["Pan", "Horno", "Amasar", "Harina"] },
+      { word: "PASTELERO", forbidden: ["Pasteles", "Dulce", "Horno", "Repostería"] },
+      { word: "CARNICERO", forbidden: ["Carne", "Cortar", "Tienda", "Filete"] },
+      { word: "TENDERO", forbidden: ["Tienda", "Vender", "Mostrador", "Comercio"] }
     ];
     const defaultWords = classifiedWords.map(entry => entry.word);
 
@@ -3416,6 +3621,7 @@
     let tabooTimerInterval = null;
     let isTabooTimerRunning = false;
     let currentTabooTeam = null;
+    let usedTabooWords = new Set(); // Track used words to prevent repetition in same game (using Set for O(1) lookup)
 
     // --- VARIABLES DE RONDAS (AGREGAR ESTO) ---
     let currentTabooRound = 1;
@@ -3590,6 +3796,7 @@
       scoreRedDisplay.textContent = '0';
       scoreBlueDisplay.textContent = '0';
       tabooTimerDisplay.textContent = '2:00';
+      usedTabooWords = new Set(); // Reset used words for new game
 
       // RESETEAR RONDAS
       currentTabooRound = 1;
@@ -3624,7 +3831,18 @@
     }
 
     function loadTabooCard() {
-      const card = tabooWords[Math.floor(Math.random() * tabooWords.length)];
+      // Get available words (not used yet) - using Set for O(1) lookup
+      let availableWords = tabooWords.filter(word => !usedTabooWords.has(word.word));
+      
+      // If all words have been used, reset the used words set
+      if (availableWords.length === 0) {
+        usedTabooWords = new Set();
+        availableWords = tabooWords;
+      }
+      
+      const card = availableWords[Math.floor(Math.random() * availableWords.length)];
+      usedTabooWords.add(card.word); // Mark this word as used
+      
       tabooMainWord.textContent = card.word;
       tabooForbiddenList.innerHTML = '';
       card.forbidden.forEach(word => {
@@ -4345,6 +4563,19 @@
       if (e.target && typeof e.target.blur === 'function') {
         e.target.blur();
       }
+    });
+    
+    // Additional fix: Prevent any button from maintaining focus/active state
+    document.addEventListener('touchcancel', (e) => {
+      if (e.target && typeof e.target.blur === 'function') {
+        e.target.blur();
+      }
+    });
+    
+    // Ensure buttons lose focus after mouseup as well
+    document.addEventListener('mouseup', (e) => {
+      const btn = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
+      if (btn) btn.blur();
     });
   </script>
 </body>
