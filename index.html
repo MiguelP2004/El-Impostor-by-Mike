@@ -1575,17 +1575,14 @@
       // EJECUCIÓN
       if (introFill && introScreenEl) {
         // Unlock audio on intro screen tap/click
-        introScreenEl.addEventListener('touchstart', () => {
+        const unlockAudioHandler = () => {
           if (typeof unlockAudioWithUserGesture === 'function') {
             unlockAudioWithUserGesture().catch(() => { });
           }
-        }, { once: true, passive: true });
+        };
         
-        introScreenEl.addEventListener('click', () => {
-          if (typeof unlockAudioWithUserGesture === 'function') {
-            unlockAudioWithUserGesture().catch(() => { });
-          }
-        }, { once: true });
+        introScreenEl.addEventListener('touchstart', unlockAudioHandler, { once: true, passive: true });
+        introScreenEl.addEventListener('click', unlockAudioHandler, { once: true });
 
         // Evento principal
         introFill.addEventListener('animationend', launchGame);
@@ -1721,8 +1718,8 @@
                 addTouchAnimation(node);
               }
               // Check children
-              const buttons = node.querySelectorAll?.('button');
-              buttons?.forEach(btn => addTouchAnimation(btn));
+              const buttons = node.querySelectorAll('button');
+              buttons.forEach(btn => addTouchAnimation(btn));
             }
           });
         });
