@@ -365,6 +365,13 @@
 
     /* Removed :active state to prevent sticky button animations on mobile */
 
+    /* Touch-based animation for counter buttons */
+    .counter-btn.touch-pressed {
+      transform: scale(0.9);
+      box-shadow: 0 1px 5px rgba(255, 193, 7, 0.3);
+      transition: all 0.1s ease;
+    }
+
     .counter-value {
       font-size: 28px;
       font-weight: 700;
@@ -395,6 +402,13 @@
 
     /* Removed :active state to prevent sticky button animations on mobile */
 
+    /* Touch-based button press animation */
+    .btn.touch-pressed {
+      transform: translateY(2px) scale(0.97);
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+      transition: all 0.1s ease;
+    }
+
     .btn.big {
       padding: 16px 32px;
       font-size: 20px;
@@ -418,6 +432,13 @@
     }
 
     /* Removed :active state to prevent sticky button animations on mobile */
+
+    /* Touch-based button press animation for secondary buttons */
+    .btn.secondary.touch-pressed {
+      transform: translateY(2px) scale(0.97);
+      box-shadow: 0 2px 8px rgba(255, 235, 59, 0.25);
+      transition: all 0.1s ease;
+    }
 
     .center {
       text-align: center
@@ -877,6 +898,20 @@
     }
 
     /* Removed :active state to prevent sticky button animations on mobile */
+
+    /* Touch-based animation for action buttons (taboo buttons) */
+    .action-btn.touch-pressed {
+      transform: translateY(4px) scale(0.95);
+      transition: all 0.1s ease;
+    }
+
+    .action-btn.btn-skip.touch-pressed {
+      box-shadow: 0 4px 0 #b33939, 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-btn.btn-correct.touch-pressed {
+      box-shadow: 0 4px 0 #0c7457, 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
 
     /* ESTILO BOTÓN VERDE (CHECK) */
     .btn-correct {
@@ -1419,6 +1454,11 @@
 
           <div class="timer-display" id="tabooTimer">2:00</div>
 
+          <!-- Free skips counter (small and compact) -->
+          <div id="freeSkipsCounter" style="display:none; margin-top:8px; font-size:14px; color:#4fd1c5; font-weight:600;">
+            🎁 Tiradas gratis: <span id="freeSkipsCount">3</span>
+          </div>
+
           <button class="btn big" id="startTabooTurnBtn">Empezar Turno</button>
         </div>
       </section>
@@ -1472,6 +1512,11 @@
     }
     // --- LÓGICA DE INICIO AUTOMÁTICA (SINCRONIZADA) ---
     window.addEventListener('load', () => {
+
+      // Initialize touch animations for all buttons
+      if (typeof initializeTouchAnimations === 'function') {
+        initializeTouchAnimations();
+      }
 
       // --- LÓGICA DE INICIO INSTANTÁNEA (OPTIMIZADA) ---
 
@@ -1529,6 +1574,19 @@
 
       // EJECUCIÓN
       if (introFill && introScreenEl) {
+        // Unlock audio on intro screen tap/click
+        introScreenEl.addEventListener('touchstart', () => {
+          if (typeof unlockAudioWithUserGesture === 'function') {
+            unlockAudioWithUserGesture().catch(() => { });
+          }
+        }, { once: true, passive: true });
+        
+        introScreenEl.addEventListener('click', () => {
+          if (typeof unlockAudioWithUserGesture === 'function') {
+            unlockAudioWithUserGesture().catch(() => { });
+          }
+        }, { once: true });
+
         // Evento principal
         introFill.addEventListener('animationend', launchGame);
 
@@ -1630,6 +1688,53 @@
       }
     }
 
+    // --- TOUCH ANIMATION HANDLER ---
+    // Universal handler for touch-based button animations
+    function addTouchAnimation(button) {
+      if (!button) return;
+      
+      button.addEventListener('touchstart', function(e) {
+        this.classList.add('touch-pressed');
+      }, { passive: true });
+      
+      button.addEventListener('touchend', function(e) {
+        this.classList.remove('touch-pressed');
+      }, { passive: true });
+      
+      button.addEventListener('touchcancel', function(e) {
+        this.classList.remove('touch-pressed');
+      }, { passive: true });
+    }
+
+    // Apply touch animations to all buttons after DOM is ready
+    function initializeTouchAnimations() {
+      // Get all buttons
+      const allButtons = document.querySelectorAll('button');
+      allButtons.forEach(btn => addTouchAnimation(btn));
+      
+      // Also handle dynamically created buttons by observing the DOM
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) { // Element node
+              if (node.tagName === 'BUTTON') {
+                addTouchAnimation(node);
+              }
+              // Check children
+              const buttons = node.querySelectorAll?.('button');
+              buttons?.forEach(btn => addTouchAnimation(btn));
+            }
+          });
+        });
+      });
+      
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    }
+    // --- END TOUCH ANIMATION HANDLER ---
+
     function playPopSound() { playSound(800, 0.08, 0.22); }
     function playClickSound() { playSound(400, 0.05, 0.15); }
     function playFailSound() { playSound(300, 0.15, 0.25); setTimeout(() => playSound(200, 0.2, 0.25), 150); }
@@ -1688,6 +1793,8 @@
     const tabooForbiddenList = document.getElementById('tabooForbiddenList');
     const tabooCorrectBtn = document.getElementById('tabooCorrectBtn');
     const tabooSkipBtn = document.getElementById('tabooSkipBtn');
+    const freeSkipsCounter = document.getElementById('freeSkipsCounter');
+    const freeSkipsCount = document.getElementById('freeSkipsCount');
 
     // ARRAY DE PALABRAS IMPOSTOR
     const classifiedWords = [
@@ -3624,6 +3731,7 @@
     let isTabooTimerRunning = false;
     let currentTabooTeam = null;
     let usedTabooWords = new Set(); // Track used words to prevent repetition in same game (using Set for O(1) lookup)
+    let freeSkipsRemaining = 3; // Free skips per round
 
     // --- VARIABLES DE RONDAS (AGREGAR ESTO) ---
     let currentTabooRound = 1;
@@ -3799,6 +3907,10 @@
       scoreBlueDisplay.textContent = '0';
       tabooTimerDisplay.textContent = '2:00';
       usedTabooWords = new Set(); // Reset used words for new game
+      freeSkipsRemaining = 3; // Reset free skips
+      if (freeSkipsCounter) {
+        freeSkipsCounter.style.display = 'none'; // Hide counter at game start
+      }
 
       // RESETEAR RONDAS
       currentTabooRound = 1;
@@ -3858,6 +3970,15 @@
     startTabooTurnBtn.addEventListener('click', () => {
       unlockAudioWithUserGesture();
       playStartGameSound();
+
+      // Reset free skips for each round
+      freeSkipsRemaining = 3;
+      if (freeSkipsCount) {
+        freeSkipsCount.textContent = freeSkipsRemaining;
+      }
+      if (freeSkipsCounter) {
+        freeSkipsCounter.style.display = 'block';
+      }
 
       startTabooTurnBtn.style.display = 'none';
       isTabooTimerRunning = true;
@@ -3931,6 +4052,11 @@
           tabooTimerDisplay.textContent = "2:00";
           isTabooTimerRunning = false;
 
+          // Hide free skips counter when round ends
+          if (freeSkipsCounter) {
+            freeSkipsCounter.style.display = 'none';
+          }
+
           // --- LÓGICA DE CAMBIO DE RONDA ---
           if (currentTabooRound >= maxTabooRounds) {
             // FIN DEL JUEGO
@@ -3965,13 +4091,24 @@
     });
 
     tabooSkipBtn.addEventListener('click', () => {
-      playFailSound();
-      if (currentTabooTeam === 'red') {
-        tabooRedScore--;
-        scoreRedDisplay.textContent = tabooRedScore;
+      // Check if there are free skips remaining
+      if (freeSkipsRemaining > 0) {
+        // Use a free skip - no point deduction
+        freeSkipsRemaining--;
+        if (freeSkipsCount) {
+          freeSkipsCount.textContent = freeSkipsRemaining;
+        }
+        playClickSound(); // Different sound for free skip
       } else {
-        tabooBlueScore--;
-        scoreBlueDisplay.textContent = tabooBlueScore;
+        // No free skips left - deduct point
+        playFailSound();
+        if (currentTabooTeam === 'red') {
+          tabooRedScore--;
+          scoreRedDisplay.textContent = tabooRedScore;
+        } else {
+          tabooBlueScore--;
+          scoreBlueDisplay.textContent = tabooBlueScore;
+        }
       }
       loadTabooCard();
     });
