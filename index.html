@@ -3812,7 +3812,7 @@
     }
 
     // Counter controls
-    decPlayers.addEventListener('click', () => {
+    decPlayers.addEventListener('click', (e) => {
       if (numPlayers > 3) {
         playClickSound();
         numPlayers--;
@@ -3823,31 +3823,43 @@
           impostorsDisplay.textContent = numImpostors;
         }
       }
+      // Force remove touch-pressed class and blur to prevent sticky animation on iPhone
+      e.currentTarget.classList.remove('touch-pressed');
+      e.currentTarget.blur();
     });
 
-    incPlayers.addEventListener('click', () => {
+    incPlayers.addEventListener('click', (e) => {
       if (numPlayers < 15) {
         playPopSound();
         numPlayers++;
         playersDisplay.textContent = numPlayers;
       }
+      // Force remove touch-pressed class and blur to prevent sticky animation on iPhone
+      e.currentTarget.classList.remove('touch-pressed');
+      e.currentTarget.blur();
     });
 
-    decImpostors.addEventListener('click', () => {
+    decImpostors.addEventListener('click', (e) => {
       if (numImpostors > 1) {
         playClickSound();
         numImpostors--;
         impostorsDisplay.textContent = numImpostors;
       }
+      // Force remove touch-pressed class and blur to prevent sticky animation on iPhone
+      e.currentTarget.classList.remove('touch-pressed');
+      e.currentTarget.blur();
     });
 
-    incImpostors.addEventListener('click', () => {
+    incImpostors.addEventListener('click', (e) => {
       const maxImpostors = getMaxImpostors(numPlayers);
       if (numImpostors < maxImpostors) {
         playPopSound();
         numImpostors++;
         impostorsDisplay.textContent = numImpostors;
       }
+      // Force remove touch-pressed class and blur to prevent sticky animation on iPhone
+      e.currentTarget.classList.remove('touch-pressed');
+      e.currentTarget.blur();
     });
 
     function updateArrowVisibility() {
@@ -4458,12 +4470,12 @@
     newGame.addEventListener('click', () => {
       playClickSound();
       players = [];
-      setup.style.display = 'none';
+      setup.style.display = 'block';
       namesSection.style.display = 'none';
       pass.style.display = 'none';
       discussion.style.display = 'none';
       results.style.display = 'none';
-      gameModeSelection.style.display = 'block';
+      gameModeSelection.style.display = 'none';
       updateArrowVisibility();
       categorySelection.style.display = 'none';
     });
