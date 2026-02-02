@@ -3909,6 +3909,7 @@
       // Hide mode selection, show taboo setup
       gameModeSelection.style.display = 'none';
       tabooSetup.style.display = 'block';
+      updateArrowVisibility();
     });
 
     // Team counter controls
@@ -4157,12 +4158,10 @@
       } else {
         // No free skips left - deduct point
         playFailSound();
-        if (tabooTeamScores[currentTabooTeam] > 0) {
-          tabooTeamScores[currentTabooTeam]--;
-          const scoreDisplay = document.getElementById(`score${currentTabooTeam}`);
-          if (scoreDisplay) {
-            scoreDisplay.textContent = tabooTeamScores[currentTabooTeam];
-          }
+        tabooTeamScores[currentTabooTeam]--;
+        const scoreDisplay = document.getElementById(`score${currentTabooTeam}`);
+        if (scoreDisplay) {
+          scoreDisplay.textContent = tabooTeamScores[currentTabooTeam];
         }
       }
       loadTabooCard();
@@ -4519,6 +4518,9 @@
       pass.style.display = 'none';
       discussion.style.display = 'none';
       results.style.display = 'none';
+      tabooSetup.style.display = 'none';
+      tabooGame.style.display = 'none';
+      document.getElementById('tabooResults').style.display = 'none';
       gameModeSelection.style.display = 'block';
       updateArrowVisibility();
       categorySelection.style.display = 'none';
@@ -4544,6 +4546,9 @@
       discussion.style.display = 'none';
       results.style.display = 'none';
       if (categorySelection) categorySelection.style.display = 'none';
+      tabooSetup.style.display = 'none';
+      tabooGame.style.display = 'none';
+      document.getElementById('tabooResults').style.display = 'none';
       updateArrowVisibility();
     }
 
@@ -4648,6 +4653,8 @@
         // 0. Si estamos en Tabú Setup -> Volver a selección de modo
         if (tabooSetup.style.display === 'block') {
           tabooSetup.style.display = 'none';
+          tabooGame.style.display = 'none';
+          document.getElementById('tabooResults').style.display = 'none';
           gameModeSelection.style.display = 'block';
           updateArrowVisibility();
           return;
@@ -4665,7 +4672,9 @@
             tabooCardArea.style.display = 'none';
           }
           tabooGame.style.display = 'none';
-          intro.style.display = 'flex';
+          tabooSetup.style.display = 'none';
+          document.getElementById('tabooResults').style.display = 'none';
+          gameModeSelection.style.display = 'block';
           updateArrowVisibility();
           return;
         }
@@ -4720,6 +4729,8 @@
     document.getElementById('tabooBackToMenuBtn').addEventListener('click', () => {
       playClickSound();
       document.getElementById('tabooResults').style.display = 'none';
+      tabooGame.style.display = 'none';
+      tabooSetup.style.display = 'none';
       gameModeSelection.style.display = 'block';
       updateArrowVisibility();
     });
