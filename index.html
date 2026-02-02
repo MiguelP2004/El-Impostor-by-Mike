@@ -782,6 +782,14 @@
       background: linear-gradient(180deg, #448aff, #1976d2);
     }
 
+    .team-green {
+      background: linear-gradient(180deg, #66bb6a, #388e3c);
+    }
+
+    .team-yellow {
+      background: linear-gradient(180deg, #ffeb3b, #f9a825);
+    }
+
     .score-label {
       font-size: 12px;
       /* Reducido de 14px */
@@ -1318,6 +1326,23 @@
         </div>
       </section>
 
+      <section id="tabooSetup" class="card" style="display:none">
+        <div class="center">
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">Configuración del Tabú</p>
+          <div>
+            <label>Número de Equipos</label>
+            <div class="counter">
+              <button class="counter-btn" id="decTeams">−</button>
+              <div class="counter-value" id="teamsDisplay">2</div>
+              <button class="counter-btn" id="incTeams">+</button>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <button class="btn big" id="startTabooGameBtn">Empezar Partida</button>
+          </div>
+        </div>
+      </section>
+
       <section id="setup" class="card" style="display:none">
         <div class="grid">
           <div>
@@ -1416,15 +1441,8 @@
 
           <div id="turnDisplay" class="turn-display"></div>
 
-          <div class="score-board">
-            <div class="team-score team-red">
-              <div class="score-label">Equipo Rojo</div>
-              <div class="score-val" id="scoreRed">0</div>
-            </div>
-            <div class="team-score team-blue">
-              <div class="score-label">Equipo Azul</div>
-              <div class="score-val" id="scoreBlue">0</div>
-            </div>
+          <div class="score-board" id="scoreBoard">
+            <!-- Teams will be dynamically added here -->
           </div>
 
           <div id="tabooCardArea" style="display:none;">
@@ -1471,15 +1489,8 @@
             style="font-family:'Fredoka One',cursive;font-size:32px;color:#ffffff;margin-bottom:20px;text-shadow:0 4px 10px rgba(0,0,0,0.5);">
           </div>
 
-          <div class="score-board">
-            <div class="team-score team-red">
-              <div class="score-label">ROJO</div>
-              <div class="score-val" id="finalScoreRed">0</div>
-            </div>
-            <div class="team-score team-blue">
-              <div class="score-label">AZUL</div>
-              <div class="score-val" id="finalScoreBlue">0</div>
-            </div>
+          <div class="score-board" id="finalScoreBoard">
+            <!-- Final scores will be dynamically added here -->
           </div>
 
           <div style="height:20px"></div>
@@ -1777,13 +1788,18 @@
 
     // NUEVOS ELEMENTOS TABÚ Y SELECCIÓN DE MODO
     const gameModeSelection = document.getElementById('gameModeSelection');
+    const tabooSetup = document.getElementById('tabooSetup');
     const tabooGame = document.getElementById('tabooGame');
     const selectImpostorMode = document.getElementById('selectImpostorMode');
     const selectTabooMode = document.getElementById('selectTabooMode');
+    const decTeams = document.getElementById('decTeams');
+    const incTeams = document.getElementById('incTeams');
+    const teamsDisplay = document.getElementById('teamsDisplay');
+    const startTabooGameBtn = document.getElementById('startTabooGameBtn');
     const startTabooTurnBtn = document.getElementById('startTabooTurnBtn');
     const tabooTimerDisplay = document.getElementById('tabooTimer');
-    const scoreRedDisplay = document.getElementById('scoreRed');
-    const scoreBlueDisplay = document.getElementById('scoreBlue');
+    const scoreBoard = document.getElementById('scoreBoard');
+    const finalScoreBoard = document.getElementById('finalScoreBoard');
     const turnDisplay = document.getElementById('turnDisplay');
     const tabooCardArea = document.getElementById('tabooCardArea');
     const tabooMainWord = document.getElementById('tabooMainWord');
@@ -2217,7 +2233,6 @@
       { word: 'Grogu', category: 'PERSONAJE' },
       { word: 'Steve Harrington', category: 'PERSONAJE' },
       { word: 'Jim Hopper', category: 'PERSONAJE' },
-      { word: 'Eleven', category: 'PERSONAJE' },
       { word: 'Tony Soprano', category: 'PERSONAJE' },
       { word: 'Walter White', category: 'PERSONAJE' },
       { word: 'Jesse Pinkman', category: 'PERSONAJE' },
@@ -2260,7 +2275,6 @@
       { word: 'C-3PO', category: 'PERSONAJE' },
       { word: 'E.T.', category: 'PERSONAJE' },
       { word: 'Super Mario', category: 'PERSONAJE' },
-      { word: 'Sonic', category: 'PERSONAJE' },
       { word: 'Franklin Clinton', category: 'PERSONAJE' },
       { word: 'Trevor Philips', category: 'PERSONAJE' },
       { word: 'Michael De Santa', category: 'PERSONAJE' },
@@ -2341,7 +2355,6 @@
       { word: 'Joker', category: 'CINE' },
       { word: 'La La Land', category: 'CINE' },
       { word: 'Toy Story', category: 'CINE' },
-      { word: 'Coco', category: 'CINE' },
       { word: 'Up', category: 'CINE' },
       { word: 'Django desencadenado', category: 'CINE' },
       { word: 'Kill Bill', category: 'CINE' },
@@ -2367,7 +2380,6 @@
       { word: 'Piratas del Caribe', category: 'CINE' },
       { word: 'Misión Imposible', category: 'CINE' },
       { word: 'John Wick', category: 'CINE' },
-      { word: 'Deadpool', category: 'CINE' },
       { word: 'El indomable Will Hunting', category: 'CINE' },
       { word: 'Big Bang Theory', category: 'CINE' },
       { word: 'Jungla de Cristal', category: 'CINE' },
@@ -2522,7 +2534,6 @@
       { word: 'cangrejo', category: 'ANIMAL' },
       { word: 'estrella de mar', category: 'ANIMAL' },
       { word: 'foca', category: 'ANIMAL' },
-      { word: 'puma', category: 'ANIMAL' },
       { word: 'avestruz', category: 'ANIMAL' },
       { word: 'jabalí', category: 'ANIMAL' },
       { word: 'ornitorrinco', category: 'ANIMAL' },
@@ -2665,7 +2676,6 @@
       { word: 'Budapest', category: 'LUGAR' },
       { word: 'Dubai', category: 'LUGAR' },
       { word: 'Hawái', category: 'LUGAR' },
-      { word: 'Chernóbil', category: 'LUGAR' },
       { word: 'Hollywood', category: 'LUGAR' },
       { word: 'Antártida', category: 'LUGAR' },
       { word: 'Las Vegas', category: 'LUGAR' },
@@ -3067,7 +3077,6 @@
       { word: "MALETÍN", forbidden: ["Trabajo", "Documentos", "Oficina", "Mano"] },
 
       // TECNOLOGÍA
-      { word: "TELEVISIÓN", forbidden: ["Pantalla", "Ver", "Mando", "Canales"] },
       { word: "ORDENADOR", forbidden: ["Teclado", "Pantalla", "Internet", "Trabajar"] },
       { word: "TELÉFONO", forbidden: ["Llamar", "Móvil", "Hablar", "Mensaje"] },
       { word: "INTERNET", forbidden: ["Web", "Wifi", "Red", "Conexión"] },
@@ -3079,7 +3088,6 @@
       { word: "ROBOT", forbidden: ["Máquina", "Futuro", "Inteligencia", "Metal"] },
       { word: "PILA", forbidden: ["Batería", "Energía", "Juguete", "Pequeña"] },
       { word: "TECLADO", forbidden: ["Escribir", "Ordenador", "Teclas", "Letras"] },
-      { word: "RATÓN", forbidden: ["Ordenador", "Click", "Mano", "Flecha"] },
       { word: "PANTALLA", forbidden: ["Monitor", "Ver", "Imagen", "Televisión"] },
       { word: "PORTÁTIL", forbidden: ["Ordenador", "Llevar", "Batería", "Teclado"] },
       { word: "TABLET", forbidden: ["Pantalla", "Táctil", "iPad", "Grande"] },
@@ -3311,7 +3319,6 @@
       { word: "DEBERES", forbidden: ["Casa", "Ejercicios", "Escuela", "Tarde"] },
       { word: "NOTA", forbidden: ["Calificación", "Examen", "Aprobado", "Suspenso"] },
       { word: "MATEMÁTICAS", forbidden: ["Números", "Cuentas", "Sumar", "Asignatura"] },
-      { word: "LENGUA", forbidden: ["Escribir", "Leer", "Gramática", "Asignatura"] },
       { word: "HISTORIA", forbidden: ["Pasado", "Fechas", "Reyes", "Asignatura"] },
       { word: "GEOGRAFÍA", forbidden: ["Mapas", "Países", "Ríos", "Mundo"] },
       { word: "INGLÉS", forbidden: ["Idioma", "Hablar", "Extranjero", "Asignatura"] },
@@ -3365,7 +3372,6 @@
       { word: "SALTAR", forbidden: ["Arriba", "Pies", "Moverse", "Brincar"] },
       { word: "NADAR", forbidden: ["Agua", "Piscina", "Mar", "Moverse"] },
       { word: "VOLAR", forbidden: ["Aire", "Pájaro", "Avión", "Cielo"] },
-      { word: "CORRER", forbidden: ["Rápido", "Andar", "Pies", "Prisa"] },
       { word: "ESCRIBIR", forbidden: ["Lápiz", "Papel", "Letras", "Libro"] },
       { word: "LEER", forbidden: ["Libro", "Palabras", "Historia", "Ojos"] },
       { word: "PINTAR", forbidden: ["Colores", "Cuadro", "Pincel", "Arte"] },
@@ -3420,8 +3426,6 @@
       { word: "AMARILLO", forbidden: ["Color", "Sol", "Limón", "Plátano"] },
       { word: "NEGRO", forbidden: ["Color", "Oscuro", "Noche", "Luto"] },
       { word: "BLANCO", forbidden: ["Color", "Nieve", "Leche", "Claro"] },
-      { word: "ROSA", forbidden: ["Color", "Niña", "Cerdo", "Pantera"] },
-      { word: "NARANJA", forbidden: ["Color", "Fruta", "Butano", "Zanahoria"] },
       { word: "GRIS", forbidden: ["Color", "Ceniza", "Ratón", "Nublado"] },
       { word: "MARRÓN", forbidden: ["Color", "Chocolate", "Tierra", "Madera"] },
       { word: "CÍRCULO", forbidden: ["Forma", "Redondo", "Pelota", "Anillo"] },
@@ -3481,9 +3485,7 @@
       { word: "MERCADO", forbidden: ["Comida", "Comprar", "Fruta", "Puestos"] },
       { word: "RESTAURANTE", forbidden: ["Comer", "Cena", "Camarero", "Carta"] },
       { word: "HOTEL", forbidden: ["Dormir", "Viaje", "Habitación", "Vacaciones"] },
-      { word: "BANCO", forbidden: ["Dinero", "Guardar", "Sacar", "Cajero"] },
       { word: "CORREOS", forbidden: ["Cartas", "Paquetes", "Enviar", "Sello"] },
-      { word: "JARDÍN", forbidden: ["Casa", "Flores", "Hierba", "Fuera"] },
       { word: "PARQUE", forbidden: ["Jugar", "Niños", "Árboles", "Banco"] },
       { word: "ASEO", forbidden: ["Baño", "Higiene", "Ducha", "Lavabo"] },
       { word: "BAÑO", forbidden: ["Ducha", "Agua", "Lavabo", "Aseo"] },
@@ -3724,17 +3726,25 @@
     ];
 
     // Variables Tabú
-    let tabooRedScore = 0;
-    let tabooBlueScore = 0;
+    let numTabooTeams = 2;  // Number of teams (2-4)
+    let tabooTeamScores = {};  // Scores for each team
     let tabooTimerInterval = null;
     let isTabooTimerRunning = false;
-    let currentTabooTeam = null;
+    let currentTabooTeam = 0;  // Index of current team (0, 1, 2, 3)
     let usedTabooWords = new Set(); // Track used words to prevent repetition in same game (using Set for O(1) lookup)
     let freeSkipsRemaining = 3; // Free skips per round
 
     // --- VARIABLES DE RONDAS (AGREGAR ESTO) ---
     let currentTabooRound = 1;
-    const maxTabooRounds = 8;
+    let maxTabooRounds = 8;
+
+    // Team configuration
+    const teamConfig = [
+      { name: 'ROJO', color: '#ff5252', class: 'team-red', emoji: '🔴' },
+      { name: 'AZUL', color: '#448aff', class: 'team-blue', emoji: '🔵' },
+      { name: 'VERDE', color: '#66bb6a', class: 'team-green', emoji: '🟢' },
+      { name: 'AMARILLO', color: '#ffeb3b', class: 'team-yellow', emoji: '🟡' }
+    ];
 
     // Phase trackers
     let revealIndex = 0;
@@ -3857,10 +3867,11 @@
       if (gameModeSelection.style.display === 'block') {
         backArrowBtn.style.display = 'none';
       }
-      // 2. Pantallas de Configuración (Setup, Categoría, Nombres) -> VISIBLE
+      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup) -> VISIBLE
       else if (setup.style.display === 'block' ||
         categorySelection.style.display === 'block' ||
-        namesSection.style.display === 'block') {
+        namesSection.style.display === 'block' ||
+        tabooSetup.style.display === 'block') {
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
@@ -3889,29 +3900,63 @@
     });
 
     selectTabooMode.addEventListener('click', () => {
+      unlockAudioWithUserGesture();
       playClickSound();
 
-      // ESTO ES LO QUE ARREGLA EL ERROR VISUAL: Ocultamos el menú
+      // Hide mode selection, show taboo setup
       gameModeSelection.style.display = 'none';
-      setup.style.display = 'none'; // Por seguridad
+      tabooSetup.style.display = 'block';
+    });
 
-      // Mostramos el juego
+    // Team counter controls
+    decTeams.addEventListener('click', () => {
+      if (numTabooTeams > 2) {
+        numTabooTeams--;
+        teamsDisplay.textContent = numTabooTeams;
+        playClickSound();
+      }
+    });
+
+    incTeams.addEventListener('click', () => {
+      if (numTabooTeams < 4) {
+        numTabooTeams++;
+        teamsDisplay.textContent = numTabooTeams;
+        playClickSound();
+      }
+    });
+
+    // Start taboo game button
+    startTabooGameBtn.addEventListener('click', () => {
+      unlockAudioWithUserGesture();
+      playStartGameSound();
+
+      // Calculate rounds based on teams
+      maxTabooRounds = numTabooTeams * 4;  // 4 rounds per team
+
+      // Hide setup, show game
+      tabooSetup.style.display = 'none';
+      setup.style.display = 'none';
       tabooGame.style.display = 'block';
-      document.getElementById('tabooResults').style.display = 'none'; // Aseguramos que resultados esté oculto
+      document.getElementById('tabooResults').style.display = 'none';
 
-      // Reset Tabú state
-      tabooRedScore = 0;
-      tabooBlueScore = 0;
-      scoreRedDisplay.textContent = '0';
-      scoreBlueDisplay.textContent = '0';
-      tabooTimerDisplay.textContent = '2:00';
-      usedTabooWords = new Set(); // Reset used words for new game
-      freeSkipsRemaining = 3; // Reset free skips
-      if (freeSkipsCounter) {
-        freeSkipsCounter.style.display = 'none'; // Hide counter at game start
+      // Initialize team scores
+      tabooTeamScores = {};
+      for (let i = 0; i < numTabooTeams; i++) {
+        tabooTeamScores[i] = 0;
       }
 
-      // RESETEAR RONDAS
+      // Build scoreboard
+      buildScoreBoard();
+
+      // Reset game state
+      tabooTimerDisplay.textContent = '2:00';
+      usedTabooWords = new Set();
+      freeSkipsRemaining = 3;
+      if (freeSkipsCounter) {
+        freeSkipsCounter.style.display = 'none';
+      }
+
+      // Reset rounds
       currentTabooRound = 1;
       const roundDisplay = document.getElementById('tabooRoundDisplay');
       if (roundDisplay) roundDisplay.textContent = `Ronda ${currentTabooRound} de ${maxTabooRounds}`;
@@ -3922,24 +3967,34 @@
       isTabooTimerRunning = false;
       tabooCardArea.style.display = 'none';
 
-      currentTabooTeam = Math.random() < 0.5 ? 'red' : 'blue';
+      // Random starting team
+      currentTabooTeam = Math.floor(Math.random() * numTabooTeams);
       updateTabooTurnDisplay();
 
       updateArrowVisibility();
     });
 
-    function updateTabooTurnDisplay() {
-      if (currentTabooTeam === 'red') {
-        turnDisplay.textContent = "Turno: Equipo ROJO";
-        turnDisplay.style.color = "#ff5252";
-      } else {
-        turnDisplay.textContent = "Turno: Equipo AZUL";
-        turnDisplay.style.color = "#448aff";
+    function buildScoreBoard() {
+      scoreBoard.innerHTML = '';
+      for (let i = 0; i < numTabooTeams; i++) {
+        const teamDiv = document.createElement('div');
+        teamDiv.className = `team-score ${teamConfig[i].class}`;
+        teamDiv.innerHTML = `
+          <div class="score-label">${teamConfig[i].name}</div>
+          <div class="score-val" id="score${i}">${tabooTeamScores[i]}</div>
+        `;
+        scoreBoard.appendChild(teamDiv);
       }
     }
 
+    function updateTabooTurnDisplay() {
+      const team = teamConfig[currentTabooTeam];
+      turnDisplay.textContent = `Turno: Equipo ${team.name}`;
+      turnDisplay.style.color = team.color;
+    }
+
     function toggleTabooTeam() {
-      currentTabooTeam = currentTabooTeam === 'red' ? 'blue' : 'red';
+      currentTabooTeam = (currentTabooTeam + 1) % numTabooTeams;
       updateTabooTurnDisplay();
     }
 
@@ -4079,12 +4134,10 @@
 
     tabooCorrectBtn.addEventListener('click', () => {
       playSuccessSound();
-      if (currentTabooTeam === 'red') {
-        tabooRedScore++;
-        scoreRedDisplay.textContent = tabooRedScore;
-      } else {
-        tabooBlueScore++;
-        scoreBlueDisplay.textContent = tabooBlueScore;
+      tabooTeamScores[currentTabooTeam]++;
+      const scoreDisplay = document.getElementById(`score${currentTabooTeam}`);
+      if (scoreDisplay) {
+        scoreDisplay.textContent = tabooTeamScores[currentTabooTeam];
       }
       loadTabooCard();
     });
@@ -4101,12 +4154,12 @@
       } else {
         // No free skips left - deduct point
         playFailSound();
-        if (currentTabooTeam === 'red') {
-          tabooRedScore--;
-          scoreRedDisplay.textContent = tabooRedScore;
-        } else {
-          tabooBlueScore--;
-          scoreBlueDisplay.textContent = tabooBlueScore;
+        if (tabooTeamScores[currentTabooTeam] > 0) {
+          tabooTeamScores[currentTabooTeam]--;
+          const scoreDisplay = document.getElementById(`score${currentTabooTeam}`);
+          if (scoreDisplay) {
+            scoreDisplay.textContent = tabooTeamScores[currentTabooTeam];
+          }
         }
       }
       loadTabooCard();
@@ -4545,22 +4598,41 @@
       const resultsSection = document.getElementById('tabooResults');
       resultsSection.style.display = 'block';
 
-      document.getElementById('finalScoreRed').textContent = tabooRedScore;
-      document.getElementById('finalScoreBlue').textContent = tabooBlueScore;
+      // Build final scoreboard
+      finalScoreBoard.innerHTML = '';
+      for (let i = 0; i < numTabooTeams; i++) {
+        const teamDiv = document.createElement('div');
+        teamDiv.className = `team-score ${teamConfig[i].class}`;
+        teamDiv.innerHTML = `
+          <div class="score-label">${teamConfig[i].name}</div>
+          <div class="score-val">${tabooTeamScores[i]}</div>
+        `;
+        finalScoreBoard.appendChild(teamDiv);
+      }
 
+      // Determine winner
       const winnerMsg = document.getElementById('tabooWinnerMsg');
-      if (tabooRedScore > tabooBlueScore) {
-        winnerMsg.textContent = "¡GANA EL EQUIPO ROJO! 🔴";
-        winnerMsg.style.color = "#ff5252";
-      } else if (tabooBlueScore > tabooRedScore) {
-        winnerMsg.textContent = "¡GANA EL EQUIPO AZUL! 🔵";
-        winnerMsg.style.color = "#448aff";
+      let maxScore = -1;
+      let winners = [];
+      
+      for (let i = 0; i < numTabooTeams; i++) {
+        if (tabooTeamScores[i] > maxScore) {
+          maxScore = tabooTeamScores[i];
+          winners = [i];
+        } else if (tabooTeamScores[i] === maxScore) {
+          winners.push(i);
+        }
+      }
+
+      if (winners.length === 1) {
+        const winningTeam = teamConfig[winners[0]];
+        winnerMsg.textContent = `¡GANA EL EQUIPO ${winningTeam.name}! ${winningTeam.emoji}`;
+        winnerMsg.style.color = winningTeam.color;
       } else {
         winnerMsg.textContent = "¡EMPATE! 🤝";
         winnerMsg.style.color = "#ffffff";
       }
 
-      // Ocultar flecha para obligar a usar el botón de menú
       // Ocultar flecha para obligar a usar el botón de menú
       if (backArrowBtn) backArrowBtn.style.display = 'none';
     }
@@ -4570,19 +4642,29 @@
       backArrowBtn.addEventListener('click', () => {
         playClickSound();
 
+        // 0. Si estamos en Tabú Setup -> Volver a selección de modo
+        if (tabooSetup.style.display === 'block') {
+          tabooSetup.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
         // 1. Si estamos en Tabú -> Volver a menú
         if (tabooGame.style.display === 'block') {
           if (isTabooTimerRunning) {
             clearInterval(tabooTimerInterval);
             isTabooTimerRunning = false;
-            tabooTimerDisplay.textContent = '1:30';
+            tabooTimerDisplay.textContent = '2:00';
             startTabooTurnBtn.disabled = false;
             startTabooTurnBtn.style.opacity = '1';
             startTabooTurnBtn.style.display = 'inline-block';
             tabooCardArea.style.display = 'none';
           }
           tabooGame.style.display = 'none';
-          gameModeSelection.style.display = 'block';
+          intro.style.display = 'flex';
+          updateArrowVisibility();
+          return;
         }
         // 2. Si estamos en Setup -> Volver a menú
         else if (setup.style.display === 'block') {
