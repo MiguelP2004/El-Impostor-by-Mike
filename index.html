@@ -782,6 +782,14 @@
       background: linear-gradient(180deg, #448aff, #1976d2);
     }
 
+    .team-green {
+      background: linear-gradient(180deg, #4caf50, #2e7d32);
+    }
+
+    .team-yellow {
+      background: linear-gradient(180deg, #ffeb3b, #f9a825);
+    }
+
     .score-label {
       font-size: 12px;
       /* Reducido de 14px */
@@ -1318,6 +1326,25 @@
         </div>
       </section>
 
+      <section id="tabooSetup" class="card" style="display:none">
+        <div class="center">
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">Configurar equipos para Tabú</p>
+          <div class="grid">
+            <div>
+              <label>Nº de Equipos</label>
+              <div class="counter">
+                <button class="counter-btn" id="decTeams">−</button>
+                <div class="counter-value" id="teamsDisplay">2</div>
+                <button class="counter-btn" id="incTeams">+</button>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <button class="btn big" id="startTabooGameBtn">Empezar Partida</button>
+          </div>
+        </div>
+      </section>
+
       <section id="setup" class="card" style="display:none">
         <div class="grid">
           <div>
@@ -1416,7 +1443,7 @@
 
           <div id="turnDisplay" class="turn-display"></div>
 
-          <div class="score-board">
+          <div class="score-board" id="tabooScoreBoard">
             <div class="team-score team-red">
               <div class="score-label">Equipo Rojo</div>
               <div class="score-val" id="scoreRed">0</div>
@@ -1424,6 +1451,14 @@
             <div class="team-score team-blue">
               <div class="score-label">Equipo Azul</div>
               <div class="score-val" id="scoreBlue">0</div>
+            </div>
+            <div class="team-score team-green" style="display:none;">
+              <div class="score-label">Equipo Verde</div>
+              <div class="score-val" id="scoreGreen">0</div>
+            </div>
+            <div class="team-score team-yellow" style="display:none;">
+              <div class="score-label">Equipo Amarillo</div>
+              <div class="score-val" id="scoreYellow">0</div>
             </div>
           </div>
 
@@ -1471,7 +1506,7 @@
             style="font-family:'Fredoka One',cursive;font-size:32px;color:#ffffff;margin-bottom:20px;text-shadow:0 4px 10px rgba(0,0,0,0.5);">
           </div>
 
-          <div class="score-board">
+          <div class="score-board" id="tabooFinalScoreBoard">
             <div class="team-score team-red">
               <div class="score-label">ROJO</div>
               <div class="score-val" id="finalScoreRed">0</div>
@@ -1479,6 +1514,14 @@
             <div class="team-score team-blue">
               <div class="score-label">AZUL</div>
               <div class="score-val" id="finalScoreBlue">0</div>
+            </div>
+            <div class="team-score team-green" style="display:none;">
+              <div class="score-label">VERDE</div>
+              <div class="score-val" id="finalScoreGreen">0</div>
+            </div>
+            <div class="team-score team-yellow" style="display:none;">
+              <div class="score-label">AMARILLO</div>
+              <div class="score-val" id="finalScoreYellow">0</div>
             </div>
           </div>
 
@@ -1780,10 +1823,17 @@
     const tabooGame = document.getElementById('tabooGame');
     const selectImpostorMode = document.getElementById('selectImpostorMode');
     const selectTabooMode = document.getElementById('selectTabooMode');
+    const tabooSetup = document.getElementById('tabooSetup');
+    const startTabooGameBtn = document.getElementById('startTabooGameBtn');
+    const decTeams = document.getElementById('decTeams');
+    const incTeams = document.getElementById('incTeams');
+    const teamsDisplay = document.getElementById('teamsDisplay');
     const startTabooTurnBtn = document.getElementById('startTabooTurnBtn');
     const tabooTimerDisplay = document.getElementById('tabooTimer');
     const scoreRedDisplay = document.getElementById('scoreRed');
     const scoreBlueDisplay = document.getElementById('scoreBlue');
+    const scoreGreenDisplay = document.getElementById('scoreGreen');
+    const scoreYellowDisplay = document.getElementById('scoreYellow');
     const turnDisplay = document.getElementById('turnDisplay');
     const tabooCardArea = document.getElementById('tabooCardArea');
     const tabooMainWord = document.getElementById('tabooMainWord');
@@ -2811,112 +2861,28 @@
 
     // ARRAY DE TABÚ (SIN DUPLICADOS Y LIMPIO)
     const tabooWords = [
-      // ANIMALES
-      { word: "JIRAFA", forbidden: ["Animal", "Cuello", "Alto", "África"] },
-      { word: "PERRO", forbidden: ["Animal", "Mascota", "Ladrido", "Gato"] },
-      { word: "GATO", forbidden: ["Animal", "Mascota", "Miau", "Perro"] },
       { word: "PÁJARO", forbidden: ["Animal", "Volar", "Alas", "Plumas"] },
       { word: "PEZ", forbidden: ["Agua", "Mar", "Nadar", "Animal"] },
-      { word: "CABALLO", forbidden: ["Animal", "Montar", "Galopar", "Granja"] },
-      { word: "VACA", forbidden: ["Animal", "Leche", "Granja", "Muu"] },
-      { word: "CERDO", forbidden: ["Animal", "Granja", "Rosa", "Jamón"] },
-      { word: "OVEJA", forbidden: ["Animal", "Lana", "Blanca", "Granja"] },
-      { word: "LEÓN", forbidden: ["Animal", "Rey", "Selva", "Rugir"] },
-      { word: "ELEFANTE", forbidden: ["Animal", "Grande", "Trompa", "Orejas"] },
-      { word: "MONO", forbidden: ["Animal", "Banana", "Árbol", "Selva"] },
-      { word: "SERPIENTE", forbidden: ["Animal", "Reptil", "Veneno", "Larga"] },
-      { word: "ARAÑA", forbidden: ["Insecto", "Patas", "Telaraña", "Miedo"] },
       { word: "RATA", forbidden: ["Ratón", "Grande", "Alcantarilla", "Cola"] },
       { word: "CUCARACHA", forbidden: ["Insecto", "Asco", "Cocina", "Suelo"] },
-      { word: "MOSCA", forbidden: ["Insecto", "Volar", "Molesta", "Caca"] },
-      { word: "MOSQUITO", forbidden: ["Picar", "Sangre", "Volar", "Verano"] },
-      { word: "AVISPA", forbidden: ["Picar", "Abeja", "Amarilla", "Insecto"] },
-      { word: "ABEJA", forbidden: ["Miel", "Flor", "Colmena", "Insecto"] },
-      { word: "HORMIGA", forbidden: ["Pequeña", "Fila", "Trabajadora", "Insecto"] },
-      { word: "MARIPOSA", forbidden: ["Alas", "Colores", "Volar", "Insecto"] },
       { word: "GUSANO", forbidden: ["Tierra", "Arrastrarse", "Largo", "Manzana"] },
-      { word: "CARACOL", forbidden: ["Concha", "Lento", "Cuernos", "Baba"] },
       { word: "RANA", forbidden: ["Verde", "Saltar", "Charca", "Croar"] },
       { word: "SAPO", forbidden: ["Rana", "Verruga", "Príncipe", "Besar"] },
-      { word: "TORTUGA", forbidden: ["Lenta", "Caparazón", "Animal", "Verde"] },
       { word: "LAGARTO", forbidden: ["Reptil", "Cola", "Sol", "Pared"] },
-      { word: "COCODRILO", forbidden: ["Dientes", "Río", "Grande", "Verde"] },
-      { word: "DINOSAURIO", forbidden: ["Extinguido", "Grande", "Antiguo", "Parque Jurásico"] },
-      { word: "TIBURÓN", forbidden: ["Mar", "Dientes", "Aleta", "Miedo"] },
-      { word: "BALLENA", forbidden: ["Mar", "Grande", "Mamífero", "Agua"] },
-      { word: "DELFÍN", forbidden: ["Mar", "Saltar", "Inteligente", "Simpático"] },
-      { word: "PULPO", forbidden: ["Ocho", "Tentáculos", "Mar", "Tinta"] },
-      { word: "CALAMAR", forbidden: ["Mar", "Tinta", "Frito", "Tentáculos"] },
-      { word: "CANGREJO", forbidden: ["Mar", "Pinzas", "Lado", "Rojo"] },
-      { word: "GAMBA", forbidden: ["Marisco", "Comer", "Roja", "Pequeña"] },
       { word: "AGUILA", forbidden: ["Pájaro", "Volar", "Depredador", "Grande"] },
-      { word: "BÚHO", forbidden: ["Noche", "Ojos", "Pájaro", "Sabio"] },
-      { word: "LORO", forbidden: ["Hablar", "Colores", "Pájaro", "Repetir"] },
       { word: "PALOMA", forbidden: ["Pájaro", "Ciudad", "Parque", "Volar"] },
-      { word: "PATO", forbidden: ["Agua", "Cuac", "Lago", "Pico"] },
-      { word: "CISNE", forbidden: ["Lago", "Cuello", "Blanco", "Pájaro"] },
-      { word: "PINGÜINO", forbidden: ["Polo", "Frío", "Pájaro", "No vuela"] },
-      { word: "AVESTRUZ", forbidden: ["Grande", "Correr", "Cabeza", "Huevo"] },
-      { word: "GALLINA", forbidden: ["Huevo", "Granja", "Ave", "Plumas"] },
       { word: "GALLO", forbidden: ["Despertar", "Granja", "Cresta", "Cantar"] },
-      { word: "POLLO", forbidden: ["Comer", "Ave", "Pequeño", "Granja"] },
-      { word: "PAVO", forbidden: ["Navidad", "Comer", "Ave", "Feo"] },
-      { word: "BURRO", forbidden: ["Orejas", "Carga", "Terco", "Animal"] },
       { word: "TORO", forbidden: ["Cuernos", "Rojo", "Corrida", "Vaca"] },
       { word: "CABRA", forbidden: ["Monte", "Cuernos", "Leche", "Loca"] },
-      { word: "CONEJO", forbidden: ["Orejas", "Saltar", "Zanahoria", "Dientes"] },
-      { word: "RATÓN", forbidden: ["Queso", "Gato", "Pequeño", "Cola"] },
-      { word: "HÁMSTER", forbidden: ["Jaula", "Rueda", "Mascota", "Pequeño"] },
-      { word: "ARDILLA", forbidden: ["Árbol", "Nueces", "Cola", "Parque"] },
-      { word: "TIGRE", forbidden: ["Rayas", "Selva", "Gato", "Naranja"] },
-      { word: "LEOPARDO", forbidden: ["Manchas", "Rápido", "Selva", "Gato"] },
       { word: "PANTERA", forbidden: ["Negra", "Selva", "Libro", "Bagheera"] },
-      { word: "OSO", forbidden: ["Miel", "Bosque", "Grande", "Pelo"] },
-      { word: "PANDA", forbidden: ["Oso", "Blanco y negro", "Bambú", "China"] },
-      { word: "OSO POLAR", forbidden: ["Oso", "Blanco", "Hielo", "Frío"] },
-      { word: "HIPOPÓTAMO", forbidden: ["Agua", "Gordo", "Grande", "África"] },
-      { word: "RINOCERONTE", forbidden: ["Cuerno", "Grande", "Gris", "África"] },
-      { word: "CEBRA", forbidden: ["Rayas", "Blanco y negro", "Caballo", "África"] },
       { word: "GORILA", forbidden: ["Mono", "Grande", "Fuerte", "Selva"] },
-      { word: "CANGURO", forbidden: ["Saltar", "Bolsa", "Australia", "Cola"] },
-      { word: "KOALA", forbidden: ["Árbol", "Eucalipto", "Australia", "Oso"] },
       { word: "CAMELLO", forbidden: ["Joroba", "Desierto", "Agua", "Arena"] },
       { word: "LLAMA", forbidden: ["Escupir", "Andes", "Animal", "Lana"] },
-      { word: "LOBO", forbidden: ["Aullar", "Luna", "Perro", "Bosque"] },
-      { word: "ZORRO", forbidden: ["Astuto", "Cola", "Naranja", "Bosque"] },
-      { word: "CIERVO", forbidden: ["Cuernos", "Bosque", "Bambi", "Animal"] },
-      { word: "JABALÍ", forbidden: ["Cerdo", "Salvaje", "Colmillos", "Bosque"] },
       { word: "COBAYA", forbidden: ["Roedor", "Conejo", "Indias", "Pequeño"] },
-      { word: "ERIZO", forbidden: ["Pinchos", "Bola", "Animal", "Sonic"] },
-      { word: "CASTOR", forbidden: ["Dientes", "Presa", "Río", "Madera"] },
-      { word: "NUTRIA", forbidden: ["Agua", "Río", "Nadar", "Animal"] },
-      { word: "MAPACHE", forbidden: ["Antifaz", "Basura", "Cola", "Rayas"] },
-      { word: "MOFETA", forbidden: ["Olor", "Peste", "Blanco y negro", "Animal"] },
-      { word: "FOCA", forbidden: ["Mar", "Circo", "Pelota", "Aplaudir"] },
-      { word: "ORCA", forbidden: ["Ballena", "Asesina", "Blanco y negro", "Mar"] },
-      { word: "MEDUSA", forbidden: ["Mar", "Picar", "Transparente", "Playa"] },
-      { word: "MURCIÉLAGO", forbidden: ["Volar", "Noche", "Cueva", "Vampiro"] },
-
-      // COMIDA Y BEBIDA
-      { word: "PIZZA", forbidden: ["Comida", "Italiana", "Queso", "Redonda"] },
-      { word: "HELADO", forbidden: ["Frío", "Postre", "Verano", "Sabor"] },
-      { word: "CHOCOLATE", forbidden: ["Dulce", "Cacao", "Marrón", "Comer"] },
-      { word: "PAN", forbidden: ["Comer", "Harina", "Bocadillo", "Trigo"] },
-      { word: "LECHE", forbidden: ["Blanca", "Vaca", "Beber", "Desayuno"] },
-      { word: "HUEVO", forbidden: ["Gallina", "Comer", "Frito", "Cáscara"] },
-      { word: "QUESO", forbidden: ["Leche", "Ratón", "Amarillo", "Comer"] },
-      { word: "MANZANA", forbidden: ["Fruta", "Roja", "Comer", "Árbol"] },
-      { word: "PLÁTANO", forbidden: ["Fruta", "Amarillo", "Mono", "Comer"] },
-      { word: "NARANJA", forbidden: ["Fruta", "Color", "Zumo", "Cítrico"] },
       { word: "LIMÓN", forbidden: ["Ácido", "Amarillo", "Fruta", "Cítrico"] },
-      { word: "AGUA", forbidden: ["Beber", "Líquido", "Mar", "Lluvia"] },
-      { word: "SOPA", forbidden: ["Comida", "Caliente", "Cuchara", "Líquido"] },
       { word: "PURÉ", forbidden: ["Comida", "Patata", "Batir", "Blando"] },
-      { word: "ENSALADA", forbidden: ["Lechuga", "Verde", "Comida", "Tomate"] },
       { word: "TORTILLA", forbidden: ["Huevo", "Patata", "Española", "Comida"] },
       { word: "FILETE", forbidden: ["Carne", "Vaca", "Plancha", "Comida"] },
-      { word: "HAMBURGUESA", forbidden: ["Carne", "Pan", "Comida rápida", "Queso"] },
-      { word: "SALCHICHA", forbidden: ["Carne", "Perrito", "Alargada", "Frankfurt"] },
       { word: "JAMÓN", forbidden: ["Cerdo", "Serrano", "Embutido", "España"] },
       { word: "CHORIZO", forbidden: ["Rojo", "Embutido", "Carne", "Picante"] },
       { word: "ATÚN", forbidden: ["Pescado", "Lata", "Ensalada", "Rojo"] },
@@ -2924,49 +2890,23 @@
       { word: "LENTEJAS", forbidden: ["Comida", "Legumbre", "Cuchara", "Hierro"] },
       { word: "GARBANZOS", forbidden: ["Cocido", "Legumbre", "Hummus", "Redondos"] },
       { word: "MACARRONES", forbidden: ["Pasta", "Tomate", "Italiana", "Queso"] },
-      { word: "ESPAGUETIS", forbidden: ["Pasta", "Largos", "Italia", "Tomate"] },
       { word: "CROQUETAS", forbidden: ["Bechamel", "Jamón", "Abuela", "Frito"] },
       { word: "ALBÓNDIGAS", forbidden: ["Carne", "Redondas", "Salsa", "Comer"] },
       { word: "EMPANADILLA", forbidden: ["Atún", "Tomate", "Frito", "Masa"] },
       { word: "GAZPACHO", forbidden: ["Tomate", "Frío", "Sopa", "Verano"] },
-      { word: "PAELLA", forbidden: ["Arroz", "Valencia", "Domingo", "Amarillo"] },
-      { word: "SUSHI", forbidden: ["Japón", "Pescado", "Crudo", "Arroz"] },
-      { word: "KEBAB", forbidden: ["Carne", "Rollo", "Salsa", "Turco"] },
       { word: "TACO", forbidden: ["México", "Tortilla", "Picante", "Comida"] },
       { word: "NACHOS", forbidden: ["Queso", "Guacamole", "Triángulos", "México"] },
-      { word: "PALOMITAS", forbidden: ["Cine", "Maíz", "Sal", "Microondas"] },
-      { word: "ACEITUNA", forbidden: ["Verde", "Negra", "Aceite", "Aperitivo"] },
       { word: "PIPA", forbidden: ["Girasol", "Sal", "Comer", "Cáscara"] },
-      { word: "CHICLE", forbidden: ["Masticar", "Globo", "Sabor", "Pegar"] },
       { word: "CARAMELO", forbidden: ["Dulce", "Azúcar", "Niños", "Chupar"] },
       { word: "CHUPACHUPS", forbidden: ["Palo", "Caramelo", "Redondo", "Dulce"] },
-
-      // OBJETOS Y CASA
       { word: "CAMA", forbidden: ["Dormir", "Mueble", "Habitación", "Noche"] },
-      { word: "RELOJ", forbidden: ["Tiempo", "Hora", "Muñeca", "Pared"] },
-      { word: "LIBRO", forbidden: ["Leer", "Páginas", "Historia", "Papel"] },
-      { word: "TELEVISIÓN", forbidden: ["Pantalla", "Ver", "Mando", "Canales"] },
-      { word: "SILLA", forbidden: ["Sentarse", "Mueble", "Mesa", "Patas"] },
-      { word: "MESA", forbidden: ["Mueble", "Comer", "Silla", "Madera"] },
-      { word: "LÁPIZ", forbidden: ["Escribir", "Papel", "Dibujar", "Goma"] },
       { word: "PAPEL", forbidden: ["Escribir", "Blanco", "Hoja", "Cuaderno"] },
       { word: "TIJERAS", forbidden: ["Cortar", "Papel", "Herramienta", "Filo"] },
-      { word: "CUCHILLO", forbidden: ["Cortar", "Cocina", "Tenedor", "Comer"] },
-      { word: "TENEDOR", forbidden: ["Comer", "Cubierto", "Pinchar", "Cuchillo"] },
-      { word: "CUCHARA", forbidden: ["Sopa", "Comer", "Cubierto", "Líquido"] },
-      { word: "PLATO", forbidden: ["Comer", "Redondo", "Vajilla", "Mesa"] },
-      { word: "VASO", forbidden: ["Beber", "Agua", "Cristal", "Líquido"] },
-      { word: "BOTELLA", forbidden: ["Líquido", "Agua", "Plástico", "Cristal"] },
       { word: "LLAVE", forbidden: ["Abrir", "Puerta", "Cerradura", "Casa"] },
-      { word: "PUERTA", forbidden: ["Casa", "Abrir", "Cerrar", "Entrada"] },
-      { word: "VENTANA", forbidden: ["Casa", "Ver", "Cristal", "Abrir"] },
       { word: "PARED", forbidden: ["Casa", "Muro", "Ladrillo", "Habitación"] },
       { word: "SUELO", forbidden: ["Pisar", "Abajo", "Casa", "Tierra"] },
       { word: "TECHO", forbidden: ["Arriba", "Casa", "Cubrir", "Alto"] },
-      { word: "LÁMPARA", forbidden: ["Luz", "Bombilla", "Iluminar", "Noche"] },
-      { word: "VELA", forbidden: ["Fuego", "Cera", "Luz", "Cumpleaños"] },
       { word: "CARTA", forbidden: ["Escribir", "Papel", "Correo", "Sobre"] },
-      { word: "SOBRE", forbidden: ["Carta", "Papel", "Guardar", "Sello"] },
       { word: "SELLO", forbidden: ["Carta", "Pegar", "Correos", "Estampilla"] },
       { word: "PAQUETE", forbidden: ["Caja", "Correo", "Envío", "Regalo"] },
       { word: "REGALO", forbidden: ["Dar", "Sorpresa", "Cumpleaños", "Caja"] },
@@ -3015,29 +2955,19 @@
       { word: "LAVAVAJILLAS", forbidden: ["Platos", "Lavar", "Máquina", "Cocina"] },
       { word: "FRIGORÍFICO", forbidden: ["Nevera", "Frío", "Comida", "Guardar"] },
       { word: "CONGELADOR", forbidden: ["Hielo", "Frío", "Helado", "Bajo cero"] },
-      { word: "MANDO", forbidden: ["Tele", "Botones", "Pilas", "Cambiar"] },
-      { word: "ALMOHADA", forbidden: ["Cama", "Dormir", "Cabeza", "Suave"] },
       { word: "SÁBANA", forbidden: ["Cama", "Tela", "Taparse", "Colchón"] },
-      { word: "MANTA", forbidden: ["Frío", "Taparse", "Sofá", "Cama"] },
-      { word: "ESPEJO", forbidden: ["Ver", "Reflejo", "Cara", "Baño"] },
       { word: "JARRÓN", forbidden: ["Flores", "Agua", "Decorar", "Mesa"] },
       { word: "BOMBILLA", forbidden: ["Luz", "Lámpara", "Cristal", "Fundida"] },
       { word: "ENCHUFE", forbidden: ["Pared", "Electricidad", "Cable", "Agujeros"] },
       { word: "INTERRUPTOR", forbidden: ["Luz", "Botón", "Encender", "Apagar"] },
       { word: "RADIADOR", forbidden: ["Calor", "Calefacción", "Invierno", "Pared"] },
-      { word: "VENTILADOR", forbidden: ["Aire", "Calor", "Verano", "Aspas"] },
       { word: "AIRE ACONDICIONADO", forbidden: ["Frío", "Verano", "Pared", "Mando"] },
-
-      // ROPA Y MODA
-      { word: "ZAPATO", forbidden: ["Pie", "Caminar", "Calzado", "Cordones"] },
       { word: "CAMISA", forbidden: ["Ropa", "Vestir", "Botones", "Mangas"] },
       { word: "PANTALÓN", forbidden: ["Ropa", "Piernas", "Vestir", "Vaqueros"] },
       { word: "VESTIDO", forbidden: ["Ropa", "Mujer", "Largo", "Fiesta"] },
       { word: "ABRIGO", forbidden: ["Frío", "Invierno", "Ropa", "Chaqueta"] },
-      { word: "SOMBRERO", forbidden: ["Cabeza", "Sol", "Ropa", "Gorra"] },
       { word: "GUANTES", forbidden: ["Manos", "Frío", "Invierno", "Dedos"] },
       { word: "BUFANDA", forbidden: ["Cuello", "Frío", "Invierno", "Lana"] },
-      { word: "CALCETINES", forbidden: ["Pies", "Zapatos", "Ropa", "Par"] },
       { word: "BOLSO", forbidden: ["Mujer", "Llevar", "Cosas", "Cartera"] },
       { word: "GORRO", forbidden: ["Cabeza", "Frío", "Lana", "Invierno"] },
       { word: "GORRA", forbidden: ["Cabeza", "Visera", "Sol", "Deporte"] },
@@ -3065,33 +2995,22 @@
       { word: "CORDONES", forbidden: ["Zapatos", "Atar", "Nudo", "Zapatillas"] },
       { word: "IMPERMEABLE", forbidden: ["Lluvia", "Agua", "Plástico", "Chubasquero"] },
       { word: "MALETÍN", forbidden: ["Trabajo", "Documentos", "Oficina", "Mano"] },
-
-      // TECNOLOGÍA
-      { word: "TELEVISIÓN", forbidden: ["Pantalla", "Ver", "Mando", "Canales"] },
-      { word: "ORDENADOR", forbidden: ["Teclado", "Pantalla", "Internet", "Trabajar"] },
-      { word: "TELÉFONO", forbidden: ["Llamar", "Móvil", "Hablar", "Mensaje"] },
       { word: "INTERNET", forbidden: ["Web", "Wifi", "Red", "Conexión"] },
       { word: "MÓVIL", forbidden: ["Teléfono", "Llamar", "Mensaje", "Apps"] },
-      { word: "CÁMARA", forbidden: ["Fotos", "Vídeo", "Imagen", "Retrato"] },
       { word: "FOTO", forbidden: ["Imagen", "Cámara", "Recuerdo", "Selfie"] },
       { word: "VIDEOJUEGO", forbidden: ["Consola", "Jugar", "Pantalla", "Mando"] },
       { word: "RADIO", forbidden: ["Escuchar", "Música", "Noticias", "Sonido"] },
       { word: "ROBOT", forbidden: ["Máquina", "Futuro", "Inteligencia", "Metal"] },
       { word: "PILA", forbidden: ["Batería", "Energía", "Juguete", "Pequeña"] },
-      { word: "TECLADO", forbidden: ["Escribir", "Ordenador", "Teclas", "Letras"] },
-      { word: "RATÓN", forbidden: ["Ordenador", "Click", "Mano", "Flecha"] },
       { word: "PANTALLA", forbidden: ["Monitor", "Ver", "Imagen", "Televisión"] },
       { word: "PORTÁTIL", forbidden: ["Ordenador", "Llevar", "Batería", "Teclado"] },
       { word: "TABLET", forbidden: ["Pantalla", "Táctil", "iPad", "Grande"] },
       { word: "WIFI", forbidden: ["Internet", "Conexión", "Clave", "Router"] },
-      { word: "BATERÍA", forbidden: ["Carga", "Móvil", "Porcentaje", "Enchufe"] },
       { word: "CARGADOR", forbidden: ["Cable", "Enchufe", "Batería", "Móvil"] },
       { word: "VIRUS", forbidden: ["Ordenador", "Enfermo", "Antivirus", "Malo"] },
       { word: "HACKER", forbidden: ["Pirata", "Ordenador", "Robar", "Seguridad"] },
       { word: "PROYECTOR", forbidden: ["Imagen", "Pared", "Cine", "Clase"] },
       { word: "ALTAVOZ", forbidden: ["Sonido", "Música", "Escuchar", "Volumen"] },
-      { word: "MICRÓFONO", forbidden: ["Hablar", "Voz", "Cantar", "Amplificar"] },
-      { word: "AURICULARES", forbidden: ["Oídos", "Música", "Escuchar", "Cascos"] },
       { word: "DVD", forbidden: ["Película", "Disco", "Reproductor", "Ver"] },
       { word: "CD", forbidden: ["Música", "Disco", "Escuchar", "Redondo"] },
       { word: "USB", forbidden: ["Memoria", "Guardar", "Ordenador", "Pincho"] },
@@ -3100,11 +3019,7 @@
       { word: "ESCÁNER", forbidden: ["Copiar", "Digitalizar", "Documento", "Imagen"] },
       { word: "FOTOCOPIADORA", forbidden: ["Copias", "Papel", "Máquina", "Duplicar"] },
       { word: "TRÍPODE", forbidden: ["Cámara", "Sujetar", "Tres patas", "Foto"] },
-      { word: "FLASH", forbidden: ["Luz", "Foto", "Cámara", "Brillo"] },
       { word: "CABLE", forbidden: ["Conectar", "Electricidad", "Enchufe", "Alambre"] },
-
-      // NATURALEZA Y CIELO
-      { word: "SOL", forbidden: ["Estrella", "Calor", "Luz", "Día"] },
       { word: "LLUVIA", forbidden: ["Agua", "Nubes", "Cielo", "Mojarse"] },
       { word: "NIEVE", forbidden: ["Blanco", "Frío", "Invierno", "Esquiar"] },
       { word: "MONTAÑA", forbidden: ["Alto", "Escalar", "Naturaleza", "Pico"] },
@@ -3113,8 +3028,6 @@
       { word: "FLOR", forbidden: ["Planta", "Olor", "Jardín", "Pétalos"] },
       { word: "ROSA", forbidden: ["Flor", "Roja", "Amor", "Espinas"] },
       { word: "CIELO", forbidden: ["Arriba", "Azul", "Nubes", "Dios"] },
-      { word: "ESTRELLA", forbidden: ["Cielo", "Noche", "Luz", "Brillar"] },
-      { word: "LUNA", forbidden: ["Noche", "Cielo", "Blanca", "Sol"] },
       { word: "NUBE", forbidden: ["Cielo", "Blanca", "Lluvia", "Algodón"] },
       { word: "ARCOIRIS", forbidden: ["Colores", "Cielo", "Lluvia", "Sol"] },
       { word: "TRUENO", forbidden: ["Ruido", "Tormenta", "Rayo", "Cielo"] },
@@ -3141,20 +3054,10 @@
       { word: "LAGO", forbidden: ["Agua", "Grande", "Peces", "Naturaleza"] },
       { word: "MAR", forbidden: ["Agua", "Salada", "Playa", "Océano"] },
       { word: "ISLA", forbidden: ["Mar", "Tierra", "Agua", "Desierta"] },
-
-      // PROFESIONES Y ROLES
-      { word: "POLICÍA", forbidden: ["Seguridad", "Ladrón", "Uniforme", "Coche"] },
-      { word: "BOMBERO", forbidden: ["Fuego", "Apagar", "Camión", "Manguera"] },
-      { word: "MÉDICO", forbidden: ["Hospital", "Curar", "Enfermo", "Doctor"] },
-      { word: "PROFESOR", forbidden: ["Escuela", "Enseñar", "Alumnos", "Clase"] },
-      { word: "COCINERO", forbidden: ["Comida", "Restaurante", "Preparar", "Cocina"] },
       { word: "PELUQUERO", forbidden: ["Pelo", "Cortar", "Peinar", "Tijeras"] },
       { word: "JUEZ", forbidden: ["Juicio", "Ley", "Martillo", "Tribunal"] },
-      { word: "PILOTO", forbidden: ["Avión", "Volar", "Conducir", "Aeropuerto"] },
       { word: "PAYASO", forbidden: ["Circo", "Risa", "Nariz", "Rojo"] },
-      { word: "ASTRONAUTA", forbidden: ["Espacio", "Cohete", "Luna", "Traje"] },
       { word: "DETECTIVE", forbidden: ["Investigar", "Lupa", "Crimen", "Misterio"] },
-      { word: "CARTERO", forbidden: ["Cartas", "Correo", "Buzón", "Repartir"] },
       { word: "ALUMNO", forbidden: ["Estudiar", "Colegio", "Clase", "Niño"] },
       { word: "PESCADERO", forbidden: ["Pescado", "Vender", "Tienda", "Mar"] },
       { word: "FRUTERO", forbidden: ["Fruta", "Vender", "Tienda", "Verdura"] },
@@ -3162,23 +3065,8 @@
       { word: "AGRICULTOR", forbidden: ["Campo", "Cultivar", "Tierra", "Tractor"] },
       { word: "GANADERO", forbidden: ["Animales", "Granja", "Vacas", "Cuidar"] },
       { word: "MINERO", forbidden: ["Mina", "Carbón", "Tierra", "Casco"] },
-      { word: "AZAFATA", forbidden: ["Avión", "Pasajeros", "Ayudar", "Vuelo"] },
-      { word: "CONDUCTOR", forbidden: ["Coche", "Autobús", "Conducir", "Volante"] },
-      { word: "TAXISTA", forbidden: ["Taxi", "Coche", "Llevar", "Carrera"] },
       { word: "CAMIONERO", forbidden: ["Camión", "Carretera", "Carga", "Viaje"] },
-      { word: "ACTOR", forbidden: ["Película", "Cine", "Teatro", "Personaje"] },
-      { word: "CANTANTE", forbidden: ["Cantar", "Música", "Canción", "Escenario"] },
-      { word: "MÚSICO", forbidden: ["Instrumento", "Tocar", "Orquesta", "Banda"] },
-      { word: "BAILARÍN", forbidden: ["Bailar", "Danza", "Ballet", "Música"] },
-      { word: "ESCRITOR", forbidden: ["Escribir", "Libros", "Autor", "Novela"] },
-      { word: "PINTOR", forbidden: ["Cuadros", "Arte", "Pincel", "Lienzo"] },
       { word: "ESCULTOR", forbidden: ["Estatua", "Arte", "Piedra", "Barro"] },
-      { word: "ARQUITECTO", forbidden: ["Edificios", "Planos", "Diseñar", "Casa"] },
-      { word: "PERIODISTA", forbidden: ["Noticias", "Televisión", "Periódico", "Informar"] },
-      { word: "FOTÓGRAFO", forbidden: ["Cámara", "Fotos", "Imagen", "Retrato"] },
-      { word: "ABOGADO", forbidden: ["Juicio", "Ley", "Defender", "Juez"] },
-      { word: "POLÍTICO", forbidden: ["Gobierno", "Votar", "Partido", "Mandar"] },
-      { word: "REY", forbidden: ["Reina", "Corona", "Monarquía", "País"] },
       { word: "PRESIDENTE", forbidden: ["País", "Gobierno", "Mandar", "Elegir"] },
       { word: "JEFE", forbidden: ["Mandar", "Trabajo", "Oficina", "Superior"] },
       { word: "EMPLEADO", forbidden: ["Trabajar", "Sueldo", "Empresa", "Jefe"] },
@@ -3188,12 +3076,9 @@
       { word: "TURISTA", forbidden: ["Viajar", "Visitar", "Fotos", "Extranjero"] },
       { word: "LADRÓN", forbidden: ["Robar", "Policía", "Delito", "Cárcel"] },
       { word: "ASESINO", forbidden: ["Matar", "Muerte", "Crimen", "Cárcel"] },
-      { word: "ESPÍA", forbidden: ["Secreto", "Información", "Agente", "Misión"] },
       { word: "MIMO", forbidden: ["Silencio", "Gestos", "Cara blanca", "Teatro"] },
       { word: "DEPORTISTA", forbidden: ["Deporte", "Entrenar", "Jugar", "Atleta"] },
       { word: "FUTBOLISTA", forbidden: ["Fútbol", "Balón", "Equipo", "Gol"] },
-      { word: "ENTRENADOR", forbidden: ["Equipo", "Deporte", "Dirigir", "Míster"] },
-      { word: "ÁRBITRO", forbidden: ["Pitar", "Faltas", "Partido", "Silbato"] },
       { word: "PORTERO", forbidden: ["Fútbol", "Parar", "Gol", "Manos"] },
       { word: "DELANTERO", forbidden: ["Fútbol", "Gol", "Atacar", "Jugador"] },
       { word: "DEFENSA", forbidden: ["Fútbol", "Proteger", "Portería", "Jugador"] },
@@ -3206,8 +3091,6 @@
       { word: "MONJA", forbidden: ["Iglesia", "Convento", "Hábito", "Rezar"] },
       { word: "PAPA", forbidden: ["Roma", "Iglesia", "Vaticano", "Padre"] },
       { word: "OBISPO", forbidden: ["Iglesia", "Mitra", "Cura", "Mandar"] },
-
-      // FANTASÍA Y FICCIÓN
       { word: "FANTASMA", forbidden: ["Miedo", "Sábana", "Muerto", "Espíritu"] },
       { word: "BRUJA", forbidden: ["Escoba", "Mala", "Magia", "Cuento"] },
       { word: "MAGO", forbidden: ["Magia", "Truco", "Sombrero", "Conejo"] },
@@ -3230,13 +3113,10 @@
       { word: "DUENDE", forbidden: ["Pequeño", "Orejas", "Bosque", "Verde"] },
       { word: "GIGANTE", forbidden: ["Grande", "Alto", "Cuento", "Enorme"] },
       { word: "ENANO", forbidden: ["Pequeño", "Bajo", "Blancanieves", "Cuento"] },
-      { word: "UNICORNIO", forbidden: ["Caballo", "Cuerno", "Magia", "Blanco"] },
       { word: "ALIENÍGENA", forbidden: ["Espacio", "OVNI", "Extraterrestre", "Verde"] },
       { word: "MOMIA", forbidden: ["Venda", "Egipto", "Tumba", "Muerto"] },
       { word: "ESQUELETO", forbidden: ["Huesos", "Cuerpo", "Muerto", "Calavera"] },
       { word: "CALAVERA", forbidden: ["Cabeza", "Hueso", "Esqueleto", "Muerto"] },
-
-      // CUERPO Y SALUD
       { word: "CUERPO", forbidden: ["Humano", "Brazos", "Piernas", "Cabeza"] },
       { word: "CABEZA", forbidden: ["Cuerpo", "Pelo", "Cara", "Pensar"] },
       { word: "PELO", forbidden: ["Cabeza", "Peinar", "Largo", "Corto"] },
@@ -3282,27 +3162,13 @@
       { word: "AUDÍFONO", forbidden: ["Oír", "Sordo", "Oreja", "Aparato"] },
       { word: "MULETA", forbidden: ["Cojear", "Pierna", "Andar", "Ayuda"] },
       { word: "SILLA DE RUEDAS", forbidden: ["Discapacitado", "Sentarse", "Moverse", "Ruedas"] },
-
-      // DEPORTES Y HOBBIES
-      { word: "FÚTBOL", forbidden: ["Deporte", "Pelota", "Gol", "Messi"] },
-      { word: "BALONCESTO", forbidden: ["Canasta", "Balón", "Alto", "Jugar"] },
-      { word: "TENIS", forbidden: ["Raqueta", "Pelota", "Red", "Jugar"] },
-      { word: "NATACIÓN", forbidden: ["Agua", "Nadar", "Piscina", "Deporte"] },
       { word: "CORRER", forbidden: ["Rápido", "Deporte", "Pies", "Cansarse"] },
       { word: "AJEDREZ", forbidden: ["Juego", "Tablero", "Rey", "Reina"] },
       { word: "PARCHÍS", forbidden: ["Juego", "Fichas", "Dado", "Colores"] },
       { word: "DOMINÓ", forbidden: ["Fichas", "Números", "Mesa", "Juego"] },
       { word: "PÓKER", forbidden: ["Cartas", "Juego", "Casino", "Apostar"] },
       { word: "PUZZLE", forbidden: ["Piezas", "Encajar", "Imagen", "Juego"] },
-      { word: "GOLF", forbidden: ["Palo", "Pelota", "Hoyo", "Hierba"] },
-      { word: "BOXEO", forbidden: ["Guantes", "Ring", "Golpear", "Pelea"] },
       { word: "KÁRATE", forbidden: ["Cinturón", "Artes marciales", "Kimono", "Japón"] },
-      { word: "ESQUÍ", forbidden: ["Nieve", "Montaña", "Deslizar", "Palos"] },
-      { word: "SURF", forbidden: ["Tabla", "Mar", "Olas", "Playa"] },
-      { word: "ATLETISMO", forbidden: ["Correr", "Pista", "Olimpiadas", "Carrera"] },
-      { word: "CICLISMO", forbidden: ["Bicicleta", "Tour", "Casco", "Ruedas"] },
-
-      // ESCUELA Y PAPELERÍA
       { word: "COLEGIO", forbidden: ["Estudiar", "Niños", "Clase", "Profesor"] },
       { word: "UNIVERSIDAD", forbidden: ["Carrera", "Estudios", "Facultad", "Examen"] },
       { word: "CLASE", forbidden: ["Aula", "Alumnos", "Profesor", "Pizarra"] },
@@ -3331,17 +3197,13 @@
       { word: "CERA", forbidden: ["Pintar", "Colores", "Dibujo", "Niños"] },
       { word: "ACUARELA", forbidden: ["Agua", "Pintura", "Colores", "Pincel"] },
       { word: "DICCIONARIO", forbidden: ["Palabras", "Significado", "Buscar", "Libro"] },
-      { word: "MAPA", forbidden: ["Países", "Mundo", "Geografía", "Plano"] },
       { word: "GLOBO TERRÁQUEO", forbidden: ["Mundo", "Redondo", "Países", "Girar"] },
-      { word: "GRAPADORA", forbidden: ["Papel", "Unir", "Metal", "Grapa"] },
       { word: "CLIP", forbidden: ["Sujetar", "Papel", "Metal", "Alambre"] },
       { word: "CELO", forbidden: ["Pegar", "Cinta", "Transparente", "Papel"] },
       { word: "CARPETA", forbidden: ["Papeles", "Guardar", "Orden", "Oficina"] },
       { word: "AGENDA", forbidden: ["Fecha", "Días", "Apuntar", "Calendario"] },
       { word: "POST-IT", forbidden: ["Nota", "Amarillo", "Pegar", "Papel"] },
       { word: "SUBRAYADOR", forbidden: ["Resaltar", "Color", "Estudiar", "Texto"] },
-
-      // HERRAMIENTAS Y BRICOLAJE
       { word: "MARTILLO", forbidden: ["Clavo", "Golpear", "Herramienta", "Madera"] },
       { word: "SIERRA", forbidden: ["Cortar", "Madera", "Herramienta", "Dientes"] },
       { word: "DESTORNILLADOR", forbidden: ["Tornillo", "Girar", "Herramienta", "Apretar"] },
@@ -3354,8 +3216,6 @@
       { word: "CRISTAL", forbidden: ["Ventana", "Romper", "Transparente", "Vaso"] },
       { word: "HIERRO", forbidden: ["Metal", "Duro", "Gris", "Pesado"] },
       { word: "PLÁSTICO", forbidden: ["Botella", "Bolsa", "Material", "Reciclar"] },
-
-      // VERBOS Y ACCIONES
       { word: "DORMIR", forbidden: ["Cama", "Noche", "Sueño", "Descansar"] },
       { word: "COMER", forbidden: ["Alimento", "Boca", "Hambre", "Mesa"] },
       { word: "BEBER", forbidden: ["Agua", "Sed", "Vaso", "Líquido"] },
@@ -3384,8 +3244,6 @@
       { word: "SUSURRAR", forbidden: ["Hablar", "Bajo", "Secreto", "Oído"] },
       { word: "BESAR", forbidden: ["Labios", "Amor", "Boca", "Pareja"] },
       { word: "ABRAZAR", forbidden: ["Brazos", "Cariño", "Rodear", "Amigo"] },
-
-      // SENTIMIENTOS Y CONCEPTOS
       { word: "AMOR", forbidden: ["Corazón", "Pareja", "Sentimiento", "Querer"] },
       { word: "ODIO", forbidden: ["Malo", "Enemigo", "Sentimiento", "No querer"] },
       { word: "MIEDO", forbidden: ["Susto", "Terror", "Noche", "Fantasma"] },
@@ -3412,8 +3270,6 @@
       { word: "OLVIDO", forbidden: ["Recordar", "Memoria", "Borrar", "No saber"] },
       { word: "PRISA", forbidden: ["Rápido", "Correr", "Tiempo", "Tarde"] },
       { word: "PACIENCIA", forbidden: ["Esperar", "Tiempo", "Calma", "Tranquilo"] },
-
-      // COLORES Y FORMAS
       { word: "ROJO", forbidden: ["Color", "Sangre", "Fuego", "Tomate"] },
       { word: "AZUL", forbidden: ["Color", "Cielo", "Mar", "Pitufo"] },
       { word: "VERDE", forbidden: ["Color", "Hierba", "Hojas", "Esperanza"] },
@@ -3421,7 +3277,6 @@
       { word: "NEGRO", forbidden: ["Color", "Oscuro", "Noche", "Luto"] },
       { word: "BLANCO", forbidden: ["Color", "Nieve", "Leche", "Claro"] },
       { word: "ROSA", forbidden: ["Color", "Niña", "Cerdo", "Pantera"] },
-      { word: "NARANJA", forbidden: ["Color", "Fruta", "Butano", "Zanahoria"] },
       { word: "GRIS", forbidden: ["Color", "Ceniza", "Ratón", "Nublado"] },
       { word: "MARRÓN", forbidden: ["Color", "Chocolate", "Tierra", "Madera"] },
       { word: "CÍRCULO", forbidden: ["Forma", "Redondo", "Pelota", "Anillo"] },
@@ -3429,28 +3284,20 @@
       { word: "TRIÁNGULO", forbidden: ["Forma", "Tres", "Lados", "Pico"] },
       { word: "LÍNEA", forbidden: ["Recta", "Raya", "Dibujar", "Lápiz"] },
       { word: "PUNTO", forbidden: ["Final", "Pequeño", "Redondo", "Escribir"] },
-
-      // VEHÍCULOS Y CALLE
-      { word: "COCHE", forbidden: ["Vehículo", "Ruedas", "Conducir", "Motor"] },
       { word: "TREN", forbidden: ["Vía", "Estación", "Viajar", "Vagones"] },
-      { word: "BARCO", forbidden: ["Mar", "Navegar", "Agua", "Viajar"] },
       { word: "AUTOBÚS", forbidden: ["Transporte", "Gente", "Parada", "Viajar"] },
       { word: "TAXI", forbidden: ["Coche", "Pagar", "Conductor", "Ciudad"] },
-      { word: "CAMIÓN", forbidden: ["Grande", "Carga", "Carretera", "Transporte"] },
       { word: "MOTO", forbidden: ["Dos ruedas", "Casco", "Rápido", "Vehículo"] },
       { word: "SEMAFORO", forbidden: ["Luces", "Rojo", "Verde", "Tráfico"] },
       { word: "CALLE", forbidden: ["Ciudad", "Coches", "Caminar", "Acera"] },
-      { word: "BICICLETA", forbidden: ["Ruedas", "Pedales", "Montar", "Vehículo"] },
       { word: "AMBULANCIA", forbidden: ["Hospital", "Enfermo", "Sirena", "Médico"] },
       { word: "BOMBEROS", forbidden: ["Camión", "Fuego", "Rojo", "Sirena"] },
       { word: "METRO", forbidden: ["Tren", "Ciudad", "Subterráneo", "Estación"] },
       { word: "TRACTOR", forbidden: ["Campo", "Granja", "Ruedas", "Agricultor"] },
       { word: "GRÚA", forbidden: ["Coche", "Levantar", "Obra", "Remolcar"] },
       { word: "PATINETE", forbidden: ["Ruedas", "Manillar", "Pie", "Juguete"] },
-      { word: "MONOPATÍN", forbidden: ["Skate", "Tabla", "Ruedas", "Suelo"] },
       { word: "HELICÓPTERO", forbidden: ["Volar", "Hélices", "Cielo", "Ruido"] },
       { word: "SUBMARINO", forbidden: ["Agua", "Mar", "Debajo", "Barco"] },
-      { word: "COHETE", forbidden: ["Espacio", "Luna", "Astronauta", "Volar"] },
       { word: "GLOBO", forbidden: ["Aire", "Volar", "Cesta", "Fuego"] },
       { word: "PASO DE CEBRA", forbidden: ["Cruzar", "Peatón", "Rayas", "Calle"] },
       { word: "ACERA", forbidden: ["Andar", "Calle", "Peatón", "Borde"] },
@@ -3462,8 +3309,6 @@
       { word: "ROTONDA", forbidden: ["Coches", "Círculo", "Girar", "Cruce"] },
       { word: "TUNEL", forbidden: ["Oscuro", "Coche", "Montaña", "Pasar"] },
       { word: "PUENTE", forbidden: ["Cruzar", "Río", "Agua", "Carretera"] },
-
-      // LUGARES
       { word: "CIUDAD", forbidden: ["Edificios", "Gente", "Grande", "Vivir"] },
       { word: "PUEBLO", forbidden: ["Pequeño", "Campo", "Vivir", "Gente"] },
       { word: "CAMPO", forbidden: ["Naturaleza", "Verde", "Agricultura", "Fuera"] },
@@ -3487,19 +3332,14 @@
       { word: "PARQUE", forbidden: ["Jugar", "Niños", "Árboles", "Banco"] },
       { word: "ASEO", forbidden: ["Baño", "Higiene", "Ducha", "Lavabo"] },
       { word: "BAÑO", forbidden: ["Ducha", "Agua", "Lavabo", "Aseo"] },
-
-      // PALABRAS ADICIONALES - COMIDA
       { word: "ABANICO", forbidden: ["Calor", "Aire", "Mover", "Abrir"] },
       { word: "ACEITE", forbidden: ["Cocinar", "Oliva", "Líquido", "Fritar"] },
       { word: "ALICATE", forbidden: ["Agarrar", "Cortar", "Herramienta", "Pinza"] },
-      { word: "ANILLO", forbidden: ["Dedo", "Joya", "Boda", "Aro"] },
       { word: "ARCILLA", forbidden: ["Barro", "Moldear", "Cerámica", "Material"] },
       { word: "ARCOÍRIS", forbidden: ["Colores", "Lluvia", "Sol", "Cielo"] },
       { word: "ARMÓNICA", forbidden: ["Música", "Soplar", "Pequeña", "Instrumento"] },
       { word: "ARPA", forbidden: ["Música", "Cuerdas", "Ángel", "Instrumento"] },
-      { word: "ARROZ", forbidden: ["Grano", "Blanco", "Comida", "Asiático"] },
       { word: "ASCENSOR", forbidden: ["Subir", "Piso", "Botón", "Cabina"] },
-      { word: "ASPIRADORA", forbidden: ["Limpiar", "Suelo", "Polvo", "Succión"] },
       { word: "ASTEROIDE", forbidden: ["Espacio", "Roca", "Cinturón", "Pequeño"] },
       { word: "AVALANCHA", forbidden: ["Nieve", "Montaña", "Caer", "Rápido"] },
       { word: "AZÚCAR", forbidden: ["Dulce", "Blanco", "Café", "Endulzar"] },
@@ -3515,16 +3355,12 @@
       { word: "CALEFACCIÓN", forbidden: ["Calor", "Invierno", "Calentar", "Casa"] },
       { word: "CANDADO", forbidden: ["Cerrar", "Llave", "Seguridad", "Metal"] },
       { word: "CARTÓN", forbidden: ["Caja", "Papel", "Grueso", "Material"] },
-      { word: "CEPILLO", forbidden: ["Pelo", "Dientes", "Limpiar", "Cerdas"] },
-      { word: "CERVEZA", forbidden: ["Alcohol", "Bar", "Espuma", "Adultos"] },
       { word: "CHAMPÁN", forbidden: ["Burbuja", "Celebrar", "Copa", "Fiesta"] },
       { word: "CHAMPÚ", forbidden: ["Pelo", "Lavar", "Ducha", "Espuma"] },
       { word: "CINCEL", forbidden: ["Tallar", "Golpear", "Herramienta", "Madera"] },
-      { word: "CINTURÓN", forbidden: ["Pantalón", "Sujetar", "Hebilla", "Cintura"] },
       { word: "CLAVO", forbidden: ["Martillo", "Golpear", "Metal", "Pared"] },
       { word: "COJÍN", forbidden: ["Sofá", "Suave", "Sentarse", "Decoración"] },
       { word: "COLCHA", forbidden: ["Cama", "Cubrir", "Tela", "Decoración"] },
-      { word: "COLLAR", forbidden: ["Cuello", "Joya", "Cadena", "Colgante"] },
       { word: "COMETA", forbidden: ["Espacio", "Cola", "Estrella", "Hielo"] },
       { word: "CORBATA", forbidden: ["Cuello", "Formal", "Nudo", "Traje"] },
       { word: "CREPE", forbidden: ["Francia", "Fino", "Dulce", "Enrollar"] },
@@ -3538,13 +3374,10 @@
       { word: "ESQUIAR", forbidden: ["Nieve", "Montaña", "Deslizar", "Invierno"] },
       { word: "ESTANTERÍA", forbidden: ["Libros", "Madera", "Estantes", "Guardar"] },
       { word: "ESTORNUDO", forbidden: ["Nariz", "Alergia", "Sonido", "Resfriado"] },
-      { word: "FLAUTA", forbidden: ["Música", "Soplar", "Agujeros", "Instrumento"] },
       { word: "FRACCIÓN", forbidden: ["Matemática", "Parte", "Numerador", "División"] },
       { word: "GALAXIA", forbidden: ["Estrellas", "Espacio", "Vía Láctea", "Universo"] },
-      { word: "GALLETA", forbidden: ["Dulce", "Crujiente", "Merienda", "Hornear"] },
       { word: "GANCHO", forbidden: ["Colgar", "Curvo", "Metal", "Sujetar"] },
       { word: "GUERRA", forbidden: ["Paz", "Lucha", "Soldado", "Batalla"] },
-      { word: "GUITARRA", forbidden: ["Música", "Cuerdas", "Tocar", "Instrumento"] },
       { word: "HARINA", forbidden: ["Blanca", "Pan", "Cocinar", "Polvo"] },
       { word: "HIERBA", forbidden: ["Verde", "Campo", "Cortar", "Crecer"] },
       { word: "HIPO", forbidden: ["Sonido", "Involuntario", "Molesto", "Diafragma"] },
@@ -3564,24 +3397,18 @@
       { word: "MESITA", forbidden: ["Mesa", "Pequeña", "Noche", "Lámpara"] },
       { word: "METAL", forbidden: ["Duro", "Brillo", "Hierro", "Material"] },
       { word: "METEORITO", forbidden: ["Espacio", "Caer", "Piedra", "Cielo"] },
-      { word: "MICROONDAS", forbidden: ["Calentar", "Comida", "Rápido", "Cocina"] },
-      { word: "MIEL", forbidden: ["Dulce", "Abeja", "Dorado", "Natural"] },
       { word: "MULTIPLICAR", forbidden: ["Matemática", "Veces", "Por", "Producto"] },
       { word: "MUSGO", forbidden: ["Verde", "Húmedo", "Árbol", "Blando"] },
       { word: "NEVERA", forbidden: ["Frío", "Comida", "Conservar", "Cocina"] },
       { word: "PAJARITA", forbidden: ["Cuello", "Formal", "Lazo", "Corbata"] },
-      { word: "PARAGUAS", forbidden: ["Lluvia", "Abrir", "Mojado", "Cubrir"] },
-      { word: "PASTA", forbidden: ["Italia", "Cocinar", "Agua", "Espagueti"] },
       { word: "PASTA DE DIENTES", forbidden: ["Cepillo", "Boca", "Blanquear", "Tubo"] },
       { word: "PATINAR", forbidden: ["Hielo", "Deslizar", "Patines", "Ruedas"] },
       { word: "PAZ", forbidden: ["Guerra", "Tranquilo", "Calma", "Armonía"] },
       { word: "PEINE", forbidden: ["Pelo", "Peinar", "Púas", "Cabeza"] },
       { word: "PENDIENTES", forbidden: ["Orejas", "Joya", "Colgar", "Aros"] },
       { word: "PERCHERO", forbidden: ["Abrigo", "Colgar", "Ropa", "Entrada"] },
-      { word: "PIANO", forbidden: ["Música", "Teclas", "Negro", "Instrumento"] },
       { word: "PLANCHA", forbidden: ["Ropa", "Alisar", "Caliente", "Vapor"] },
       { word: "PLANETA", forbidden: ["Tierra", "Espacio", "Órbita", "Redondo"] },
-      { word: "PULSERA", forbidden: ["Muñeca", "Joya", "Brazalete", "Adorno"] },
       { word: "PÉTALO", forbidden: ["Flor", "Hoja", "Caer", "Delicado"] },
       { word: "RAMA", forbidden: ["Árbol", "Madera", "Romper", "Palo"] },
       { word: "RAÍZ", forbidden: ["Árbol", "Tierra", "Planta", "Subterránea"] },
@@ -3592,37 +3419,25 @@
       { word: "SACO", forbidden: ["Bolsa", "Grande", "Llevar", "Tela"] },
       { word: "SAL", forbidden: ["Blanca", "Condimento", "Sabor", "Mar"] },
       { word: "SATÉLITE", forbidden: ["Espacio", "Órbita", "Luna", "Artificial"] },
-      { word: "SAXOFÓN", forbidden: ["Música", "Soplar", "Jazz", "Instrumento"] },
-      { word: "SECADOR", forbidden: ["Pelo", "Aire", "Caliente", "Secar"] },
       { word: "SEMILLA", forbidden: ["Plantar", "Pequeña", "Crecer", "Fruto"] },
       { word: "SUMA", forbidden: ["Matemática", "Más", "Añadir", "Total"] },
       { word: "SUSPIRO", forbidden: ["Respirar", "Cansancio", "Exhalar", "Aire"] },
       { word: "SÓTANO", forbidden: ["Abajo", "Casa", "Oscuro", "Bodega"] },
       { word: "TABURETE", forbidden: ["Sentarse", "Alto", "Barra", "Patas"] },
-      { word: "TACOS", forbidden: ["México", "Tortilla", "Carne", "Picante"] },
       { word: "TAMBOR", forbidden: ["Música", "Golpear", "Percusión", "Instrumento"] },
       { word: "TARRO", forbidden: ["Cristal", "Guardar", "Conserva", "Tapa"] },
       { word: "TARTA", forbidden: ["Dulce", "Cumpleaños", "Pastel", "Horno"] },
       { word: "TEJADO", forbidden: ["Casa", "Arriba", "Techo", "Tejas"] },
       { word: "TELA", forbidden: ["Ropa", "Suave", "Coser", "Material"] },
       { word: "TIRANTES", forbidden: ["Pantalón", "Hombros", "Sujetar", "Elástico"] },
-      { word: "TOALLA", forbidden: ["Secar", "Baño", "Tela", "Ducha"] },
       { word: "TORNILLO", forbidden: ["Rosca", "Girar", "Metal", "Tuerca"] },
       { word: "TOS", forbidden: ["Garganta", "Enfermo", "Sonido", "Pecho"] },
-      { word: "TROMPETA", forbidden: ["Música", "Soplar", "Metal", "Instrumento"] },
       { word: "TRONCO", forbidden: ["Árbol", "Madera", "Grueso", "Cortar"] },
       { word: "TSUNAMI", forbidden: ["Ola", "Mar", "Grande", "Desastre"] },
       { word: "TUERCA", forbidden: ["Tornillo", "Rosca", "Metal", "Apretar"] },
       { word: "VICTORIA", forbidden: ["Ganar", "Triunfo", "Éxito", "Vencer"] },
-      { word: "VINAGRE", forbidden: ["Ácido", "Ensalada", "Líquido", "Condimento"] },
-      { word: "VINO", forbidden: ["Alcohol", "Uva", "Copa", "Tinto"] },
-      { word: "VIOLÍN", forbidden: ["Música", "Cuerdas", "Arco", "Instrumento"] },
-      { word: "YOGUR", forbidden: ["Lácteo", "Cremoso", "Desayuno", "Probiótico"] },
-      { word: "ZUMO", forbidden: ["Fruta", "Líquido", "Beber", "Naranja"] },
       { word: "ÁNGULO", forbidden: ["Matemática", "Esquina", "Grados", "Recto"] },
       { word: "ÁTICO", forbidden: ["Arriba", "Casa", "Techo", "Piso"] },
-
-      // LIMPIEZA Y HOGAR
       { word: "BROCHA", forbidden: ["Pincel", "Pintar", "Pelo", "Mango"] },
       { word: "ESPONJA", forbidden: ["Lavar", "Absorber", "Suave", "Jabón"] },
       { word: "ESCOBA", forbidden: ["Barrer", "Suelo", "Palo", "Limpiar"] },
@@ -3634,8 +3449,6 @@
       { word: "MACETERO", forbidden: ["Plantas", "Maceta", "Flores", "Decoración"] },
       { word: "PECERA", forbidden: ["Peces", "Agua", "Cristal", "Acuario"] },
       { word: "FLORERO", forbidden: ["Flores", "Agua", "Decoración", "Cristal"] },
-
-      // COSTURA Y TEJIDO
       { word: "ALFILER", forbidden: ["Pinchar", "Coser", "Punta", "Pequeño"] },
       { word: "DEDAL", forbidden: ["Dedo", "Coser", "Metal", "Proteger"] },
       { word: "HILOS", forbidden: ["Coser", "Aguja", "Carrete", "Delgado"] },
@@ -3643,8 +3456,6 @@
       { word: "COSTURA", forbidden: ["Coser", "Aguja", "Tela", "Hilo"] },
       { word: "PARCHES", forbidden: ["Ropa", "Tapar", "Agujero", "Coser"] },
       { word: "REMIENDO", forbidden: ["Reparar", "Coser", "Agujero", "Parche"] },
-
-      // COMIDA Y FORMAS DE COCINAR
       { word: "PUCHERO", forbidden: ["Cocinar", "Olla", "Guiso", "Caldo"] },
       { word: "GUISO", forbidden: ["Cocinar", "Carne", "Cocido", "Olla"] },
       { word: "ESTOFADO", forbidden: ["Carne", "Cocinar", "Lento", "Salsa"] },
@@ -3657,16 +3468,12 @@
       { word: "COCIDO", forbidden: ["Guiso", "Hervir", "Legumbres", "Carne"] },
       { word: "PARRILLA", forbidden: ["Asar", "Fuego", "Carne", "Barbacoa"] },
       { word: "BRASA", forbidden: ["Carbón", "Fuego", "Rojo", "Caliente"] },
-
-      // VERBOS DE COCINA
       { word: "ASAR", forbidden: ["Cocinar", "Horno", "Fuego", "Calor"] },
       { word: "COCER", forbidden: ["Cocinar", "Agua", "Hervir", "Olla"] },
       { word: "HERVIR", forbidden: ["Agua", "Burbuja", "Caliente", "Vapor"] },
       { word: "FREÍR", forbidden: ["Aceite", "Caliente", "Sartén", "Dorar"] },
       { word: "HORNEAR", forbidden: ["Horno", "Cocinar", "Pan", "Calor"] },
       { word: "GUISAR", forbidden: ["Cocinar", "Olla", "Salsa", "Lento"] },
-
-      // LUGARES RURALES Y NATURALES
       { word: "ALDEA", forbidden: ["Pequeño", "Pueblo", "Rural", "Campo"] },
       { word: "HUERTO", forbidden: ["Cultivar", "Verduras", "Plantas", "Regar"] },
       { word: "INVERNADERO", forbidden: ["Plantas", "Cristal", "Cultivar", "Calor"] },
@@ -3682,8 +3489,6 @@
       { word: "ESTANQUE", forbidden: ["Agua", "Artificial", "Pequeño", "Peces"] },
       { word: "ARROYO", forbidden: ["Agua", "Pequeño", "Corriente", "Río"] },
       { word: "MANANTIAL", forbidden: ["Agua", "Brotar", "Nacimiento", "Fuente"] },
-
-      // VEHÍCULOS Y TRANSPORTE
       { word: "TRICICLO", forbidden: ["Tres", "Ruedas", "Pedal", "Niño"] },
       { word: "CARRETILLA", forbidden: ["Empujar", "Rueda", "Transportar", "Obra"] },
       { word: "CAMIONETA", forbidden: ["Vehículo", "Pequeño", "Camión", "Transportar"] },
@@ -3691,15 +3496,9 @@
       { word: "TRÁILER", forbidden: ["Camión", "Grande", "Remolque", "Mercancía"] },
       { word: "REMOLQUE", forbidden: ["Arrastrar", "Vehículo", "Carga", "Enganchar"] },
       { word: "GÓNDOLA", forbidden: ["Venecia", "Barco", "Agua", "Remo"] },
-
-      // MÁS PROFESIONES
-      { word: "MECÁNICO", forbidden: ["Coches", "Reparar", "Motor", "Taller"] },
-      { word: "ELECTRICISTA", forbidden: ["Cables", "Corriente", "Luz", "Reparar"] },
-      { word: "FONTANERO", forbidden: ["Agua", "Tuberías", "Reparar", "Grifos"] },
       { word: "HERRERO", forbidden: ["Hierro", "Forjar", "Martillo", "Metal"] },
       { word: "SASTRE", forbidden: ["Ropa", "Coser", "Traje", "Medidas"] },
       { word: "COSTURERA", forbidden: ["Coser", "Ropa", "Aguja", "Tela"] },
-      { word: "PANADERO", forbidden: ["Pan", "Horno", "Amasar", "Harina"] },
       { word: "PASTELERO", forbidden: ["Pasteles", "Dulce", "Horno", "Repostería"] },
       { word: "CARNICERO", forbidden: ["Carne", "Cortar", "Tienda", "Filete"] },
       { word: "TENDERO", forbidden: ["Tienda", "Vender", "Mostrador", "Comercio"] }
@@ -3724,8 +3523,11 @@
     ];
 
     // Variables Tabú
+    let numTabooTeams = 2;
     let tabooRedScore = 0;
     let tabooBlueScore = 0;
+    let tabooGreenScore = 0;
+    let tabooYellowScore = 0;
     let tabooTimerInterval = null;
     let isTabooTimerRunning = false;
     let currentTabooTeam = null;
@@ -3734,7 +3536,7 @@
 
     // --- VARIABLES DE RONDAS (AGREGAR ESTO) ---
     let currentTabooRound = 1;
-    const maxTabooRounds = 8;
+    let maxTabooRounds = 8;
 
     // Phase trackers
     let revealIndex = 0;
@@ -3902,28 +3704,75 @@
 
     selectTabooMode.addEventListener('click', () => {
       playClickSound();
-
-      // ESTO ES LO QUE ARREGLA EL ERROR VISUAL: Ocultamos el menú
       gameModeSelection.style.display = 'none';
-      setup.style.display = 'none'; // Por seguridad
+      setup.style.display = 'none';
+      tabooSetup.style.display = 'block';
+      updateArrowVisibility();
+    });
 
-      // Mostramos el juego
+    // Team counter controls
+    decTeams.addEventListener('click', () => {
+      if (numTabooTeams > 2) {
+        numTabooTeams--;
+        teamsDisplay.textContent = numTabooTeams;
+        playClickSound();
+      }
+    });
+
+    incTeams.addEventListener('click', () => {
+      if (numTabooTeams < 4) {
+        numTabooTeams++;
+        teamsDisplay.textContent = numTabooTeams;
+        playClickSound();
+      }
+    });
+
+    // Start Taboo game with selected teams
+    startTabooGameBtn.addEventListener('click', () => {
+      playClickSound();
+      
+      // Hide setup and show game
+      tabooSetup.style.display = 'none';
       tabooGame.style.display = 'block';
-      document.getElementById('tabooResults').style.display = 'none'; // Aseguramos que resultados esté oculto
+      document.getElementById('tabooResults').style.display = 'none';
+
+      // Calculate max rounds based on teams: 4 rounds per team
+      maxTabooRounds = numTabooTeams * 4;
 
       // Reset Tabú state
       tabooRedScore = 0;
       tabooBlueScore = 0;
+      tabooGreenScore = 0;
+      tabooYellowScore = 0;
       scoreRedDisplay.textContent = '0';
       scoreBlueDisplay.textContent = '0';
+      if (scoreGreenDisplay) scoreGreenDisplay.textContent = '0';
+      if (scoreYellowDisplay) scoreYellowDisplay.textContent = '0';
       tabooTimerDisplay.textContent = '2:00';
-      usedTabooWords = new Set(); // Reset used words for new game
-      freeSkipsRemaining = 3; // Reset free skips
+      usedTabooWords = new Set();
+      freeSkipsRemaining = 3;
       if (freeSkipsCounter) {
-        freeSkipsCounter.style.display = 'none'; // Hide counter at game start
+        freeSkipsCounter.style.display = 'none';
       }
 
-      // RESETEAR RONDAS
+      // Show/hide team scores based on number of teams
+      const tabooScoreBoard = document.getElementById('tabooScoreBoard');
+      const teamGreen = tabooScoreBoard.querySelector('.team-green');
+      const teamYellow = tabooScoreBoard.querySelector('.team-yellow');
+      
+      if (numTabooTeams >= 3) {
+        teamGreen.style.display = 'block';
+      } else {
+        teamGreen.style.display = 'none';
+      }
+      
+      if (numTabooTeams >= 4) {
+        teamYellow.style.display = 'block';
+      } else {
+        teamYellow.style.display = 'none';
+      }
+
+      // Reset rounds
       currentTabooRound = 1;
       const roundDisplay = document.getElementById('tabooRoundDisplay');
       if (roundDisplay) roundDisplay.textContent = `Ronda ${currentTabooRound} de ${maxTabooRounds}`;
@@ -3934,7 +3783,11 @@
       isTabooTimerRunning = false;
       tabooCardArea.style.display = 'none';
 
-      currentTabooTeam = Math.random() < 0.5 ? 'red' : 'blue';
+      // Set random starting team
+      const teams = ['red', 'blue'];
+      if (numTabooTeams >= 3) teams.push('green');
+      if (numTabooTeams >= 4) teams.push('yellow');
+      currentTabooTeam = teams[Math.floor(Math.random() * teams.length)];
       updateTabooTurnDisplay();
 
       updateArrowVisibility();
@@ -3944,14 +3797,26 @@
       if (currentTabooTeam === 'red') {
         turnDisplay.textContent = "Turno: Equipo ROJO";
         turnDisplay.style.color = "#ff5252";
-      } else {
+      } else if (currentTabooTeam === 'blue') {
         turnDisplay.textContent = "Turno: Equipo AZUL";
         turnDisplay.style.color = "#448aff";
+      } else if (currentTabooTeam === 'green') {
+        turnDisplay.textContent = "Turno: Equipo VERDE";
+        turnDisplay.style.color = "#4caf50";
+      } else if (currentTabooTeam === 'yellow') {
+        turnDisplay.textContent = "Turno: Equipo AMARILLO";
+        turnDisplay.style.color = "#ffeb3b";
       }
     }
 
     function toggleTabooTeam() {
-      currentTabooTeam = currentTabooTeam === 'red' ? 'blue' : 'red';
+      const teams = ['red', 'blue'];
+      if (numTabooTeams >= 3) teams.push('green');
+      if (numTabooTeams >= 4) teams.push('yellow');
+      
+      const currentIndex = teams.indexOf(currentTabooTeam);
+      const nextIndex = (currentIndex + 1) % teams.length;
+      currentTabooTeam = teams[nextIndex];
       updateTabooTurnDisplay();
     }
 
@@ -4094,9 +3959,15 @@
       if (currentTabooTeam === 'red') {
         tabooRedScore++;
         scoreRedDisplay.textContent = tabooRedScore;
-      } else {
+      } else if (currentTabooTeam === 'blue') {
         tabooBlueScore++;
         scoreBlueDisplay.textContent = tabooBlueScore;
+      } else if (currentTabooTeam === 'green') {
+        tabooGreenScore++;
+        scoreGreenDisplay.textContent = tabooGreenScore;
+      } else if (currentTabooTeam === 'yellow') {
+        tabooYellowScore++;
+        scoreYellowDisplay.textContent = tabooYellowScore;
       }
       loadTabooCard();
     });
@@ -4116,9 +3987,15 @@
         if (currentTabooTeam === 'red') {
           tabooRedScore--;
           scoreRedDisplay.textContent = tabooRedScore;
-        } else {
+        } else if (currentTabooTeam === 'blue') {
           tabooBlueScore--;
           scoreBlueDisplay.textContent = tabooBlueScore;
+        } else if (currentTabooTeam === 'green') {
+          tabooGreenScore--;
+          scoreGreenDisplay.textContent = tabooGreenScore;
+        } else if (currentTabooTeam === 'yellow') {
+          tabooYellowScore--;
+          scoreYellowDisplay.textContent = tabooYellowScore;
         }
       }
       loadTabooCard();
@@ -4557,22 +4434,58 @@
       const resultsSection = document.getElementById('tabooResults');
       resultsSection.style.display = 'block';
 
+      // Show/hide teams based on number of teams
+      const finalScoreBoard = document.getElementById('tabooFinalScoreBoard');
+      const teamGreen = finalScoreBoard.querySelector('.team-green');
+      const teamYellow = finalScoreBoard.querySelector('.team-yellow');
+      
       document.getElementById('finalScoreRed').textContent = tabooRedScore;
       document.getElementById('finalScoreBlue').textContent = tabooBlueScore;
-
-      const winnerMsg = document.getElementById('tabooWinnerMsg');
-      if (tabooRedScore > tabooBlueScore) {
-        winnerMsg.textContent = "¡GANA EL EQUIPO ROJO! 🔴";
-        winnerMsg.style.color = "#ff5252";
-      } else if (tabooBlueScore > tabooRedScore) {
-        winnerMsg.textContent = "¡GANA EL EQUIPO AZUL! 🔵";
-        winnerMsg.style.color = "#448aff";
+      
+      if (numTabooTeams >= 3) {
+        teamGreen.style.display = 'block';
+        document.getElementById('finalScoreGreen').textContent = tabooGreenScore;
       } else {
-        winnerMsg.textContent = "¡EMPATE! 🤝";
-        winnerMsg.style.color = "#ffffff";
+        teamGreen.style.display = 'none';
+      }
+      
+      if (numTabooTeams >= 4) {
+        teamYellow.style.display = 'block';
+        document.getElementById('finalScoreYellow').textContent = tabooYellowScore;
+      } else {
+        teamYellow.style.display = 'none';
       }
 
-      // Ocultar flecha para obligar a usar el botón de menú
+      // Determine winner
+      const scores = [
+        { team: 'ROJO', score: tabooRedScore, color: '#ff5252', emoji: '🔴' },
+        { team: 'AZUL', score: tabooBlueScore, color: '#448aff', emoji: '🔵' }
+      ];
+      
+      if (numTabooTeams >= 3) {
+        scores.push({ team: 'VERDE', score: tabooGreenScore, color: '#4caf50', emoji: '🟢' });
+      }
+      if (numTabooTeams >= 4) {
+        scores.push({ team: 'AMARILLO', score: tabooYellowScore, color: '#ffeb3b', emoji: '🟡' });
+      }
+
+      // Sort by score descending
+      scores.sort((a, b) => b.score - a.score);
+
+      const winnerMsg = document.getElementById('tabooWinnerMsg');
+      if (scores[0].score === scores[1].score) {
+        // Check if there's a tie at the top
+        const topScore = scores[0].score;
+        const winners = scores.filter(s => s.score === topScore);
+        if (winners.length > 1) {
+          winnerMsg.textContent = "¡EMPATE! 🤝";
+          winnerMsg.style.color = "#ffffff";
+        }
+      } else {
+        winnerMsg.textContent = `¡GANA EL EQUIPO ${scores[0].team}! ${scores[0].emoji}`;
+        winnerMsg.style.color = scores[0].color;
+      }
+
       // Ocultar flecha para obligar a usar el botón de menú
       if (backArrowBtn) backArrowBtn.style.display = 'none';
     }
@@ -4596,12 +4509,17 @@
           tabooGame.style.display = 'none';
           gameModeSelection.style.display = 'block';
         }
-        // 2. Si estamos en Setup -> Volver a menú
+        // 2. Si estamos en Taboo Setup -> Volver a menú
+        else if (tabooSetup.style.display === 'block') {
+          tabooSetup.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+        }
+        // 3. Si estamos en Setup -> Volver a menú
         else if (setup.style.display === 'block') {
           setup.style.display = 'none';
           gameModeSelection.style.display = 'block';
         }
-        // 3. Si estamos en Categorías -> Volver a Setup
+        // 4. Si estamos en Categorías -> Volver a Setup
         else if (categorySelection.style.display === 'block') {
           categorySelection.style.display = 'none';
           setup.style.display = 'block';
