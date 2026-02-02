@@ -3757,20 +3757,7 @@
 
       // Show/hide team scores based on number of teams
       const tabooScoreBoard = document.getElementById('tabooScoreBoard');
-      const teamGreen = tabooScoreBoard.querySelector('.team-green');
-      const teamYellow = tabooScoreBoard.querySelector('.team-yellow');
-      
-      if (numTabooTeams >= 3) {
-        teamGreen.style.display = 'block';
-      } else {
-        teamGreen.style.display = 'none';
-      }
-      
-      if (numTabooTeams >= 4) {
-        teamYellow.style.display = 'block';
-      } else {
-        teamYellow.style.display = 'none';
-      }
+      updateTeamVisibility(tabooScoreBoard);
 
       // Reset rounds
       currentTabooRound = 1;
@@ -3806,6 +3793,23 @@
       } else if (currentTabooTeam === 'yellow') {
         turnDisplay.textContent = "Turno: Equipo AMARILLO";
         turnDisplay.style.color = "#ffeb3b";
+      }
+    }
+
+    function updateTeamVisibility(scoreBoard) {
+      const teamGreen = scoreBoard.querySelector('.team-green');
+      const teamYellow = scoreBoard.querySelector('.team-yellow');
+      
+      if (numTabooTeams >= 3) {
+        teamGreen.style.display = 'block';
+      } else {
+        teamGreen.style.display = 'none';
+      }
+      
+      if (numTabooTeams >= 4) {
+        teamYellow.style.display = 'block';
+      } else {
+        teamYellow.style.display = 'none';
       }
     }
 
@@ -4436,24 +4440,17 @@
 
       // Show/hide teams based on number of teams
       const finalScoreBoard = document.getElementById('tabooFinalScoreBoard');
-      const teamGreen = finalScoreBoard.querySelector('.team-green');
-      const teamYellow = finalScoreBoard.querySelector('.team-yellow');
+      updateTeamVisibility(finalScoreBoard);
       
       document.getElementById('finalScoreRed').textContent = tabooRedScore;
       document.getElementById('finalScoreBlue').textContent = tabooBlueScore;
       
       if (numTabooTeams >= 3) {
-        teamGreen.style.display = 'block';
         document.getElementById('finalScoreGreen').textContent = tabooGreenScore;
-      } else {
-        teamGreen.style.display = 'none';
       }
       
       if (numTabooTeams >= 4) {
-        teamYellow.style.display = 'block';
         document.getElementById('finalScoreYellow').textContent = tabooYellowScore;
-      } else {
-        teamYellow.style.display = 'none';
       }
 
       // Determine winner
