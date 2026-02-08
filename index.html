@@ -3910,6 +3910,10 @@
 
     // Phase trackers
     let revealIndex = 0;
+    
+    // Constants for liar game
+    const QUESTION_REVERSAL_PROBABILITY = 0.5; // 50% chance to reverse questions
+    const AUTO_SUBMIT_DELAY_MS = 300; // Delay before auto-submitting vote
 
     function randInt(max) { return Math.floor(Math.random() * max) }
 
@@ -4168,8 +4172,8 @@
       // Select random question
       const questionPair = liarQuestions[randInt(liarQuestions.length)];
       
-      // Randomly reverse the questions (50% chance)
-      if (Math.random() < 0.5) {
+      // Randomly reverse the questions
+      if (Math.random() < QUESTION_REVERSAL_PROBABILITY) {
         // Normal order
         normalQuestion = questionPair.normal;
         liarQuestion = questionPair.liar;
@@ -4289,7 +4293,7 @@
             setTimeout(() => {
               const selectedId = parseInt(answerDiv.dataset.id);
               showLiarResults(selectedId);
-            }, 300);
+            }, AUTO_SUBMIT_DELAY_MS);
           }
         });
         
