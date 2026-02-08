@@ -1290,7 +1290,7 @@
   <div class="intro-screen" id="introScreen">
     <div class="intro-glow"></div>
     <img src="indiBola.png" alt="Logo" class="intro-logo">
-    <div class="intro-title">EL IMPOSTOR & TABÚ</div>
+    <div class="intro-title">MIKE'S GAMES</div>
     <div class="intro-subtitle">creado por Mike</div>
     <div class="intro-progress">
       <div class="intro-progress-fill"></div>
@@ -1555,6 +1555,7 @@
           <p class="muted" style="font-weight:700;margin-bottom:12px;font-size:18px;">¿Quién es el mentiroso?</p>
           <p style="font-family:'Fredoka One',cursive;font-size:16px;color:#ffeb3b;margin-bottom:12px;">Pulsa en la respuesta del mentiroso:</p>
           <div id="liarAnswersList" style="display:grid;gap:12px;margin-bottom:20px;text-align:left;"></div>
+          <button class="btn big" id="liarRevealBtn" disabled style="opacity:0.5;">🔍 Revelar</button>
         </div>
       </section>
 
@@ -1900,6 +1901,7 @@
     const liarNextPlayerBtn = document.getElementById('liarNextPlayerBtn');
     const liarRevealQuestion = document.getElementById('liarRevealQuestion');
     const liarAnswersList = document.getElementById('liarAnswersList');
+    const liarRevealBtn = document.getElementById('liarRevealBtn');
     const liarSelectLiarList = document.getElementById('liarSelectLiarList');
     const liarSubmitGuessBtn = document.getElementById('liarSubmitGuessBtn');
     const liarResultText = document.getElementById('liarResultText');
@@ -3857,7 +3859,7 @@
     // Liar Game Questions Array - 50 questions with normal and liar versions
     const liarQuestions = [
       { normal: "¿Cuánto tiempo te pasas desde que te despiertas hasta que te levantas de la cama?", liar: "¿Cuál es la duración perfecta de una serie?" },
-      { normal: "¿Cuánto tiempo sueles tardar en ducharte?", liar: "¿Cuánto dura una película que te parece perfecta?" },
+      { normal: "¿Cuánto tiempo sueles tardar en ducharte?", liar: "¿Cuál es la duración perfecta de una película?" },
       { normal: "¿Cuántos minutos tardas en desayunar?", liar: "¿Cuántas horas al día deberían durar las clases en el colegio?" },
       { normal: "¿Cuánto tiempo pasas eligiendo qué ropa ponerte?", liar: "¿Cuántas horas duermes normalmente cada noche?" },
       { normal: "¿Cuántos pasos crees que das desde tu cama hasta la cocina?", liar: "¿Cuántos kilómetros recorres en tu viaje más largo?" },
@@ -3885,11 +3887,11 @@
       { normal: "¿Cuántas fotos tienes en tu móvil?", liar: "¿Cuántos viajes haces al año?" },
       { normal: "¿Cuántas veces parpadeas mientras lees esto?", liar: "¿Cuántos libros tienes en tu casa?" },
       { normal: "¿Cuántos segundos aguantas la respiración?", liar: "¿Cuántos minutos puedes aguantar corriendo sin parar?" },
-      { normal: "¿Cuántas veces respiras por minuto?", liar: "¿Cuántas pulsaciones por minuto tienes en reposo?" },
-      { normal: "¿Cuántos contactos tienes en tu móvil?", liar: "¿Con cuántas personas hablas regularmente?" },
+      { normal: "¿Cuántas veces respiras por minuto?", liar: "¿Cuántos minutos puedes aguantar corriendo sin parar?" },
+      { normal: "¿Cuántos contactos tienes en tu móvil?", liar: "¿Cuántos amigos reales tienes?" },
       { normal: "¿Cuántas veces recargas el móvil al día?", liar: "¿Cuántos años llevas con tu móvil actual?" },
-      { normal: "¿Cuánto porcentaje de batería tiene tu móvil ahora?", liar: "¿Cuántos móviles has tenido en tu vida?" },
-      { normal: "¿Cuántas pestañas tienes abiertas en tu navegador ahora?", liar: "¿Cuántos ordenadores has tenido en tu vida?" },
+      { normal: "¿Cuánto porcentaje de batería suele tener tu móvil cuando estás fuera de casa?", liar: "¿Que porcentaje hay de que seas multimillonario en el futuro?" },
+      { normal: "¿Cuantos años has ido al colegio/instituto en tu vida?", liar: "¿Cuántos móviles has tenido en tu vida?" },
       { normal: "¿Cuántos dedos usas para escribir en el móvil?", liar: "¿Cuántos idiomas hablas?" },
       { normal: "¿Cuántas veces al día bostezas?", liar: "¿Cuántas horas puedes estar sin dormir?" },
       { normal: "¿Cuántas palabras por minuto escribes en el móvil?", liar: "¿Cuántas palabras por minuto escribes en el ordenador?" },
@@ -3899,13 +3901,10 @@
       { normal: "¿Cuántas veces cambias de postura mientras duermes?", liar: "¿En cuántos sitios diferentes has dormido este año?" },
       { normal: "¿Cuántos bocados das para comer una manzana?", liar: "¿Cuántas piezas de fruta comes al día?" },
       { normal: "¿Cuántos segundos masticas cada bocado?", liar: "¿Cuántas veces al día comes algo dulce?" },
-      { normal: "¿Cuántas respiraciones profundas haces al día?", liar: "¿Cuántos minutos dedicas a relajarte cada día?" },
       { normal: "¿Cuántos pasos das para cruzar una habitación?", liar: "¿Cuántas habitaciones tiene tu casa?" },
-      { normal: "¿Cuántas veces cierras y abres los ojos en un minuto?", liar: "¿Cuántas horas al día tienes los ojos cerrados?" },
-      { normal: "¿Cuántos clicks haces con el ratón por minuto?", liar: "¿Cuántas horas pasas frente al ordenador al día?" },
-      { normal: "¿Cuántas teclas pulsas por minuto en el móvil?", liar: "¿Cuántos caracteres tiene tu contraseña más larga?" },
-      { normal: "¿Cuántos segundos tardas en encender el móvil?", liar: "¿Cuántos minutos tardas en encender el ordenador?" },
-      { normal: "¿Cuántas veces tocas tu cara al día?", liar: "¿Cuántas veces al año te haces una foto?" }
+      { normal: "¿Cuántos minutos pasas leyendo un libro al día?", liar: "¿Cuántas horas pasas frente al ordenador al día?" },
+      { normal: "¿Cuántos minutos tardas en ducharte?", liar: "¿Cuántos minutos tardas en lavarte los dientes?" },
+      { normal: "¿Cuántas veces te lavas la cara al día?", liar: "¿Cuántas veces al mes te haces una foto?" }
     ];
 
     // Phase trackers
@@ -4258,6 +4257,10 @@
       liarQuestionView.style.display = 'none';
       liarReveal.style.display = 'block';
       
+      // Reset reveal button state
+      liarRevealBtn.disabled = true;
+      liarRevealBtn.style.opacity = '0.5';
+      
       // Show the normal question (the one most players got)
       liarRevealQuestion.textContent = normalQuestion;
       
@@ -4288,12 +4291,13 @@
             answerDiv.classList.add('selected');
             answerDiv.style.border = '2px solid #ffc107';
             answerDiv.style.background = '#353847';
-            
-            // Auto-submit after selection
-            setTimeout(() => {
-              const selectedId = parseInt(answerDiv.dataset.id);
-              showLiarResults(selectedId);
-            }, AUTO_SUBMIT_DELAY_MS);
+            // Enable reveal button
+            liarRevealBtn.disabled = false;
+            liarRevealBtn.style.opacity = '1';
+          } else {
+            // Disable reveal button when deselected
+            liarRevealBtn.disabled = true;
+            liarRevealBtn.style.opacity = '0.5';
           }
         });
         
@@ -4315,6 +4319,17 @@
     //   const guessedId = parseInt(sel.dataset.id);
     //   showLiarResults(guessedId);
     // });
+
+    // Reveal button click handler
+    liarRevealBtn.addEventListener('click', () => {
+      const sel = Array.from(liarAnswersList.children).find(c => c.classList.contains('selected'));
+      if (!sel) {
+        return;
+      }
+      playClickSound();
+      const guessedId = parseInt(sel.dataset.id);
+      showLiarResults(guessedId);
+    });
 
     function showLiarResults(guessedId) {
       liarReveal.style.display = 'none';
