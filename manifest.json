@@ -1,7 +1,7 @@
 {
-  "name": "El Impostor & Tabú by Mike",
-  "short_name": "Impostor & Tabú",
-  "description": "Juego del impostor y Tabú creado por Mike",
+  "name": "Mike's games",
+  "short_name": "Mike's games",
+  "description": "Juegos divertidos creados por Mike",
   "start_url": "./?utm_source=homescreen",
   "scope": "./",
   "display": "standalone",
