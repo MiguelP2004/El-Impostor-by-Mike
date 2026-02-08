@@ -1321,7 +1321,8 @@
           <div class="mode-buttons">
             <button class="btn big" id="selectImpostorMode" style="width:100%; margin-bottom:12px;">Juego del Impostor
               👤🔍</button>
-            <button class="btn big secondary" id="selectTabooMode" style="width:100%;">Tabú 💭🤔</button>
+            <button class="btn big secondary" id="selectTabooMode" style="width:100%; margin-bottom:12px;">Tabú 💭🤔</button>
+            <button class="btn big" id="selectLiarMode" style="width:100%;">El Mentiroso 🤥</button>
           </div>
         </div>
       </section>
@@ -1495,6 +1496,76 @@
 
           <div style="height:20px"></div>
           <button class="btn big secondary" id="tabooBackToMenuBtn">Volver al Menú</button>
+        </div>
+      </section>
+
+      <!-- Liar Game Sections -->
+      <section id="liarSetup" class="card" style="display:none">
+        <div class="center">
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">Configuración del Mentiroso</p>
+          <div>
+            <label>Número de Jugadores</label>
+            <div class="counter">
+              <button class="counter-btn" id="decLiarPlayers">−</button>
+              <div class="counter-value" id="liarPlayersDisplay">4</div>
+              <button class="counter-btn" id="incLiarPlayers">+</button>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <button class="btn big" id="liarContinueBtn">Continuar</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="liarNames" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">
+            Jugadores</p>
+          <div id="liarNamesList" style="display:grid;gap:10px;margin-bottom:16px"></div>
+          <button class="btn big" id="startLiarGameBtn">Empezar partida</button>
+        </div>
+      </section>
+
+      <section id="liarQuestionPass" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="player-indicator" id="liarPlayerIndicator">Mike</div>
+          <div class="player-number" id="liarPlayerNumber">Jugador 1 de 4</div>
+          <div style="height:8px"></div>
+          <button class="btn big secondary" id="liarRevealQuestionBtn">🔍 Ver mi pregunta</button>
+        </div>
+      </section>
+
+      <section id="liarQuestionView" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="player-indicator" id="liarQuestionPlayerName">Mike</div>
+          <div style="height:16px"></div>
+          <div id="liarQuestionText" style="font-size:20px;font-weight:600;color:#f0f1f5;margin-bottom:20px;line-height:1.4;padding:0 10px;"></div>
+          <div style="margin-bottom:12px">
+            <label style="display:block;margin-bottom:8px;color:#d0d3e1;font-weight:600;">Tu respuesta:</label>
+            <textarea id="liarAnswerInput" rows="3" style="width:100%;padding:12px;border-radius:12px;border:2px solid #353847;background-color:#2a2d3a;color:#f0f1f5;font-family:'Poppins',sans-serif;font-size:16px;resize:vertical;"></textarea>
+          </div>
+          <button class="btn big" id="liarNextPlayerBtn">Siguiente</button>
+        </div>
+      </section>
+
+      <section id="liarReveal" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:22px;color:#ffc107;margin-bottom:16px;">La pregunta era:</p>
+          <div id="liarRevealQuestion" style="font-size:18px;font-weight:600;color:#f0f1f5;margin-bottom:24px;line-height:1.4;padding:0 10px;"></div>
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffeb3b;margin-bottom:12px;">Respuestas de todos:</p>
+          <div id="liarAnswersList" style="display:grid;gap:12px;margin-bottom:20px;text-align:left;"></div>
+          <p class="muted" style="font-weight:700;margin-bottom:12px">¿Quién es el mentiroso?</p>
+          <div class="players-list" id="liarSelectLiarList" style="margin-top:10px"></div>
+          <div style="height:12px"></div>
+          <button class="btn medium" id="liarSubmitGuessBtn" style="width: auto; min-width: 180px; padding: 12px 20px; font-size: 16px;">Confirmar selección</button>
+        </div>
+      </section>
+
+      <section id="liarResults" class="card" style="display:none;margin-top:12px">
+        <div id="liarResultText" class="center"></div>
+        <div style="height:20px"></div>
+        <div class="center">
+          <button class="btn big secondary" id="liarNewGameBtn">Nueva partida</button>
         </div>
       </section>
 
@@ -1792,6 +1863,7 @@
     const tabooGame = document.getElementById('tabooGame');
     const selectImpostorMode = document.getElementById('selectImpostorMode');
     const selectTabooMode = document.getElementById('selectTabooMode');
+    const selectLiarMode = document.getElementById('selectLiarMode');
     const decTeams = document.getElementById('decTeams');
     const incTeams = document.getElementById('incTeams');
     const teamsDisplay = document.getElementById('teamsDisplay');
@@ -1808,6 +1880,33 @@
     const tabooSkipBtn = document.getElementById('tabooSkipBtn');
     const freeSkipsCounter = document.getElementById('freeSkipsCounter');
     const freeSkipsCount = document.getElementById('freeSkipsCount');
+
+    // LIAR GAME ELEMENTS
+    const liarSetup = document.getElementById('liarSetup');
+    const liarNames = document.getElementById('liarNames');
+    const liarQuestionPass = document.getElementById('liarQuestionPass');
+    const liarQuestionView = document.getElementById('liarQuestionView');
+    const liarReveal = document.getElementById('liarReveal');
+    const liarResults = document.getElementById('liarResults');
+    const decLiarPlayers = document.getElementById('decLiarPlayers');
+    const incLiarPlayers = document.getElementById('incLiarPlayers');
+    const liarPlayersDisplay = document.getElementById('liarPlayersDisplay');
+    const liarContinueBtn = document.getElementById('liarContinueBtn');
+    const liarNamesList = document.getElementById('liarNamesList');
+    const startLiarGameBtn = document.getElementById('startLiarGameBtn');
+    const liarPlayerIndicator = document.getElementById('liarPlayerIndicator');
+    const liarPlayerNumber = document.getElementById('liarPlayerNumber');
+    const liarRevealQuestionBtn = document.getElementById('liarRevealQuestionBtn');
+    const liarQuestionPlayerName = document.getElementById('liarQuestionPlayerName');
+    const liarQuestionText = document.getElementById('liarQuestionText');
+    const liarAnswerInput = document.getElementById('liarAnswerInput');
+    const liarNextPlayerBtn = document.getElementById('liarNextPlayerBtn');
+    const liarRevealQuestion = document.getElementById('liarRevealQuestion');
+    const liarAnswersList = document.getElementById('liarAnswersList');
+    const liarSelectLiarList = document.getElementById('liarSelectLiarList');
+    const liarSubmitGuessBtn = document.getElementById('liarSubmitGuessBtn');
+    const liarResultText = document.getElementById('liarResultText');
+    const liarNewGameBtn = document.getElementById('liarNewGameBtn');
 
     // ARRAY DE PALABRAS IMPOSTOR
     const classifiedWords = [
@@ -3749,6 +3848,69 @@
       { name: 'AMARILLO', color: '#ffeb3b', class: 'team-yellow', emoji: '🟡' }
     ];
 
+    // Liar Game Variables
+    let liarPlayers = [];
+    let numLiarPlayers = 4;
+    let liarIndex = -1;
+    let currentLiarPlayerIndex = 0;
+    let liarAnswers = [];
+    let normalQuestion = '';
+    let liarQuestion = '';
+    
+    // Liar Game Questions Array - 50 questions with normal and liar versions
+    const liarQuestions = [
+      { normal: "¿Cuánto tiempo te pasas desde que te despiertas hasta que te levantas de la cama?", liar: "¿Cuál es la duración perfecta de una serie?" },
+      { normal: "¿Cuánto tiempo sueles tardar en ducharte?", liar: "¿Cuánto dura una película que te parece perfecta?" },
+      { normal: "¿Cuántos minutos tardas en desayunar?", liar: "¿Cuántas horas al día deberían durar las clases en el colegio?" },
+      { normal: "¿Cuánto tiempo pasas eligiendo qué ropa ponerte?", liar: "¿Cuántas horas duermes normalmente cada noche?" },
+      { normal: "¿Cuántos pasos crees que das desde tu cama hasta la cocina?", liar: "¿Cuántos kilómetros recorres en tu viaje más largo?" },
+      { normal: "¿Cuántas veces al día miras el móvil?", liar: "¿Cuántos libros lees al año?" },
+      { normal: "¿Cuántos mensajes de WhatsApp envías al día aproximadamente?", liar: "¿Cuántas películas ves al mes?" },
+      { normal: "¿Cuántos cafés o tés tomas al día?", liar: "¿Cuántas comidas haces al día?" },
+      { normal: "¿Cuántas horas pasas al día en el móvil?", liar: "¿Cuántas horas trabajas o estudias al día?" },
+      { normal: "¿Cuántas veces te ríes al día?", liar: "¿Cuántas horas pasas viendo televisión a la semana?" },
+      { normal: "¿Cuánto tiempo tardas en hacer la cama?", liar: "¿Cuánto tiempo tardas en leer un libro?" },
+      { normal: "¿Cuántas veces pestañeas por minuto?", liar: "¿Cuántas horas pasas haciendo deporte a la semana?" },
+      { normal: "¿Cuántos vasos de agua bebes al día?", liar: "¿Cuántas veces al año vas al cine?" },
+      { normal: "¿Cuántas veces al día te lavas las manos?", liar: "¿Cuántas veces al mes te cortas el pelo?" },
+      { normal: "¿Cuánto tiempo pasas cepillándote los dientes?", liar: "¿Cuánto tiempo pasas cocinando cada día?" },
+      { normal: "¿Cuántos escalones subes al día aproximadamente?", liar: "¿Cuántos países has visitado en tu vida?" },
+      { normal: "¿Cuántas veces usas el ascensor al día?", liar: "¿Cuántas vacaciones tomas al año?" },
+      { normal: "¿Cuántas apps tienes instaladas en tu móvil?", liar: "¿Cuántos amigos cercanos tienes?" },
+      { normal: "¿Cuántas notificaciones recibes al día en tu móvil?", liar: "¿Cuántos emails recibes al día?" },
+      { normal: "¿Cuánto tiempo tardas en comer?", liar: "¿Cuánto tiempo necesitas para preparar un viaje?" },
+      { normal: "¿Cuántas canciones escuchas al día?", liar: "¿Cuántos conciertos has ido en tu vida?" },
+      { normal: "¿Cuántas veces pulsas el botón de 'snooze' del despertador?", liar: "¿A qué hora te sueles acostar normalmente?" },
+      { normal: "¿Cuántos minutos tardas en dormirte una vez en la cama?", liar: "¿Cuántas horas necesitas dormir para sentirte descansado?" },
+      { normal: "¿Cuántas veces al día abres la nevera?", liar: "¿Cuántas veces al mes haces la compra grande?" },
+      { normal: "¿Cuántas veces miras la hora al día?", liar: "¿Cuántos relojes tienes?" },
+      { normal: "¿Cuántos pasos das desde tu casa hasta el lugar más cercano?", liar: "¿Cuántos kilómetros caminas en un día normal?" },
+      { normal: "¿Cuántas fotos tienes en tu móvil?", liar: "¿Cuántos viajes haces al año?" },
+      { normal: "¿Cuántas veces parpadeas mientras lees esto?", liar: "¿Cuántos libros tienes en tu casa?" },
+      { normal: "¿Cuántos segundos aguantas la respiración?", liar: "¿Cuántos minutos puedes aguantar corriendo sin parar?" },
+      { normal: "¿Cuántas veces respiras por minuto?", liar: "¿Cuántas pulsaciones por minuto tienes en reposo?" },
+      { normal: "¿Cuántos contactos tienes en tu móvil?", liar: "¿Con cuántas personas hablas regularmente?" },
+      { normal: "¿Cuántas veces recargas el móvil al día?", liar: "¿Cuántos años llevas con tu móvil actual?" },
+      { normal: "¿Cuánto porcentaje de batería tiene tu móvil ahora?", liar: "¿Cuántos móviles has tenido en tu vida?" },
+      { normal: "¿Cuántas pestañas tienes abiertas en tu navegador ahora?", liar: "¿Cuántos ordenadores has tenido en tu vida?" },
+      { normal: "¿Cuántos dedos usas para escribir en el móvil?", liar: "¿Cuántos idiomas hablas?" },
+      { normal: "¿Cuántas veces al día bostezas?", liar: "¿Cuántas horas puedes estar sin dormir?" },
+      { normal: "¿Cuántas palabras por minuto escribes en el móvil?", liar: "¿Cuántas palabras por minuto escribes en el ordenador?" },
+      { normal: "¿Cuántos segundos aguantas sin pestañear?", liar: "¿Cuántos minutos aguantas en una posición incómoda?" },
+      { normal: "¿Cuántas veces usas el baño al día?", liar: "¿Cuántas duchas te das a la semana?" },
+      { normal: "¿Cuántas veces al día te miras al espejo?", liar: "¿Cuánto tiempo pasas arreglándote cada día?" },
+      { normal: "¿Cuántas veces cambias de postura mientras duermes?", liar: "¿En cuántos sitios diferentes has dormido este año?" },
+      { normal: "¿Cuántos bocados das para comer una manzana?", liar: "¿Cuántas piezas de fruta comes al día?" },
+      { normal: "¿Cuántos segundos masticas cada bocado?", liar: "¿Cuántas veces al día comes algo dulce?" },
+      { normal: "¿Cuántas respiraciones profundas haces al día?", liar: "¿Cuántos minutos dedicas a relajarte cada día?" },
+      { normal: "¿Cuántos pasos das para cruzar una habitación?", liar: "¿Cuántas habitaciones tiene tu casa?" },
+      { normal: "¿Cuántas veces cierras y abres los ojos en un minuto?", liar: "¿Cuántas horas al día tienes los ojos cerrados?" },
+      { normal: "¿Cuántos clicks haces con el ratón por minuto?", liar: "¿Cuántas horas pasas frente al ordenador al día?" },
+      { normal: "¿Cuántas teclas pulsas por minuto en el móvil?", liar: "¿Cuántos caracteres tiene tu contraseña más larga?" },
+      { normal: "¿Cuántos segundos tardas en encender el móvil?", liar: "¿Cuántos minutos tardas en encender el ordenador?" },
+      { normal: "¿Cuántas veces tocas tu cara al día?", liar: "¿Cuántas veces al año te haces una foto?" }
+    ];
+
     // Phase trackers
     let revealIndex = 0;
 
@@ -3870,11 +4032,13 @@
       if (gameModeSelection.style.display === 'block') {
         backArrowBtn.style.display = 'none';
       }
-      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup) -> VISIBLE
+      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup, Liar Setup, Liar Names) -> VISIBLE
       else if (setup.style.display === 'block' ||
         categorySelection.style.display === 'block' ||
         namesSection.style.display === 'block' ||
-        tabooSetup.style.display === 'block') {
+        tabooSetup.style.display === 'block' ||
+        liarSetup.style.display === 'block' ||
+        liarNames.style.display === 'block') {
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
@@ -3888,7 +4052,14 @@
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
-      // 5. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
+      // 5. Juego Mentiroso (Pass, View, Reveal) -> VISIBLE
+      else if (liarQuestionPass.style.display === 'block' || 
+               liarQuestionView.style.display === 'block' ||
+               liarReveal.style.display === 'block') {
+        backArrowBtn.style.display = 'flex';
+        backArrowBtn.style.opacity = '1';
+      }
+      // 6. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
       else {
         backArrowBtn.style.display = 'none';
       }
@@ -3909,6 +4080,269 @@
       // Hide mode selection, show taboo setup
       gameModeSelection.style.display = 'none';
       tabooSetup.style.display = 'block';
+      updateArrowVisibility();
+    });
+
+    selectLiarMode.addEventListener('click', () => {
+      unlockAudioWithUserGesture();
+      playClickSound();
+      
+      // Hide mode selection, show liar setup
+      gameModeSelection.style.display = 'none';
+      liarSetup.style.display = 'block';
+      updateArrowVisibility();
+    });
+
+    // Liar player counter controls
+    decLiarPlayers.addEventListener('click', () => {
+      if (numLiarPlayers > 3) {
+        numLiarPlayers--;
+        liarPlayersDisplay.textContent = numLiarPlayers;
+        playClickSound();
+      }
+    });
+
+    incLiarPlayers.addEventListener('click', () => {
+      if (numLiarPlayers < 7) {
+        numLiarPlayers++;
+        liarPlayersDisplay.textContent = numLiarPlayers;
+        playPopSound();
+      }
+    });
+
+    // Continue to names
+    liarContinueBtn.addEventListener('click', () => {
+      playSuccessSound();
+      showLiarNamesScreen();
+    });
+
+    function showLiarNamesScreen() {
+      liarSetup.style.display = 'none';
+      
+      // Initialize players
+      liarPlayers = [];
+      for (let i = 0; i < numLiarPlayers; i++) {
+        liarPlayers.push({ 
+          id: i, 
+          name: `Jugador ${i + 1}`, 
+          isLiar: false, 
+          answer: '' 
+        });
+      }
+      
+      // Build name inputs
+      liarNamesList.innerHTML = '';
+      liarPlayers.forEach((p, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'name-input-wrapper';
+        wrapper.style.animation = `slideIn 0.3s ease-out ${idx * 0.05}s forwards`;
+        wrapper.style.opacity = '0';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = `Jugador ${idx + 1}`;
+        input.value = '';
+        input.dataset.playerId = p.id;
+        input.className = 'name-input';
+        wrapper.appendChild(input);
+        liarNamesList.appendChild(wrapper);
+      });
+      
+      liarNames.style.display = 'block';
+      updateArrowVisibility();
+    }
+
+    // Start liar game
+    startLiarGameBtn.addEventListener('click', () => {
+      unlockAudioWithUserGesture();
+      playStartGameSound();
+      
+      // Save player names
+      Array.from(liarNamesList.children).forEach(wrapper => {
+        const input = wrapper.querySelector('input');
+        const id = parseInt(input.dataset.playerId);
+        const name = input.value.trim() || `Jugador ${id + 1}`;
+        liarPlayers[id].name = name;
+      });
+      
+      // Select random liar
+      liarIndex = randInt(numLiarPlayers);
+      liarPlayers[liarIndex].isLiar = true;
+      
+      // Select random question
+      const questionPair = liarQuestions[randInt(liarQuestions.length)];
+      normalQuestion = questionPair.normal;
+      liarQuestion = questionPair.liar;
+      
+      // Reset state
+      currentLiarPlayerIndex = 0;
+      liarAnswers = [];
+      
+      // Show first player pass screen
+      liarNames.style.display = 'none';
+      liarQuestionPass.style.display = 'block';
+      updateLiarPlayerIndicator();
+      updateArrowVisibility();
+    });
+
+    function updateLiarPlayerIndicator() {
+      const currentPlayer = liarPlayers[currentLiarPlayerIndex];
+      liarPlayerIndicator.textContent = currentPlayer.name;
+      liarPlayerNumber.textContent = `Jugador ${currentLiarPlayerIndex + 1} de ${numLiarPlayers}`;
+    }
+
+    // Reveal question button
+    liarRevealQuestionBtn.addEventListener('click', () => {
+      playPopSound();
+      liarQuestionPass.style.display = 'none';
+      liarQuestionView.style.display = 'block';
+      
+      const currentPlayer = liarPlayers[currentLiarPlayerIndex];
+      liarQuestionPlayerName.textContent = currentPlayer.name;
+      
+      // Show appropriate question
+      if (currentPlayer.isLiar) {
+        liarQuestionText.textContent = liarQuestion;
+      } else {
+        liarQuestionText.textContent = normalQuestion;
+      }
+      
+      // Clear answer input
+      liarAnswerInput.value = '';
+      
+      // Update button text
+      if (currentLiarPlayerIndex === numLiarPlayers - 1) {
+        liarNextPlayerBtn.textContent = 'Empezar partida';
+      } else {
+        liarNextPlayerBtn.textContent = 'Siguiente';
+      }
+      
+      updateArrowVisibility();
+    });
+
+    // Next player or finish
+    liarNextPlayerBtn.addEventListener('click', () => {
+      const answer = liarAnswerInput.value.trim();
+      if (!answer) {
+        alert('Por favor, escribe tu respuesta antes de continuar.');
+        return;
+      }
+      
+      // Save answer
+      liarPlayers[currentLiarPlayerIndex].answer = answer;
+      
+      playClickSound();
+      
+      if (currentLiarPlayerIndex < numLiarPlayers - 1) {
+        // Next player
+        currentLiarPlayerIndex++;
+        liarQuestionView.style.display = 'none';
+        liarQuestionPass.style.display = 'block';
+        updateLiarPlayerIndicator();
+      } else {
+        // All players done - show reveal
+        showLiarRevealScreen();
+      }
+    });
+
+    function showLiarRevealScreen() {
+      liarQuestionView.style.display = 'none';
+      liarReveal.style.display = 'block';
+      
+      // Show the normal question (the one most players got)
+      liarRevealQuestion.textContent = normalQuestion;
+      
+      // Build answers list
+      liarAnswersList.innerHTML = '';
+      liarPlayers.forEach(p => {
+        const answerDiv = document.createElement('div');
+        answerDiv.style.cssText = 'background:#2a2d3a;padding:12px;border-radius:12px;border:2px solid #353847;';
+        answerDiv.innerHTML = `<div style="color:#ffc107;font-weight:600;margin-bottom:4px;">${p.name}</div><div style="color:#d0d3e1;">${p.answer}</div>`;
+        liarAnswersList.appendChild(answerDiv);
+      });
+      
+      // Build player selection list
+      liarSelectLiarList.innerHTML = '';
+      liarPlayers.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'player-pill';
+        el.dataset.id = p.id;
+        el.textContent = p.name;
+        el.addEventListener('click', () => {
+          playPopSound();
+          if (el.classList.contains('selected')) {
+            el.classList.remove('selected');
+          } else {
+            el.classList.add('selected');
+          }
+          // Remove selection from others
+          Array.from(liarSelectLiarList.children).forEach(ch => {
+            if (ch !== el) ch.classList.remove('selected');
+          });
+        });
+        liarSelectLiarList.appendChild(el);
+      });
+      
+      updateArrowVisibility();
+    }
+
+    // Submit guess
+    liarSubmitGuessBtn.addEventListener('click', () => {
+      const sel = Array.from(liarSelectLiarList.children).find(c => c.classList.contains('selected'));
+      if (!sel) {
+        alert('Selecciona a quién crees que es el mentiroso.');
+        return;
+      }
+      
+      playSuccessSound();
+      const guessedId = parseInt(sel.dataset.id);
+      showLiarResults(guessedId);
+    });
+
+    function showLiarResults(guessedId) {
+      liarReveal.style.display = 'none';
+      liarResults.style.display = 'block';
+      
+      const guessedPlayer = liarPlayers.find(p => p.id === guessedId);
+      const actualLiar = liarPlayers.find(p => p.isLiar);
+      
+      if (guessedPlayer.isLiar) {
+        // Correct guess
+        liarResultText.innerHTML = 
+          `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#4fd1c5;margin-bottom:12px;">🎉 ¡Acertasteis! 🎉</div>` +
+          `<div class="muted" style="margin-bottom:12px;">¡<strong>${guessedPlayer.name}</strong> era el mentiroso!</div>` +
+          `<div style="margin-top:16px;font-size:16px;color:#d0d3e1;">` +
+          `<div style="margin-bottom:8px;">La pregunta del mentiroso era:</div>` +
+          `<div style="font-size:18px;color:#ffeb3b;font-weight:600;margin-bottom:12px;">${liarQuestion}</div>` +
+          `<div style="margin-bottom:8px;">La pregunta de los demás era:</div>` +
+          `<div style="font-size:18px;color:#4fd1c5;font-weight:600;">${normalQuestion}</div>` +
+          `</div>`;
+      } else {
+        // Wrong guess
+        liarResultText.innerHTML = 
+          `<div style="font-size:24px;font-family:'Fredoka One',cursive;color:#ff3b3b;margin-bottom:12px;">❌ ¡Fallasteis! ❌</div>` +
+          `<div class="muted" style="margin-bottom:12px;"><strong>${guessedPlayer.name}</strong> NO era el mentiroso.</div>` +
+          `<div class="muted" style="margin-bottom:12px;">El mentiroso era: <strong>${actualLiar.name}</strong></div>` +
+          `<div style="margin-top:16px;font-size:16px;color:#d0d3e1;">` +
+          `<div style="margin-bottom:8px;">La pregunta del mentiroso era:</div>` +
+          `<div style="font-size:18px;color:#ffeb3b;font-weight:600;margin-bottom:12px;">${liarQuestion}</div>` +
+          `<div style="margin-bottom:8px;">La pregunta de los demás era:</div>` +
+          `<div style="font-size:18px;color:#4fd1c5;font-weight:600;">${normalQuestion}</div>` +
+          `</div>`;
+      }
+      
+      updateArrowVisibility();
+    }
+
+    // New game button
+    liarNewGameBtn.addEventListener('click', () => {
+      playClickSound();
+      liarResults.style.display = 'none';
+      gameModeSelection.style.display = 'block';
+      
+      // Reset state
+      numLiarPlayers = 4;
+      liarPlayersDisplay.textContent = numLiarPlayers;
+      
       updateArrowVisibility();
     });
 
@@ -4655,6 +5089,46 @@
           tabooSetup.style.display = 'none';
           tabooGame.style.display = 'none';
           document.getElementById('tabooResults').style.display = 'none';
+          gameModeSelection.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0b. Si estamos en Liar Setup -> Volver a selección de modo
+        if (liarSetup.style.display === 'block') {
+          liarSetup.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0c. Si estamos en Liar Names -> Volver a Liar Setup
+        if (liarNames.style.display === 'block') {
+          liarNames.style.display = 'none';
+          liarSetup.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0d. Si estamos en Liar Question Pass -> Volver a nombres
+        if (liarQuestionPass.style.display === 'block') {
+          liarQuestionPass.style.display = 'none';
+          liarNames.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0e. Si estamos en Liar Question View -> Volver a pass (sin perder respuesta)
+        if (liarQuestionView.style.display === 'block') {
+          liarQuestionView.style.display = 'none';
+          liarQuestionPass.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0f. Si estamos en Liar Reveal -> Volver al menú
+        if (liarReveal.style.display === 'block') {
+          liarReveal.style.display = 'none';
           gameModeSelection.style.display = 'block';
           updateArrowVisibility();
           return;
