@@ -4130,6 +4130,13 @@
         });
       }
       
+      // Load saved names from localStorage
+      let savedLiarNames = [];
+      try {
+        const stored = localStorage.getItem('liarPlayerNames');
+        if (stored) savedLiarNames = JSON.parse(stored);
+      } catch (e) { savedLiarNames = []; }
+
       // Build name inputs
       liarNamesList.innerHTML = '';
       liarPlayers.forEach((p, idx) => {
@@ -4140,7 +4147,7 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.placeholder = `Jugador ${idx + 1}`;
-        input.value = '';
+        input.value = savedLiarNames[idx] || '';
         input.dataset.playerId = p.id;
         input.className = 'name-input';
         wrapper.appendChild(input);
@@ -4157,12 +4164,19 @@
       playStartGameSound();
       
       // Save player names
+      const savedLiarNames = [];
       Array.from(liarNamesList.children).forEach(wrapper => {
         const input = wrapper.querySelector('input');
         const id = parseInt(input.dataset.playerId);
         const name = input.value.trim() || `Jugador ${id + 1}`;
         liarPlayers[id].name = name;
+        savedLiarNames[id] = input.value.trim();
       });
+
+      // Save names to localStorage
+      try {
+        localStorage.setItem('liarPlayerNames', JSON.stringify(savedLiarNames));
+      } catch (e) { }
       
       // Select random liar
       liarIndex = randInt(numLiarPlayers);
@@ -4682,6 +4696,12 @@
       categorySelection.style.display = 'none';
       setup.style.display = 'none';
 
+      // Load saved names from localStorage
+      try {
+        const stored = localStorage.getItem('impostorPlayerNames');
+        if (stored) savedPlayerNames = JSON.parse(stored);
+      } catch (e) { savedPlayerNames = []; }
+
       players = [];
       for (let i = 0; i < numPlayers; i++) {
         players.push({ id: i, name: `Jugador ${i + 1}`, role: 'civil', word: null });
@@ -4718,6 +4738,11 @@
         players[id].eliminated = false;
         savedPlayerNames[id] = input.value.trim();
       });
+
+      // Save names to localStorage
+      try {
+        localStorage.setItem('impostorPlayerNames', JSON.stringify(savedPlayerNames));
+      } catch (e) { }
 
       // 2. Limitar impostores
       const maxAllowed = getMaxImpostors(numPlayers);
