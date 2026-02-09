@@ -1542,7 +1542,7 @@
           <div id="liarQuestionText" style="font-size:20px;font-weight:600;color:#f0f1f5;margin-bottom:20px;line-height:1.4;padding:0 10px;"></div>
           <div style="margin-bottom:12px">
             <label style="display:block;margin-bottom:8px;color:#d0d3e1;font-weight:600;">Tu respuesta:</label>
-            <textarea id="liarAnswerInput" rows="3" style="width:100%;padding:12px;border-radius:12px;border:2px solid #353847;background-color:#2a2d3a;color:#f0f1f5;font-family:'Poppins',sans-serif;font-size:16px;resize:vertical;"></textarea>
+            <textarea id="liarAnswerInput" rows="2" style="width:80%;max-width:400px;padding:16px;border-radius:12px;border:2px solid #353847;background-color:#2a2d3a;color:#f0f1f5;font-family:'Poppins',sans-serif;font-size:20px;font-weight:500;resize:vertical;text-align:center;display:block;margin:0 auto;"></textarea>
           </div>
           <button class="btn big" id="liarNextPlayerBtn">Siguiente</button>
         </div>
@@ -3904,7 +3904,28 @@
       { normal: "¿Cuántos pasos das para cruzar una habitación?", liar: "¿Cuántas habitaciones tiene tu casa?" },
       { normal: "¿Cuántos minutos pasas leyendo un libro al día?", liar: "¿Cuántas horas pasas frente al ordenador al día?" },
       { normal: "¿Cuántos minutos tardas en ducharte?", liar: "¿Cuántos minutos tardas en lavarte los dientes?" },
-      { normal: "¿Cuántas veces te lavas la cara al día?", liar: "¿Cuántas veces al mes te haces una foto?" }
+      { normal: "¿Cuántas veces te lavas la cara al día?", liar: "¿Cuántas veces al mes te haces una foto?" },
+      // Celebrity/Character name questions
+      { normal: "¿Qué famoso debería ser presidente de España?", liar: "¿Qué famoso sería un terrible presidente de España?" },
+      { normal: "¿Qué famoso sería un terrible compañero de piso?", liar: "¿Qué famoso sería el mejor compañero de piso?" },
+      { normal: "¿Qué personaje de ficción te gustaría que fuera real?", liar: "¿Qué personaje de ficción es mejor que no sea real?" },
+      { normal: "¿Qué famoso invitarías a cenar en tu casa?", liar: "¿Qué famoso nunca invitarías a cenar en tu casa?" },
+      { normal: "¿Qué deportista admiras más?", liar: "¿Qué deportista te cae peor?" },
+      { normal: "¿Qué cantante o grupo musical te gustaría ver en concierto?", liar: "¿Qué cantante o grupo musical nunca verías en concierto?" },
+      { normal: "¿Qué actor o actriz debería ganar un Oscar este año?", liar: "¿Qué actor o actriz nunca debería ganar un Oscar?" },
+      { normal: "¿Qué personaje de Disney es tu favorito?", liar: "¿Qué personaje de Disney te parece el más molesto?" },
+      { normal: "¿Qué superhéroe tiene los mejores poderes?", liar: "¿Qué superhéroe tiene los peores poderes?" },
+      { normal: "¿Qué villano de película es el más memorable?", liar: "¿Qué villano de película es el más aburrido?" },
+      { normal: "¿Qué youtuber o influencer te parece más auténtico?", liar: "¿Qué youtuber o influencer te parece más falso?" },
+      { normal: "¿Qué personaje histórico te gustaría conocer?", liar: "¿Qué personaje histórico preferirías no conocer?" },
+      { normal: "¿Qué chef o cocinero famoso te gustaría que te preparara una comida?", liar: "¿Qué chef o cocinero famoso nunca debería cocinar para ti?" },
+      { normal: "¿Qué presentador de televisión es el más carismático?", liar: "¿Qué presentador de televisión es el más aburrido?" },
+      { normal: "¿Qué personaje de videojuego es el más icónico?", liar: "¿Qué personaje de videojuego es el más olvidable?" },
+      { normal: "¿Qué famoso sería el mejor profesor?", liar: "¿Qué famoso sería el peor profesor?" },
+      { normal: "¿Qué personaje de serie te gustaría ser por un día?", liar: "¿Qué personaje de serie nunca querrías ser?" },
+      { normal: "¿Qué comediante te hace reír más?", liar: "¿Qué comediante no te hace ninguna gracia?" },
+      { normal: "¿Qué famoso crees que sería tu mejor amigo en la vida real?", liar: "¿Qué famoso crees que sería imposible ser tu amigo?" },
+      { normal: "¿Qué personaje de anime o manga es el más genial?", liar: "¿Qué personaje de anime o manga te parece sobrevalorado?" }
     ];
 
     // Phase trackers
@@ -4068,6 +4089,13 @@
     // --- SELECCIÓN DE MODO ---
     selectImpostorMode.addEventListener('click', () => {
       playClickSound();
+      
+      // Sync player count from liar game (in case they came from there)
+      if (numLiarPlayers >= 3 && numLiarPlayers <= 15) {
+        numPlayers = numLiarPlayers;
+        playersDisplay.textContent = numPlayers;
+      }
+      
       gameModeSelection.style.display = 'none';
       setup.style.display = 'block';
       updateArrowVisibility();
@@ -4086,6 +4114,13 @@
     selectLiarMode.addEventListener('click', () => {
       unlockAudioWithUserGesture();
       playClickSound();
+      
+      // Sync player count from impostor game
+      numLiarPlayers = numPlayers;
+      // Cap at 7 for liar game
+      if (numLiarPlayers > 7) numLiarPlayers = 7;
+      if (numLiarPlayers < 3) numLiarPlayers = 3;
+      liarPlayersDisplay.textContent = numLiarPlayers;
       
       // Hide mode selection, show liar setup
       gameModeSelection.style.display = 'none';
@@ -4130,10 +4165,10 @@
         });
       }
       
-      // Load saved names from localStorage
+      // Load saved names from localStorage (shared with impostor game)
       let savedLiarNames = [];
       try {
-        const stored = localStorage.getItem('liarPlayerNames');
+        const stored = localStorage.getItem('playerNames'); // Shared key
         if (stored) savedLiarNames = JSON.parse(stored);
       } catch (e) { savedLiarNames = []; }
 
@@ -4173,9 +4208,9 @@
         savedLiarNames[id] = input.value.trim();
       });
 
-      // Save names to localStorage
+      // Save names to localStorage (shared with impostor game)
       try {
-        localStorage.setItem('liarPlayerNames', JSON.stringify(savedLiarNames));
+        localStorage.setItem('playerNames', JSON.stringify(savedLiarNames)); // Shared key
       } catch (e) { }
       
       // Select random liar
@@ -4696,9 +4731,9 @@
       categorySelection.style.display = 'none';
       setup.style.display = 'none';
 
-      // Load saved names from localStorage
+      // Load saved names from localStorage (shared with liar game)
       try {
-        const stored = localStorage.getItem('impostorPlayerNames');
+        const stored = localStorage.getItem('playerNames'); // Shared key
         if (stored) savedPlayerNames = JSON.parse(stored);
       } catch (e) { savedPlayerNames = []; }
 
@@ -4739,9 +4774,9 @@
         savedPlayerNames[id] = input.value.trim();
       });
 
-      // Save names to localStorage
+      // Save names to localStorage (shared with liar game)
       try {
-        localStorage.setItem('impostorPlayerNames', JSON.stringify(savedPlayerNames));
+        localStorage.setItem('playerNames', JSON.stringify(savedPlayerNames)); // Shared key
       } catch (e) { }
 
       // 2. Limitar impostores
