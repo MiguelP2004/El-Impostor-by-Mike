@@ -4013,11 +4013,6 @@
         playClickSound();
         numPlayers--;
         playersDisplay.textContent = numPlayers;
-        // Sync with liar game if within its range
-        if (numPlayers <= 7) {
-          numLiarPlayers = numPlayers;
-          liarPlayersDisplay.textContent = numLiarPlayers;
-        }
         const maxImpostors = getMaxImpostors(numPlayers);
         if (numImpostors > maxImpostors) {
           numImpostors = maxImpostors;
@@ -4031,11 +4026,6 @@
         playPopSound();
         numPlayers++;
         playersDisplay.textContent = numPlayers;
-        // Sync with liar game if within its range
-        if (numPlayers <= 7) {
-          numLiarPlayers = numPlayers;
-          liarPlayersDisplay.textContent = numLiarPlayers;
-        }
       }
     });
 
@@ -4142,9 +4132,7 @@
     decLiarPlayers.addEventListener('click', () => {
       if (numLiarPlayers > 3) {
         numLiarPlayers--;
-        numPlayers = numLiarPlayers; // Sync with impostor game
         liarPlayersDisplay.textContent = numLiarPlayers;
-        playersDisplay.textContent = numPlayers;
         playClickSound();
       }
     });
@@ -4152,9 +4140,7 @@
     incLiarPlayers.addEventListener('click', () => {
       if (numLiarPlayers < 7) {
         numLiarPlayers++;
-        numPlayers = numLiarPlayers; // Sync with impostor game
         liarPlayersDisplay.textContent = numLiarPlayers;
-        playersDisplay.textContent = numPlayers;
         playPopSound();
       }
     });
