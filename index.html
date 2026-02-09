@@ -5196,6 +5196,14 @@
 
         // 0c. Si estamos en Liar Names -> Volver a Liar Setup
         if (liarNames.style.display === 'block') {
+          // Guardar nombres antes de volver
+          const savedLiarNamesBack = [];
+          Array.from(liarNamesList.children).forEach(wrapper => {
+            const input = wrapper.querySelector('input');
+            const id = parseInt(input.dataset.playerId);
+            savedLiarNamesBack[id] = input.value.trim();
+          });
+          try { localStorage.setItem('playerNames', JSON.stringify(savedLiarNamesBack)); } catch (e) { }
           liarNames.style.display = 'none';
           liarSetup.style.display = 'block';
           updateArrowVisibility();
@@ -5260,6 +5268,14 @@
         }
         // 4. Si estamos en Nombres -> Volver atrás
         else if (namesSection.style.display === 'block') {
+          // Guardar nombres antes de volver
+          savedPlayerNames = [];
+          Array.from(namesList.children).forEach(wrapper => {
+            const input = wrapper.querySelector('input');
+            const id = parseInt(input.dataset.playerId);
+            savedPlayerNames[id] = input.value.trim();
+          });
+          try { localStorage.setItem('playerNames', JSON.stringify(savedPlayerNames)); } catch (e) { }
           namesSection.style.display = 'none';
           if (selectedCategoryFilter !== null) {
             categorySelection.style.display = 'block';
