@@ -4220,6 +4220,9 @@
         localStorage.setItem('playerNames', JSON.stringify(savedLiarNames)); // Shared key
       } catch (e) { }
       
+      // Reset all players to NOT be liars first (prevents multiple liars bug)
+      liarPlayers.forEach(p => p.isLiar = false);
+      
       // Select random liar
       liarIndex = randInt(numLiarPlayers);
       liarPlayers[liarIndex].isLiar = true;
