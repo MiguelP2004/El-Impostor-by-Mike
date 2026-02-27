@@ -3857,6 +3857,23 @@
     // Liar Game Variables
     let liarPlayers = [];
     let numLiarPlayers = 4;
+
+    // Load persisted settings from localStorage
+    (function () {
+      try {
+        const _s = JSON.parse(localStorage.getItem('impostorSettings') || '{}');
+        if (_s.numPlayers >= 3 && _s.numPlayers <= 15) numPlayers = _s.numPlayers;
+        if (_s.numImpostors >= 1) numImpostors = Math.min(Math.max(1, _s.numImpostors), getMaxImpostors(numPlayers));
+        if (_s.numLiarPlayers >= 3 && _s.numLiarPlayers <= 7) numLiarPlayers = _s.numLiarPlayers;
+      } catch (e) {}
+      const plDisp = document.getElementById('playersDisplay');
+      const impDisp = document.getElementById('impostorsDisplay');
+      const liarDisp = document.getElementById('liarPlayersDisplay');
+      if (plDisp) plDisp.textContent = numPlayers;
+      if (impDisp) impDisp.textContent = numImpostors;
+      if (liarDisp) liarDisp.textContent = numLiarPlayers;
+    })();
+
     let liarIndex = -1;
     let currentLiarPlayerIndex = 0;
     let liarAnswers = [];
@@ -3946,6 +3963,12 @@
 
     function randInt(max) { return Math.floor(Math.random() * max) }
 
+    function saveGameSettings() {
+      try {
+        localStorage.setItem('impostorSettings', JSON.stringify({ numPlayers, numImpostors, numLiarPlayers }));
+      } catch (e) {}
+    }
+
     // Calculate max impostors based on number of players
     function getMaxImpostors(numPlayers) {
       if (numPlayers <= 4) return 1;
@@ -4027,6 +4050,7 @@
           numImpostors = maxImpostors;
           impostorsDisplay.textContent = numImpostors;
         }
+        saveGameSettings();
       }
     });
 
@@ -4035,6 +4059,7 @@
         playPopSound();
         numPlayers++;
         playersDisplay.textContent = numPlayers;
+        saveGameSettings();
       }
     });
 
@@ -4043,6 +4068,7 @@
         playClickSound();
         numImpostors--;
         impostorsDisplay.textContent = numImpostors;
+        saveGameSettings();
       }
     });
 
@@ -4052,6 +4078,7 @@
         playPopSound();
         numImpostors++;
         impostorsDisplay.textContent = numImpostors;
+        saveGameSettings();
       }
     });
 
@@ -4143,6 +4170,7 @@
         numLiarPlayers--;
         liarPlayersDisplay.textContent = numLiarPlayers;
         playClickSound();
+        saveGameSettings();
       }
     });
 
@@ -4151,6 +4179,7 @@
         numLiarPlayers++;
         liarPlayersDisplay.textContent = numLiarPlayers;
         playPopSound();
+        saveGameSettings();
       }
     });
 
@@ -4431,12 +4460,8 @@
     liarNewGameBtn.addEventListener('click', () => {
       playClickSound();
       liarResults.style.display = 'none';
-      gameModeSelection.style.display = 'block';
-      
-      // Keep the previous number of players setting
-      // numLiarPlayers is maintained from the previous game
       liarPlayersDisplay.textContent = numLiarPlayers;
-      
+      liarSetup.style.display = 'block';
       updateArrowVisibility();
     });
 
@@ -5052,17 +5077,15 @@
     newGame.addEventListener('click', () => {
       playClickSound();
       players = [];
-      setup.style.display = 'none';
       namesSection.style.display = 'none';
       pass.style.display = 'none';
       discussion.style.display = 'none';
       results.style.display = 'none';
-      tabooSetup.style.display = 'none';
-      tabooGame.style.display = 'none';
-      document.getElementById('tabooResults').style.display = 'none';
-      gameModeSelection.style.display = 'block';
-      updateArrowVisibility();
       categorySelection.style.display = 'none';
+      document.getElementById('playersDisplay').textContent = numPlayers;
+      document.getElementById('impostorsDisplay').textContent = numImpostors;
+      setup.style.display = 'block';
+      updateArrowVisibility();
     });
 
     function handleContinueFromIntro() {
@@ -5309,11 +5332,6 @@
         else if (discussion.style.display === 'block') {
           discussion.style.display = 'none';
           gameModeSelection.style.display = 'block';
-          // Resetear valores por defecto al salir
-          numPlayers = 4;
-          numImpostors = 1;
-          if (typeof playersDisplay !== 'undefined') playersDisplay.textContent = numPlayers;
-          if (typeof impostorsDisplay !== 'undefined') impostorsDisplay.textContent = numImpostors;
         }
 
         updateArrowVisibility();
@@ -5325,8 +5343,8 @@
       playClickSound();
       document.getElementById('tabooResults').style.display = 'none';
       tabooGame.style.display = 'none';
-      tabooSetup.style.display = 'none';
-      gameModeSelection.style.display = 'block';
+      teamsDisplay.textContent = numTabooTeams;
+      tabooSetup.style.display = 'block';
       updateArrowVisibility();
     });
 
