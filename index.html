@@ -4131,6 +4131,18 @@
         numPlayers = numLiarPlayers;
         playersDisplay.textContent = numPlayers;
       }
+
+      // Validar que el nº de impostores sea coherente con el nº de jugadores
+      const maxImpostors = getMaxImpostors(numPlayers);
+      if (numImpostors > maxImpostors) {
+        numImpostors = maxImpostors;
+      }
+      if (numImpostors < 1) {
+        numImpostors = 1;
+      }
+      impostorsDisplay.textContent = numImpostors;
+      playersDisplay.textContent = numPlayers;
+      saveGameSettings();
       
       gameModeSelection.style.display = 'none';
       setup.style.display = 'block';
