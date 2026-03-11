@@ -4015,6 +4015,7 @@
     let numLiarPlayers = 4;
 
     // VoF Game Variables
+    const MAX_VOF_PLAYERS = 10;
     let numVofPlayers = 4;
     let vofPlayers = [];
     let vofLiarIndex = -1;
@@ -4028,7 +4029,7 @@
         if (_s.numPlayers >= 3 && _s.numPlayers <= 15) numPlayers = _s.numPlayers;
         if (_s.numImpostors >= 1) numImpostors = Math.min(Math.max(1, _s.numImpostors), getMaxImpostors(numPlayers));
         if (_s.numLiarPlayers >= 3 && _s.numLiarPlayers <= 7) numLiarPlayers = _s.numLiarPlayers;
-        if (_s.numVofPlayers >= 3 && _s.numVofPlayers <= 10) numVofPlayers = _s.numVofPlayers;
+        if (_s.numVofPlayers >= 3 && _s.numVofPlayers <= MAX_VOF_PLAYERS) numVofPlayers = _s.numVofPlayers;
       } catch (e) {}
       const plDisp = document.getElementById('playersDisplay');
       const impDisp = document.getElementById('impostorsDisplay');
@@ -4469,6 +4470,16 @@
 
     function randInt(max) { return Math.floor(Math.random() * max) }
 
+    // Fisher-Yates shuffle for unbiased random ordering
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = randInt(i + 1);
+        const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
     function saveGameSettings() {
       try {
         localStorage.setItem('impostorSettings', JSON.stringify({ numPlayers, numImpostors, numLiarPlayers, numVofPlayers }));
@@ -4741,7 +4752,7 @@
       triggerModeTransition(selectVofMode, '#ffb300', () => {
         // Sync player count
         numVofPlayers = numPlayers;
-        if (numVofPlayers > 10) numVofPlayers = 10;
+        if (numVofPlayers > MAX_VOF_PLAYERS) numVofPlayers = MAX_VOF_PLAYERS;
         if (numVofPlayers < 3) numVofPlayers = 3;
         vofPlayersDisplay.textContent = numVofPlayers;
 
@@ -4763,7 +4774,7 @@
     });
 
     incVofPlayers.addEventListener('click', () => {
-      if (numVofPlayers < 10) {
+      if (numVofPlayers < MAX_VOF_PLAYERS) {
         numVofPlayers++;
         vofPlayersDisplay.textContent = numVofPlayers;
         playPopSound();
@@ -5142,7 +5153,7 @@
       vofLiarIndex = randInt(numVofPlayers);
 
       // Pick unique facts for civilians (shuffle and assign)
-      const shuffledFacts = vofFacts.slice().sort(function () { return Math.random() - 0.5; });
+      const shuffledFacts = shuffleArray(vofFacts);
       vofPlayerFacts = [];
       let factIdx = 0;
       for (let i = 0; i < numVofPlayers; i++) {
