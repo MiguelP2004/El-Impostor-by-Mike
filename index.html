@@ -37,10 +37,13 @@
     html {
       width: 100%;
       height: 100%;
-      /* PINTAMOS EL FONDO DEL NAVEGADOR PARA TAPAR LA FRANJA BLANCA */
-      background-color: #1a1a2e;
+      /* Negro durante la intro para evitar franjas de color en iOS */
+      background-color: #000;
       overflow-x: hidden;
-      /* Evita el scroll horizontal (la barra de lado) */
+    }
+
+    html.intro-done {
+      background-color: #1a1a2e;
     }
 
     :root {
@@ -1009,19 +1012,17 @@
 
     .intro-screen {
       position: fixed;
-      /* TRUCO FINAL IPHONE: Hacemos la intro GIGANTE */
-      top: 0;
-      /* Centrado vertical correcto */
-      left: 0;
-      width: 100%;
-      height: 100%;
-      /* Altura completa de viewport */
-      min-height: 100vh;
-      min-height: 100dvh;
-      /* dvh para dispositivos móviles modernos */
+      /* Extendemos más allá del viewport para cubrir overscroll en iOS */
+      top: -50px;
+      left: -50px;
+      right: -50px;
+      bottom: -50px;
+      width: auto;
+      height: auto;
 
-      /* Tu fondo original */
-      background: radial-gradient(circle at 50% 50%, #2d1b4e 0, #1a1635 45%, #05020a 100%);
+      /* Fondo con color sólido de respaldo que coincide con el borde del degradado */
+      background-color: #05020a;
+      background-image: radial-gradient(circle at 50% 50%, #2d1b4e 0, #1a1635 45%, #05020a 100%);
 
       z-index: 10000;
 
@@ -1032,16 +1033,13 @@
       gap: 18px;
       text-align: center;
 
-      padding: 20px;
-      padding-top: max(20px, env(safe-area-inset-top));
-      padding-bottom: max(40px, env(safe-area-inset-bottom));
-      /* Respeta safe areas de iPhone */
+      padding: 70px 20px;
+      padding-top: max(70px, calc(50px + env(safe-area-inset-top)));
+      padding-bottom: max(90px, calc(50px + env(safe-area-inset-bottom)));
 
-      /* IMPRESCINDIBLE: Bloquea que el dedo mueva la intro */
+      /* Bloquea que el dedo mueva la intro */
       touch-action: none;
       pointer-events: auto;
-      
-      /* Evita que se vea contenido fuera del viewport */
       overflow: hidden;
     }
 
@@ -1201,6 +1199,60 @@
       align-items: center;
     }
 
+    .game-mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .game-mode-grid .game-mode-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 18px 10px;
+      border-radius: 16px;
+      border: 2px solid transparent;
+      color: var(--text);
+      font-family: 'Fredoka One', cursive;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+      min-height: 100px;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Colores por modo */
+    #selectImpostorMode { background: linear-gradient(135deg, #e53935, #b71c1c); }
+    #selectTabooMode { background: linear-gradient(135deg, #7c4dff, #4a148c); }
+    #selectLiarMode { background: linear-gradient(135deg, #00bfa5, #00796b); }
+    #selectVofMode { background: linear-gradient(135deg, #ffb300, #e65100); }
+
+    /* Animación al pulsar (mobile-friendly con :active) */
+    .game-mode-card:active {
+      transform: scale(0.93);
+      filter: brightness(0.85);
+    }
+
+    /* Hover solo en dispositivos con puntero (desktop) */
+    @media (hover: hover) and (pointer: fine) {
+      .game-mode-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    .game-mode-card .mode-emoji {
+      font-size: 28px;
+    }
+
+    .game-mode-card .mode-label {
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
     .mode-buttons-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -1325,11 +1377,23 @@
       <section id="gameModeSelection" class="card" style="display:none">
         <div class="center">
           <p class="muted" style="margin-bottom:16px;font-weight:700;">Elige el modo de juego!!</p>
-          <div class="mode-buttons">
-            <button class="btn big" id="selectImpostorMode" style="width:100%; margin-bottom:12px;">Juego del Impostor
-              👤🔍</button>
-            <button class="btn big secondary" id="selectTabooMode" style="width:100%; margin-bottom:12px;">Tabú 💭🤔</button>
-            <button class="btn big" id="selectLiarMode" style="width:100%;">El Mentiroso 🤥</button>
+          <div class="game-mode-grid">
+            <button class="game-mode-card" id="selectImpostorMode">
+              <span class="mode-emoji">👤🔍</span>
+              <span class="mode-label">Juego del Impostor</span>
+            </button>
+            <button class="game-mode-card" id="selectTabooMode">
+              <span class="mode-emoji">💭🤔</span>
+              <span class="mode-label">Tabú</span>
+            </button>
+            <button class="game-mode-card" id="selectLiarMode">
+              <span class="mode-emoji">🤥</span>
+              <span class="mode-label">El Mentiroso</span>
+            </button>
+            <button class="game-mode-card" id="selectVofMode">
+              <span class="mode-emoji">✅❌</span>
+              <span class="mode-label">¿Verdadero o Falso?</span>
+            </button>
           </div>
         </div>
       </section>
@@ -1506,6 +1570,24 @@
         </div>
       </section>
 
+      <!-- VoF (Verdadero o Falso) Game Sections -->
+      <section id="vofSetup" class="card" style="display:none">
+        <div class="center">
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">Configuración del Impostor (V o F)</p>
+          <div>
+            <label>Número de Jugadores</label>
+            <div class="counter">
+              <button class="counter-btn" id="decVofPlayers">−</button>
+              <div class="counter-value" id="vofPlayersDisplay">4</div>
+              <button class="counter-btn" id="incVofPlayers">+</button>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <button class="btn big" id="vofContinueBtn">Continuar</button>
+          </div>
+        </div>
+      </section>
+
       <!-- Liar Game Sections -->
       <section id="liarSetup" class="card" style="display:none">
         <div class="center">
@@ -1627,7 +1709,7 @@
           introScreenEl.style.opacity = '0';
 
           // La eliminamos del HTML justo cuando termine de desvanecerse
-          setTimeout(() => introScreenEl.remove(), 300);
+          setTimeout(() => { introScreenEl.remove(); document.documentElement.classList.add('intro-done'); }, 300);
         }
 
         // 2. Mostrar el menú del juego detrás
@@ -1869,6 +1951,12 @@
     const selectImpostorMode = document.getElementById('selectImpostorMode');
     const selectTabooMode = document.getElementById('selectTabooMode');
     const selectLiarMode = document.getElementById('selectLiarMode');
+    const selectVofMode = document.getElementById('selectVofMode');
+    const vofSetup = document.getElementById('vofSetup');
+    const vofPlayersDisplay = document.getElementById('vofPlayersDisplay');
+    const decVofPlayers = document.getElementById('decVofPlayers');
+    const incVofPlayers = document.getElementById('incVofPlayers');
+    const vofContinueBtn = document.getElementById('vofContinueBtn');
     const decTeams = document.getElementById('decTeams');
     const incTeams = document.getElementById('incTeams');
     const teamsDisplay = document.getElementById('teamsDisplay');
@@ -3858,6 +3946,9 @@
     let liarPlayers = [];
     let numLiarPlayers = 4;
 
+    // VoF Game Variables
+    let numVofPlayers = 4;
+
     // Load persisted settings from localStorage
     (function () {
       try {
@@ -3865,13 +3956,16 @@
         if (_s.numPlayers >= 3 && _s.numPlayers <= 15) numPlayers = _s.numPlayers;
         if (_s.numImpostors >= 1) numImpostors = Math.min(Math.max(1, _s.numImpostors), getMaxImpostors(numPlayers));
         if (_s.numLiarPlayers >= 3 && _s.numLiarPlayers <= 7) numLiarPlayers = _s.numLiarPlayers;
+        if (_s.numVofPlayers >= 3 && _s.numVofPlayers <= 15) numVofPlayers = _s.numVofPlayers;
       } catch (e) {}
       const plDisp = document.getElementById('playersDisplay');
       const impDisp = document.getElementById('impostorsDisplay');
       const liarDisp = document.getElementById('liarPlayersDisplay');
+      const vofDisp = document.getElementById('vofPlayersDisplay');
       if (plDisp) plDisp.textContent = numPlayers;
       if (impDisp) impDisp.textContent = numImpostors;
       if (liarDisp) liarDisp.textContent = numLiarPlayers;
+      if (vofDisp) vofDisp.textContent = numVofPlayers;
     })();
 
     let liarIndex = -1;
@@ -3965,7 +4059,7 @@
 
     function saveGameSettings() {
       try {
-        localStorage.setItem('impostorSettings', JSON.stringify({ numPlayers, numImpostors, numLiarPlayers }));
+        localStorage.setItem('impostorSettings', JSON.stringify({ numPlayers, numImpostors, numLiarPlayers, numVofPlayers }));
       } catch (e) {}
     }
 
@@ -4089,13 +4183,14 @@
       if (gameModeSelection.style.display === 'block') {
         backArrowBtn.style.display = 'none';
       }
-      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup, Liar Setup, Liar Names) -> VISIBLE
+      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup, Liar Setup, Liar Names, VoF Setup) -> VISIBLE
       else if (setup.style.display === 'block' ||
         categorySelection.style.display === 'block' ||
         namesSection.style.display === 'block' ||
         tabooSetup.style.display === 'block' ||
         liarSetup.style.display === 'block' ||
-        liarNames.style.display === 'block') {
+        liarNames.style.display === 'block' ||
+        vofSetup.style.display === 'block') {
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
@@ -4174,6 +4269,41 @@
       gameModeSelection.style.display = 'none';
       liarSetup.style.display = 'block';
       updateArrowVisibility();
+    });
+
+    selectVofMode.addEventListener('click', () => {
+      unlockAudioWithUserGesture();
+      playClickSound();
+      
+      // Sync player count
+      numVofPlayers = numLiarPlayers;
+      if (numVofPlayers > 7) numVofPlayers = 7;
+      if (numVofPlayers < 3) numVofPlayers = 3;
+      vofPlayersDisplay.textContent = numVofPlayers;
+      
+      // Hide mode selection, show VoF setup
+      gameModeSelection.style.display = 'none';
+      vofSetup.style.display = 'block';
+      updateArrowVisibility();
+    });
+
+    // VoF player counter controls
+    decVofPlayers.addEventListener('click', () => {
+      if (numVofPlayers > 3) {
+        numVofPlayers--;
+        vofPlayersDisplay.textContent = numVofPlayers;
+        playClickSound();
+        saveGameSettings();
+      }
+    });
+
+    incVofPlayers.addEventListener('click', () => {
+      if (numVofPlayers < 7) {
+        numVofPlayers++;
+        vofPlayersDisplay.textContent = numVofPlayers;
+        playPopSound();
+        saveGameSettings();
+      }
     });
 
     // Liar player counter controls
@@ -5109,6 +5239,7 @@
         mainContainer.style.opacity = '1';
         setTimeout(() => {
           introScreen.remove();
+          document.documentElement.classList.add('intro-done');
         }, 500);
       } else {
         mainContainer.style.opacity = '1';
@@ -5234,7 +5365,15 @@
           return;
         }
 
-        // 0b. Si estamos en Liar Setup -> Volver a selección de modo
+        // 0b. Si estamos en VoF Setup -> Volver a selección de modo
+        if (vofSetup.style.display === 'block') {
+          vofSetup.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0c. Si estamos en Liar Setup -> Volver a selección de modo
         if (liarSetup.style.display === 'block') {
           liarSetup.style.display = 'none';
           gameModeSelection.style.display = 'block';
@@ -5393,7 +5532,7 @@
         handleContinueFromIntro();
       } else {
         // Fallback por si acaso
-        if (introScreenEl) introScreenEl.remove();
+        if (introScreenEl) { introScreenEl.remove(); document.documentElement.classList.add('intro-done'); }
         document.getElementById('mainContainer').style.opacity = '1';
       }
     }
