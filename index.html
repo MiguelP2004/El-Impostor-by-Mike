@@ -1201,27 +1201,28 @@
 
     .game-mode-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 1fr;
+      gap: 14px;
     }
 
     .game-mode-grid .game-mode-card {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 18px 10px;
-      border-radius: 16px;
-      border: 2px solid transparent;
+      justify-content: flex-start;
+      text-align: left;
+      padding: 20px 22px;
+      border-radius: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
       color: var(--text);
       font-family: 'Fredoka One', cursive;
-      font-size: 14px;
+      font-size: 18px;
       cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-      min-height: 100px;
-      gap: 8px;
+      min-height: 90px;
+      gap: 18px;
       -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
 
     /* Colores por modo */
@@ -1245,11 +1246,12 @@
     }
 
     .game-mode-card .mode-emoji {
-      font-size: 28px;
+      font-size: 38px;
+      flex-shrink: 0;
     }
 
     .game-mode-card .mode-label {
-      font-size: 13px;
+      font-size: 18px;
       line-height: 1.3;
     }
 
@@ -1585,6 +1587,56 @@
           <div style="margin-top:20px">
             <button class="btn big" id="vofContinueBtn">Continuar</button>
           </div>
+        </div>
+      </section>
+
+      <!-- VoF Names Section -->
+      <section id="vofNames" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">
+            Jugadores</p>
+          <div id="vofNamesList" style="display:grid;gap:10px;margin-bottom:16px"></div>
+          <button class="btn big" id="startVofGameBtn">Empezar partida</button>
+        </div>
+      </section>
+
+      <!-- VoF Pass Screen -->
+      <section id="vofPass" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="player-indicator" id="vofPlayerIndicator">Jugador</div>
+          <div class="player-number" id="vofPlayerNumber">Jugador 1 de 4</div>
+          <div style="height:8px"></div>
+          <button class="btn big secondary" id="vofRevealRoleBtn">🔍 Ver mi rol</button>
+        </div>
+      </section>
+
+      <!-- VoF Role View -->
+      <section id="vofRoleView" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div id="vofRoleContent"></div>
+          <div style="height:16px"></div>
+          <button class="btn big" id="vofRoleNextBtn">Entendido ✓</button>
+        </div>
+      </section>
+
+      <!-- VoF Voting Screen -->
+      <section id="vofVote" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:20px;color:#ffc107;margin-bottom:8px;">🗳️ ¡A votar!</p>
+          <p class="muted" style="font-weight:600;margin-bottom:4px;">Cada civil ha dicho su dato en voz alta.</p>
+          <p class="muted" style="font-weight:700;margin-bottom:16px;">¿Quién creéis que es el mentiroso?</p>
+          <div class="players-list" id="vofVoteList" style="margin-top:10px"></div>
+          <div style="height:14px"></div>
+          <button class="btn medium" id="vofConfirmVoteBtn" disabled style="opacity:0.5;width:auto;min-width:180px;padding:12px 20px;font-size:16px;">Confirmar votación</button>
+        </div>
+      </section>
+
+      <!-- VoF Results -->
+      <section id="vofResults" class="card" style="display:none;margin-top:12px">
+        <div id="vofResultText" class="center"></div>
+        <div style="height:20px"></div>
+        <div class="center">
+          <button class="btn big secondary" id="vofNewGameBtn">Nueva partida</button>
         </div>
       </section>
 
@@ -1957,6 +2009,22 @@
     const decVofPlayers = document.getElementById('decVofPlayers');
     const incVofPlayers = document.getElementById('incVofPlayers');
     const vofContinueBtn = document.getElementById('vofContinueBtn');
+    const vofNames = document.getElementById('vofNames');
+    const vofNamesList = document.getElementById('vofNamesList');
+    const startVofGameBtn = document.getElementById('startVofGameBtn');
+    const vofPass = document.getElementById('vofPass');
+    const vofPlayerIndicator = document.getElementById('vofPlayerIndicator');
+    const vofPlayerNumber = document.getElementById('vofPlayerNumber');
+    const vofRevealRoleBtn = document.getElementById('vofRevealRoleBtn');
+    const vofRoleView = document.getElementById('vofRoleView');
+    const vofRoleContent = document.getElementById('vofRoleContent');
+    const vofRoleNextBtn = document.getElementById('vofRoleNextBtn');
+    const vofVote = document.getElementById('vofVote');
+    const vofVoteList = document.getElementById('vofVoteList');
+    const vofConfirmVoteBtn = document.getElementById('vofConfirmVoteBtn');
+    const vofResults = document.getElementById('vofResults');
+    const vofResultText = document.getElementById('vofResultText');
+    const vofNewGameBtn = document.getElementById('vofNewGameBtn');
     const decTeams = document.getElementById('decTeams');
     const incTeams = document.getElementById('incTeams');
     const teamsDisplay = document.getElementById('teamsDisplay');
@@ -3947,7 +4015,12 @@
     let numLiarPlayers = 4;
 
     // VoF Game Variables
+    const MAX_VOF_PLAYERS = 10;
     let numVofPlayers = 4;
+    let vofPlayers = [];
+    let vofLiarIndex = -1;
+    let currentVofPlayerIndex = 0;
+    let vofPlayerFacts = [];
 
     // Load persisted settings from localStorage
     (function () {
@@ -3956,7 +4029,7 @@
         if (_s.numPlayers >= 3 && _s.numPlayers <= 15) numPlayers = _s.numPlayers;
         if (_s.numImpostors >= 1) numImpostors = Math.min(Math.max(1, _s.numImpostors), getMaxImpostors(numPlayers));
         if (_s.numLiarPlayers >= 3 && _s.numLiarPlayers <= 7) numLiarPlayers = _s.numLiarPlayers;
-        if (_s.numVofPlayers >= 3 && _s.numVofPlayers <= 15) numVofPlayers = _s.numVofPlayers;
+        if (_s.numVofPlayers >= 3 && _s.numVofPlayers <= MAX_VOF_PLAYERS) numVofPlayers = _s.numVofPlayers;
       } catch (e) {}
       const plDisp = document.getElementById('playersDisplay');
       const impDisp = document.getElementById('impostorsDisplay');
@@ -4048,6 +4121,346 @@
       { normal: "¿Cuántos minutos aguantas corriendo a tope?", liar: "¿Cuántos minutos tardas en peinarte/arreglarte el pelo?" }
     ];
 
+    // VoF Game Facts Array (300 datos reales únicos)
+    const vofFacts = [
+      "Las hormigas no tienen pulmones.",
+      "Los elefantes son los únicos animales que no pueden saltar.",
+      "Los caracoles pueden dormir hasta 3 años seguidos.",
+      "Los pulpos tienen tres corazones.",
+      "Los flamencos son rosas porque comen camarones y algas con betacaroteno.",
+      "Las vacas tienen cuatro estómagos.",
+      "Los tiburones son más antiguos que los árboles en la Tierra.",
+      "Los delfines se llaman entre sí por un silbido único, como si tuvieran un nombre.",
+      "Las abejas pueden reconocer caras humanas.",
+      "Los osos polares tienen la piel negra bajo su pelaje blanco.",
+      "Las tortugas pueden respirar a través de su cloaca.",
+      "Los pingüinos se proponen matrimonio con una piedra.",
+      "Los koalas tienen huellas dactilares casi idénticas a las de los humanos.",
+      "Las ratas se ríen cuando se las hace cosquillas.",
+      "Los peces payaso son todos machos al nacer; el dominante se convierte en hembra.",
+      "Las ballenas jorobadas crean cantos que pueden durar hasta 20 minutos.",
+      "El cocodrilo no puede sacar la lengua.",
+      "Los canguros no pueden caminar hacia atrás.",
+      "Los gorilas pueden contraer resfriados y otras enfermedades humanas.",
+      "Las mariposas monarca emigran hasta 4.000 km cada año.",
+      "Los pulpos tienen nueve cerebros: uno central y uno en cada tentáculo.",
+      "Los caracoles pueden tener hasta 25.000 dientes.",
+      "Los elefantes son los únicos animales que muestran rituales de duelo por sus muertos.",
+      "Los pingüinos emperadores son los únicos que crían durante el invierno antártico.",
+      "Los camellos no almacenan agua en sus jorobas, sino grasa.",
+      "Los hipopótamos sudan un líquido rojo que actúa como protector solar.",
+      "Las focas pueden aguantar la respiración hasta 2 horas bajo el agua.",
+      "El colibrí es el único pájaro que puede volar hacia atrás.",
+      "Las serpientes no tienen párpados y duermen con los ojos abiertos.",
+      "Los cerdos son tan inteligentes que pueden jugar a videojuegos con joysticks.",
+      "Los tiburones son los únicos peces que tienen párpados.",
+      "Los gatos no perciben el sabor dulce.",
+      "El pájaro carpintero puede golpear la madera hasta 20 veces por segundo.",
+      "La velocidad máxima registrada de un guepardo es 120 km/h.",
+      "El tigre siberiano es el felino más grande del mundo.",
+      "El tiburón ballena es el pez más grande del mundo.",
+      "La tortuga de Galápagos puede vivir más de 150 años.",
+      "El delfín rosado solo existe en el río Amazonas.",
+      "La mariposa más grande del mundo, la Ornithoptera alexandrae, tiene 28 cm de envergadura.",
+      "El Coliseo de Roma podía albergar hasta 80.000 espectadores.",
+      "Cleopatra vivió más cerca en el tiempo de la llegada del hombre a la Luna que de la construcción de las pirámides.",
+      "La Muralla China no puede verse desde el espacio a simple vista.",
+      "Napoleón no era tan bajo como se cree; medía 1,70 m, la altura media de su época.",
+      "La guillotina fue utilizada en Francia hasta 1977.",
+      "Las pirámides de Giza fueron construidas hace más de 4.500 años.",
+      "El Titanic tardó solo 2 horas y 40 minutos en hundirse.",
+      "El primer ser humano en el espacio fue Yuri Gagarin en 1961.",
+      "Los vikingos llegaron a América del Norte unos 500 años antes que Cristóbal Colón.",
+      "Shakespeare escribió 37 obras de teatro en total.",
+      "La Estatua de la Libertad fue un regalo de Francia a Estados Unidos en 1886.",
+      "La Reconquista de España duró aproximadamente 800 años.",
+      "El Coliseo Romano tardó 8 años en construirse.",
+      "La primera bomba atómica fue detonada en julio de 1945 en Nuevo México.",
+      "El primer anuncio de televisión fue emitido en 1941.",
+      "Rusia es el país más grande del mundo, cubriendo el 11% de la superficie terrestre.",
+      "El río Nilo es el más largo del mundo con 6.650 km.",
+      "El Monte Everest crece unos 4 mm cada año.",
+      "El Océano Pacífico es más grande que todos los continentes juntos.",
+      "El desierto del Sahara tiene un tamaño similar al de Estados Unidos.",
+      "El lago Baikal en Rusia contiene el 20% del agua dulce superficial del mundo.",
+      "La Ciudad del Vaticano es el país más pequeño del mundo.",
+      "El Amazonas descarga el 20% del agua dulce que entra en los océanos del mundo.",
+      "Nueva Zelanda fue el primer país del mundo en dar el voto a las mujeres, en 1893.",
+      "Canadá tiene más lagos que todos los demás países juntos.",
+      "El punto más profundo del océano es la Fosa de las Marianas con 11 km.",
+      "España es el segundo país más montañoso de Europa, después de Suiza.",
+      "La Gran Barrera de Coral es la estructura viviente más grande del mundo.",
+      "La Antártida es el continente más ventoso, frío y seco del planeta.",
+      "El Congo es el río más profundo del mundo.",
+      "Japón tiene más de 6.800 islas en su territorio.",
+      "La capital de Australia es Canberra, no Sídney.",
+      "El monte Kilimanjaro en Tanzania es el pico más alto de África.",
+      "El Monte Aconcagua en Argentina es el punto más alto del hemisferio occidental.",
+      "El río Amazonas tiene más agua que los siete ríos más grandes del mundo juntos.",
+      "El desierto de Atacama en Chile es el más seco del mundo.",
+      "El monte Olimpo en Marte es también el volcán más alto del Sistema Solar con 22 km.",
+      "El ADN humano comparte un 98,4% con el de los chimpancés.",
+      "La luz solar tarda 8 minutos en llegar a la Tierra.",
+      "El cerebro humano genera suficiente energía eléctrica para encender una bombilla.",
+      "El Universo tiene aproximadamente 13.800 millones de años.",
+      "Un rayo cae en la Tierra unas 100 veces por segundo.",
+      "La Luna se aleja de la Tierra unos 3,8 cm cada año.",
+      "El átomo es 99,9999% espacio vacío.",
+      "Los agujeros negros pueden distorsionar el tiempo a su alrededor.",
+      "Saturno tiene una densidad tan baja que flotaría en el agua.",
+      "Venus es el planeta más caliente del Sistema Solar, no Mercurio.",
+      "El cuerpo humano tiene suficiente hierro para fabricar un pequeño clavo.",
+      "El sonido viaja a aproximadamente 343 m/s en el aire.",
+      "La primera computadora electrónica pesaba 27 toneladas.",
+      "El WiFi fue inventado en Australia.",
+      "Plutón fue reclasificado como planeta enano en 2006.",
+      "El cometa Halley pasa cerca de la Tierra cada 75-76 años.",
+      "Hay más estrellas en el universo que granos de arena en todas las playas de la Tierra.",
+      "La temperatura en la superficie del Sol es de aproximadamente 5.500 grados Celsius.",
+      "Los satélites GPS están sincronizados con relojes atómicos para mantener su precisión.",
+      "El primer vuelo de los hermanos Wright duró 12 segundos en 1903.",
+      "La primera vacuna fue creada por Edward Jenner en 1796 contra la viruela.",
+      "El ADN fue descubierto en 1953 por Watson, Crick y Franklin.",
+      "El primer trasplante de corazón fue realizado por Christiaan Barnard en 1967.",
+      "La aspirina fue sintetizada por primera vez en 1897.",
+      "El teléfono fue inventado por Alexander Graham Bell en 1876.",
+      "Internet fue creada originalmente como una red militar llamada ARPANET en 1969.",
+      "El primer automóvil a gasolina fue construido por Karl Benz en 1885.",
+      "El primer satélite artificial fue el Sputnik 1, lanzado por la URSS en 1957.",
+      "La distancia de la Tierra al Sol es de aproximadamente 150 millones de kilómetros.",
+      "La miel nunca caduca; se han encontrado muestras comestibles de 3.000 años en Egipto.",
+      "La Torre Eiffel puede ser 15 cm más alta en verano debido a la expansión térmica.",
+      "El chocolate caliente fue inventado por los mayas hace 2.500 años.",
+      "La palabra 'robot' viene del checo 'robota', que significa trabajo forzado.",
+      "Oxford es más antigua que los Aztecas; su fundación fue en el siglo XI.",
+      "Los humanos son los únicos animales que se sonrojan.",
+      "La lengua más hablada del mundo por nativos es el mandarín chino.",
+      "La Torre de Pisa tardó 177 años en construirse.",
+      "El primer teléfono móvil pesaba 1,1 kilogramos.",
+      "El cerebro humano procesa imágenes en solo 13 milisegundos.",
+      "Los bebés nacen sin rótulas; se forman entre los 2 y 6 años.",
+      "El fuego no tiene sombra porque emite luz propia.",
+      "Los dientes son la única parte del cuerpo humano que no pueden repararse solos.",
+      "El limón contiene más azúcar que la fresa, a pesar de su sabor ácido.",
+      "Los bananos son técnicamente bayas, mientras que las fresas no lo son.",
+      "Los delfines duermen con la mitad del cerebro activo para poder respirar.",
+      "Las uñas de los pies crecen más lentamente que las de las manos.",
+      "Los humanos compartimos el 50% del ADN con los plátanos.",
+      "El cerebro humano tiene aproximadamente 86.000 millones de neuronas.",
+      "La piel humana se renueva completamente cada 27 días.",
+      "Los humanos son los únicos animales que lloran por emociones.",
+      "Reír aumenta el sistema inmunológico y reduce el estrés.",
+      "El bostezo es contagioso incluso al leerlo o pensarlo.",
+      "La mayoría de las personas solo recuerdan el 10% de sus sueños.",
+      "El cerebro humano es más activo durante el sueño que cuando vemos televisión.",
+      "El ojo humano puede distinguir entre 10 millones de colores diferentes.",
+      "El corazón humano late unas 100.000 veces al día.",
+      "El cuerpo humano tiene unos 206 huesos de adulto, pero nacemos con unos 270.",
+      "Los humanos son los únicos primates que cocinan sus alimentos.",
+      "El sentido del olfato está directamente conectado con la memoria y las emociones.",
+      "La Torre Eiffel fue construida como estructura temporal para la Exposición Universal de 1889.",
+      "El Partenón de Atenas lleva más tiempo en ruinas que en pie.",
+      "La Gran Pirámide de Guiza fue la estructura más alta del mundo durante 3.800 años.",
+      "Los romanos inventaron el hormigón y lo utilizaron en sus construcciones.",
+      "La Muralla China mide unos 21.000 km de longitud total.",
+      "Rusia y EE.UU. están separados por solo 4 km en el punto más cercano.",
+      "La primera imprenta de tipos móviles fue inventada por Gutenberg hacia 1440.",
+      "Los dinosaurios dominaron la Tierra durante más de 165 millones de años.",
+      "El Homo sapiens lleva unos 300.000 años en la Tierra.",
+      "Los primeros Juegos Olímpicos modernos se celebraron en Atenas en 1896.",
+      "El primer código legal conocido es el Código de Hammurabi de Babilonia.",
+      "El papel fue inventado en China alrededor del año 105 d.C.",
+      "Roma fue fundada, según la leyenda, en el 753 a.C. por Rómulo y Remo.",
+      "Aristóteles fue el primer pensador en sistematizar la lógica.",
+      "El filósofo Sócrates no dejó nada escrito; sus ideas las conocemos a través de Platón.",
+      "Confucio fue un filósofo chino que vivió en el siglo V a.C.",
+      "La especie humana migró fuera de África hace unos 60.000 años.",
+      "El primer mapa del mundo data de hace unos 2.600 años y fue creado por los babilonios.",
+      "La primera imprenta permitió que la Biblia fuera el libro más reproducido de la historia.",
+      "Mientras que la Tierra tarda un día en girar sobre su propio eje, el Sol tarda entre 25 y 28 días.",
+      "El Big Bang sucedió hace aproximadamente 13.800 millones de años.",
+      "Los agujeros negros son tan densos que ni la luz puede escapar de su gravedad.",
+      "La longitud del ecuador terrestre es aproximadamente 40.075 km.",
+      "El polo norte geográfico y el polo norte magnético no están en el mismo lugar.",
+      "Hay más de 195 países reconocidos actualmente en el mundo.",
+      "La mayor corriente oceánica es la Corriente del Golfo.",
+      "El continente más alto sobre el nivel del mar es la Antártida, con una altitud media de 2.300 metros.",
+      "Los Alpes se formaron por la colisión de las placas africana y euroasiática.",
+      "El primer partido de fútbol moderno se jugó en 1863 en Inglaterra.",
+      "El récord mundial de los 100 metros lisos lo tiene Usain Bolt con 9,58 segundos.",
+      "El maratón oficial mide 42,195 kilómetros.",
+      "El ciclismo Tour de Francia se celebra desde 1903.",
+      "La natación sincronizada se introdujo en los Juegos Olímpicos en 1984.",
+      "El Real Madrid es el club de fútbol con más títulos de Champions League.",
+      "El primer Oscar de la historia se entregó en 1929.",
+      "Beethoven compuso su novena sinfonía siendo completamente sordo.",
+      "Los Beatles se separaron en 1970.",
+      "La guitarra eléctrica fue inventada en 1932 por Adolph Rickenbacker.",
+      "Mozart compuso su primera sinfonía a los 8 años.",
+      "El baile del flamenco tiene sus raíces en la cultura gitana andaluza del siglo XVIII.",
+      "La ópera nació en Italia a finales del siglo XVI.",
+      "El hip-hop nació en el Bronx, Nueva York, en los años 70.",
+      "La película más taquillera de la historia es Avatar (2009).",
+      "El libro más vendido de la historia es la Biblia con más de 5.000 millones de copias.",
+      "El primer videojuego comercial fue Pong, lanzado en 1972.",
+      "El videojuego más vendido de la historia es Minecraft.",
+      "España tiene más bares per cápita que ningún otro país de la Unión Europea.",
+      "El flamenco fue declarado Patrimonio Cultural Inmaterial de la Humanidad por la UNESCO en 2010.",
+      "La siesta tiene su origen en el Imperio Romano.",
+      "La Sagrada Familia en Barcelona lleva bajo construcción desde 1882.",
+      "El Big Ben es técnicamente el nombre de la campana, no de la torre.",
+      "España es el principal productor de aceite de oliva del mundo.",
+      "El país con mayor consumo de café per cápita es Finlandia.",
+      "La paella valenciana tradicional se hace con pollo y conejo, no con marisco.",
+      "El croissant no es francés; fue creado en Austria en el siglo XVII.",
+      "El helado fue inventado en China hace unos 2.000 años.",
+      "El chocolate tuvo un uso medicinal antes de ser considerado un dulce.",
+      "La cerveza es la bebida alcohólica más consumida del mundo.",
+      "La primera cocina conocida data de hace 780.000 años.",
+      "La pizza margarita fue nombrada en honor de la Reina Margarita de Saboya en 1889.",
+      "Hay más de 7.000 idiomas en el mundo, aunque más de la mitad están en peligro de extinción.",
+      "El lenguaje de signos no es universal; cada país tiene el suyo.",
+      "El quechua es el idioma indígena más hablado de América con 8 millones de hablantes.",
+      "El japonés tiene tres alfabetos distintos: hiragana, katakana y kanji.",
+      "El árabe se escribe de derecha a izquierda.",
+      "El gallego y el portugués tienen origen común y son muy similares.",
+      "El finlandés y el húngaro son idiomas emparentados, aunque geográficamente separados.",
+      "En el español hay más de 100.000 palabras en el diccionario de la RAE.",
+      "La música puede activar las mismas áreas del cerebro que el placer y la comida.",
+      "El azul es el color favorito de la mayoría de las personas en el mundo.",
+      "La fobia más común en el mundo es la aracnofobia, el miedo a las arañas.",
+      "El primer periódico se publicó en Alemania en 1605.",
+      "El primer país en legalizar el matrimonio homosexual fue Países Bajos en 2001.",
+      "El plástico fue inventado en 1907 por Leo Baekeland.",
+      "La electricidad fue aprovechada comercialmente gracias a Thomas Edison en 1879.",
+      "La radioactividad fue descubierta por Henri Becquerel en 1896.",
+      "El primer antibiótico descubierto fue la penicilina, por Alexander Fleming en 1928.",
+      "Los seres humanos y los neandertales coexistieron durante miles de años.",
+      "El telescopio fue inventado por Hans Lippershey en 1608.",
+      "El primer satélite GPS fue lanzado en 1978.",
+      "La Torre de Babel era probablemente un zigurat babilónico.",
+      "La Ilíada y la Odisea fueron escritas o compiladas por el poeta Homero.",
+      "El pensamiento científico moderno tiene raíces en la Grecia antigua.",
+      "El Imperio Mongol fue el segundo mayor imperio de la historia.",
+      "La Revolución Francesa comenzó en 1789.",
+      "La Segunda Guerra Mundial terminó en 1945.",
+      "La primera guerra mundial comenzó tras el asesinato del archiduque Franz Ferdinand.",
+      "El número de hormigas en el mundo supera los 10.000 billones.",
+      "Los lobos aúllan para comunicarse entre ellos, no para aullar a la luna.",
+      "Los pingüinos son monógamos y a menudo pasan su vida con una sola pareja.",
+      "El venado puede correr hasta 88 km/h.",
+      "Las abejas melíferas pueden volar a una velocidad de hasta 25 km/h.",
+      "Un grupo de cuervos se llama 'murder' (asesinato) en inglés.",
+      "Los flamencos solo pueden comer con la cabeza bocabajo.",
+      "Los gatos tienen tres párpados en cada ojo.",
+      "Las arañas tienen ocho ojos, aunque la mayoría tienen visión bastante deficiente.",
+      "Los avestruces no esconden la cabeza en la arena; es un mito.",
+      "Los pulpos pueden cambiar de color para camuflarse, aunque son daltónicos.",
+      "La sangre de los pulpos y los calamares es de color azul.",
+      "Las medusas son aproximadamente un 95% agua.",
+      "El corazón del camarón está en su cabeza.",
+      "La lengua de una ballena azul puede pesar tanto como un elefante adulto.",
+      "Las abejas reinas pueden vivir hasta 5 años, las obreras solo unas semanas.",
+      "Los leones son los únicos felinos que viven en grupos familiares.",
+      "Los osos polares nadan largas distancias en busca de hielo y presas.",
+      "La mantis religiosa es el único insecto capaz de girar la cabeza 180 grados.",
+      "El ratón tiene el corazón que late más rápido entre los mamíferos: 500-600 veces por minuto.",
+      "La lombriz de tierra puede regenerar su cuerpo si es cortada.",
+      "Las mariposas saborean con las patas.",
+      "Los perros tienen un olfato entre 10.000 y 100.000 veces más potente que el humano.",
+      "Los gatos pasan el 70% de sus vidas durmiendo.",
+      "Las ballenas azules son los animales más grandes que han existido en la Tierra.",
+      "El cocodrilo del Nilo puede vivir hasta 70 años.",
+      "Las langostas se comunican orinándose a la cara mutuamente.",
+      "Los flamencos son aves que necesitan vivir en grupos para reproducirse con éxito.",
+      "El chimpancé puede aprender hasta 300 señales de lenguaje de signos.",
+      "Los leones pueden dormir hasta 20 horas al día.",
+      "Las cebras tienen un patrón de rayas único, como las huellas dactilares humanas.",
+      "El zorro ártico cambia de color de pelaje según la estación: blanco en invierno, marrón en verano.",
+      "Los pulpos pueden abrir frascos con tapa desde dentro de un acuario.",
+      "El cerebro del pulpo tiene más neuronas en sus tentáculos que en el cerebro central.",
+      "Los murciélagos son los únicos mamíferos capaces de volar de forma sostenida.",
+      "La mayoría de las estrellas del universo son más pequeñas que el Sol.",
+      "Los planetas del Sistema Solar orbitan alrededor del Sol en sentido antihorario si se mira desde el norte.",
+      "Marte tiene el día más parecido al de la Tierra: dura 24 horas y 37 minutos.",
+      "La Luna tiene el 1/6 de la gravedad de la Tierra.",
+      "El primer alunizaje tripulado fue el Apolo 11 el 20 de julio de 1969.",
+      "Los rayos de una tormenta pueden calentar el aire hasta 30.000 grados Celsius.",
+      "El ojo humano es incapaz de ver la luz ultravioleta, pero las abejas sí.",
+      "El color naranja de las zanahorias fue introducido artificialmente por agricultores holandeses.",
+      "El aguacate es técnicamente una fruta, no una verdura.",
+      "Los tomates fueron considerados venenosos en Europa durante mucho tiempo.",
+      "El café es la segunda bebida más consumida del mundo después del agua.",
+      "La mancha roja de Júpiter es una tormenta que lleva activa más de 350 años.",
+      "El lago más grande del mundo es el mar Caspio, que es en realidad un lago salado.",
+      "Australia tiene más especies venenosas que cualquier otro país del mundo.",
+      "El árbol más alto del mundo es una secuoya llamada Hyperion, con 115 metros.",
+      "El árbol más antiguo vivo se llama Matusalén y tiene más de 4.800 años.",
+      "La hormiga cortadora de hojas puede cargar hasta 50 veces su propio peso.",
+      "Los elefantes son capaces de reconocerse a sí mismos en un espejo.",
+      "Los cuervos son capaces de usar herramientas y resolver problemas complejos.",
+      "Los delfines son capaces de reconocerse a sí mismos en un espejo.",
+      "Las ballenas jorobadas son capaces de aprender las canciones de otras poblaciones.",
+      "El primer telescopio espacial fue el Hubble, lanzado en 1990.",
+      "Venus gira en sentido contrario a la mayoría de los planetas del Sistema Solar.",
+      "Urano gira de lado, con su eje inclinado casi 98 grados.",
+      "Neptuno tiene los vientos más rápidos del Sistema Solar, de hasta 2.100 km/h.",
+      "El polo sur de la Tierra nunca ha visto el sol durante el invierno antártico.",
+      "Los humanos son los únicos animales que tienen la barbilla prominente.",
+      "El sudor humano no tiene olor; el olor lo producen las bacterias.",
+      "La Mona Lisa de Leonardo da Vinci no tiene cejas.",
+      "La Estatua de la Libertad está hecha de cobre y es verde por la oxidación.",
+      "El arco iris siempre aparece en dirección opuesta al sol.",
+      "Reírse 100 veces equivale energéticamente a hacer 10 minutos de remo.",
+      "La música de fondo en los supermercados fue diseñada para aumentar las ventas.",
+      "El juego de ajedrez tiene más variantes posibles que átomos en el universo observable.",
+      "El Monopoly fue inventado en 1935 durante la Gran Depresión.",
+      "El primer videojuego de la historia fue el Tennis for Two, creado en 1958.",
+      "Google fue fundado en 1998 por Larry Page y Sergey Brin.",
+      "Apple fue fundada en 1976 por Steve Jobs, Steve Wozniak y Ronald Wayne.",
+      "El ratón de ordenador fue inventado por Douglas Engelbart en 1964.",
+      "El primer correo electrónico fue enviado en 1971 por Ray Tomlinson.",
+      "La primera fotografía de la historia fue tomada en 1826 por Nicéphore Niépce.",
+      "El cine fue inventado por los hermanos Lumière en 1895 en París.",
+      "La televisión en color empezó a emitir en España en 1969.",
+      "El primer libro impreso en español fue el Sinodal de Aguilafuente en 1472.",
+      "El queso Gouda holandés representa más del 50% del consumo mundial de queso.",
+      "Los suizos consumen más chocolate per cápita que cualquier otro país del mundo.",
+      "El país con más Patrimonio de la Humanidad de la UNESCO es Italia.",
+      "Francia es el país más visitado del mundo por turistas.",
+      "El español es el idioma oficial de 21 países en el mundo.",
+      "Brasil es el único país de América del Sur que habla portugués, no español.",
+      "El idioma con más palabras del mundo es el inglés, con más de un millón.",
+      "El esperanto es el idioma artificial más hablado del mundo.",
+      "El primer ser vivo en el espacio fue la perra Laika en 1957.",
+      "El traje espacial de un astronauta cuesta aproximadamente 12 millones de dólares.",
+      "La Estación Espacial Internacional orbita la Tierra a unos 400 km de altitud.",
+      "Una cucharada de material de una estrella de neutrones pesa mil millones de toneladas.",
+      "El universo observable contiene aproximadamente 2 billones de galaxias.",
+      "La Vía Láctea tiene unos 100.000 años luz de diámetro.",
+      "El oro fue formado en explosiones de estrellas de neutrones antes de que existiera el Sistema Solar.",
+      "Los océanos cubren aproximadamente el 71% de la superficie de la Tierra.",
+      "El oxígeno que respiramos proviene en un 70% del fitoplancton marino.",
+      "Los volcanes submarinos producen aproximadamente el 75% de la lava del planeta.",
+      "El Mar Muerto es el lugar habitado más bajo de la Tierra, a 430 metros bajo el nivel del mar.",
+      "La Amazonia alberga el 10% de todas las especies de la Tierra.",
+      "Los bosques tropicales producen el 40% del oxígeno del planeta.",
+      "El coral puede tardar hasta 100 años en crecer solo un metro.",
+      "El polo magnético norte se mueve unos 55 km al año hacia el norte.",
+      "Las placas tectónicas se mueven a la velocidad a la que crecen las uñas.",
+      "El Himalaya fue formado por la colisión de India con Asia hace 50 millones de años.",
+      "El Gran Cañón del Colorado tiene 446 km de longitud y 1.600 metros de profundidad.",
+      "La cascada más alta del mundo es el Salto Ángel en Venezuela con 979 metros.",
+      "El desierto ártico es más grande que el desierto del Sahara.",
+      "Los terremotos pueden desplazar continentes enteros varios centímetros.",
+      "El tsunami de 2004 en el Índico fue tan poderoso que acortó el día en la Tierra en microsegundos.",
+      "La erupción del Krakatoa en 1883 fue escuchada a 5.000 km de distancia.",
+      "Los humanos han explorado solo el 5% del fondo marino.",
+      "El aire que respiramos es 78% nitrógeno y solo 21% oxígeno.",
+      "El cuerpo humano produce suficiente calor en 30 minutos para hervir medio litro de agua.",
+      "La velocidad de la luz en el vacío es de 299.792.458 metros por segundo.",
+      "Un año luz equivale a aproximadamente 9,46 billones de kilómetros."
+    ];
     // Phase trackers
     let revealIndex = 0;
     
@@ -4056,6 +4469,16 @@
     const AUTO_SUBMIT_DELAY_MS = 300; // Delay before auto-submitting vote
 
     function randInt(max) { return Math.floor(Math.random() * max) }
+
+    // Fisher-Yates shuffle for unbiased random ordering
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = randInt(i + 1);
+        const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
 
     function saveGameSettings() {
       try {
@@ -4070,6 +4493,54 @@
       if (numPlayers <= 9) return 3;
       if (numPlayers <= 13) return 4;
       return 5;
+    }
+
+    // Game mode button transition animation
+    function triggerModeTransition(btn, color, callback) {
+      unlockAudioWithUserGesture();
+      playStartGameSound();
+
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const maxDist = Math.sqrt(
+        Math.pow(Math.max(cx, vw - cx), 2) + Math.pow(Math.max(cy, vh - cy), 2)
+      );
+      const initSize = 80;
+      const scale = (maxDist * 2.4) / initSize;
+
+      const overlay = document.createElement('div');
+      overlay.style.cssText =
+        'position:fixed;' +
+        'left:' + (cx - initSize / 2) + 'px;' +
+        'top:' + (cy - initSize / 2) + 'px;' +
+        'width:' + initSize + 'px;' +
+        'height:' + initSize + 'px;' +
+        'border-radius:50%;' +
+        'background:' + color + ';' +
+        'transform:scale(1);' +
+        'z-index:9998;' +
+        'pointer-events:none;' +
+        'will-change:transform,opacity;';
+      document.body.appendChild(overlay);
+
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          overlay.style.transition =
+            'transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.38s 0.22s ease';
+          overlay.style.transform = 'scale(' + scale + ')';
+          overlay.style.opacity = '0';
+        });
+      });
+
+      setTimeout(function () {
+        callback();
+        setTimeout(function () {
+          if (overlay.parentNode) overlay.remove();
+        }, 300);
+      }, 500);
     }
 
     // Sound effects
@@ -4183,14 +4654,15 @@
       if (gameModeSelection.style.display === 'block') {
         backArrowBtn.style.display = 'none';
       }
-      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup, Liar Setup, Liar Names, VoF Setup) -> VISIBLE
+      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup, Liar Setup, Liar Names, VoF Setup, VoF Names) -> VISIBLE
       else if (setup.style.display === 'block' ||
         categorySelection.style.display === 'block' ||
         namesSection.style.display === 'block' ||
         tabooSetup.style.display === 'block' ||
         liarSetup.style.display === 'block' ||
         liarNames.style.display === 'block' ||
-        vofSetup.style.display === 'block') {
+        vofSetup.style.display === 'block' ||
+        vofNames.style.display === 'block') {
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
@@ -4205,13 +4677,20 @@
         backArrowBtn.style.opacity = '1';
       }
       // 5. Juego Mentiroso (Pass, View, Reveal) -> VISIBLE
-      else if (liarQuestionPass.style.display === 'block' || 
+      else if (liarQuestionPass.style.display === 'block' ||
                liarQuestionView.style.display === 'block' ||
                liarReveal.style.display === 'block') {
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
-      // 6. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
+      // 6. Juego VoF (Pass, Role View, Votación) -> VISIBLE
+      else if (vofPass.style.display === 'block' ||
+               vofRoleView.style.display === 'block' ||
+               vofVote.style.display === 'block') {
+        backArrowBtn.style.display = 'flex';
+        backArrowBtn.style.opacity = '1';
+      }
+      // 7. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
       else {
         backArrowBtn.style.display = 'none';
       }
@@ -4219,72 +4698,69 @@
 
     // --- SELECCIÓN DE MODO ---
     selectImpostorMode.addEventListener('click', () => {
-      playClickSound();
-      
-      // Sync player count from liar game (in case they came from there)
-      if (numLiarPlayers >= 3 && numLiarPlayers <= 15) {
-        numPlayers = numLiarPlayers;
-        playersDisplay.textContent = numPlayers;
-      }
+      triggerModeTransition(selectImpostorMode, '#e53935', () => {
+        // Sync player count from liar game (in case they came from there)
+        if (numLiarPlayers >= 3 && numLiarPlayers <= 15) {
+          numPlayers = numLiarPlayers;
+          playersDisplay.textContent = numPlayers;
+        }
 
-      // Validar que el nº de impostores sea coherente con el nº de jugadores
-      const maxImpostors = getMaxImpostors(numPlayers);
-      if (numImpostors > maxImpostors) {
-        numImpostors = maxImpostors;
-      }
-      if (numImpostors < 1) {
-        numImpostors = 1;
-      }
-      impostorsDisplay.textContent = numImpostors;
-      playersDisplay.textContent = numPlayers;
-      saveGameSettings();
-      
-      gameModeSelection.style.display = 'none';
-      setup.style.display = 'block';
-      updateArrowVisibility();
+        // Validar que el nº de impostores sea coherente con el nº de jugadores
+        const maxImpostors = getMaxImpostors(numPlayers);
+        if (numImpostors > maxImpostors) {
+          numImpostors = maxImpostors;
+        }
+        if (numImpostors < 1) {
+          numImpostors = 1;
+        }
+        impostorsDisplay.textContent = numImpostors;
+        playersDisplay.textContent = numPlayers;
+        saveGameSettings();
+
+        gameModeSelection.style.display = 'none';
+        setup.style.display = 'block';
+        updateArrowVisibility();
+      });
     });
 
     selectTabooMode.addEventListener('click', () => {
-      unlockAudioWithUserGesture();
-      playClickSound();
-
-      // Hide mode selection, show taboo setup
-      gameModeSelection.style.display = 'none';
-      tabooSetup.style.display = 'block';
-      updateArrowVisibility();
+      triggerModeTransition(selectTabooMode, '#7c4dff', () => {
+        // Hide mode selection, show taboo setup
+        gameModeSelection.style.display = 'none';
+        tabooSetup.style.display = 'block';
+        updateArrowVisibility();
+      });
     });
 
     selectLiarMode.addEventListener('click', () => {
-      unlockAudioWithUserGesture();
-      playClickSound();
-      
-      // Sync player count from impostor game
-      numLiarPlayers = numPlayers;
-      // Cap at 7 for liar game
-      if (numLiarPlayers > 7) numLiarPlayers = 7;
-      if (numLiarPlayers < 3) numLiarPlayers = 3;
-      liarPlayersDisplay.textContent = numLiarPlayers;
-      
-      // Hide mode selection, show liar setup
-      gameModeSelection.style.display = 'none';
-      liarSetup.style.display = 'block';
-      updateArrowVisibility();
+      triggerModeTransition(selectLiarMode, '#00bfa5', () => {
+        // Sync player count from impostor game
+        numLiarPlayers = numPlayers;
+        // Cap at 7 for liar game
+        if (numLiarPlayers > 7) numLiarPlayers = 7;
+        if (numLiarPlayers < 3) numLiarPlayers = 3;
+        liarPlayersDisplay.textContent = numLiarPlayers;
+
+        // Hide mode selection, show liar setup
+        gameModeSelection.style.display = 'none';
+        liarSetup.style.display = 'block';
+        updateArrowVisibility();
+      });
     });
 
     selectVofMode.addEventListener('click', () => {
-      unlockAudioWithUserGesture();
-      playClickSound();
-      
-      // Sync player count
-      numVofPlayers = numLiarPlayers;
-      if (numVofPlayers > 7) numVofPlayers = 7;
-      if (numVofPlayers < 3) numVofPlayers = 3;
-      vofPlayersDisplay.textContent = numVofPlayers;
-      
-      // Hide mode selection, show VoF setup
-      gameModeSelection.style.display = 'none';
-      vofSetup.style.display = 'block';
-      updateArrowVisibility();
+      triggerModeTransition(selectVofMode, '#ffb300', () => {
+        // Sync player count
+        numVofPlayers = numPlayers;
+        if (numVofPlayers > MAX_VOF_PLAYERS) numVofPlayers = MAX_VOF_PLAYERS;
+        if (numVofPlayers < 3) numVofPlayers = 3;
+        vofPlayersDisplay.textContent = numVofPlayers;
+
+        // Hide mode selection, show VoF setup
+        gameModeSelection.style.display = 'none';
+        vofSetup.style.display = 'block';
+        updateArrowVisibility();
+      });
     });
 
     // VoF player counter controls
@@ -4298,7 +4774,7 @@
     });
 
     incVofPlayers.addEventListener('click', () => {
-      if (numVofPlayers < 7) {
+      if (numVofPlayers < MAX_VOF_PLAYERS) {
         numVofPlayers++;
         vofPlayersDisplay.textContent = numVofPlayers;
         playPopSound();
@@ -4604,6 +5080,257 @@
       liarResults.style.display = 'none';
       liarPlayersDisplay.textContent = numLiarPlayers;
       liarSetup.style.display = 'block';
+      updateArrowVisibility();
+    });
+
+    // -------------------------------------------------------
+    // VoF (Verdadero o Falso) Game Logic
+    // -------------------------------------------------------
+
+    // VoF Continue → Names screen
+    vofContinueBtn.addEventListener('click', () => {
+      playSuccessSound();
+      showVofNamesScreen();
+    });
+
+    function showVofNamesScreen() {
+      vofSetup.style.display = 'none';
+
+      // Initialize players
+      vofPlayers = [];
+      for (let i = 0; i < numVofPlayers; i++) {
+        vofPlayers.push({ id: i, name: 'Jugador ' + (i + 1) });
+      }
+
+      // Load saved names from localStorage (shared key)
+      let savedVofNames = [];
+      try {
+        const stored = localStorage.getItem('playerNames');
+        if (stored) savedVofNames = JSON.parse(stored);
+      } catch (e) { savedVofNames = []; }
+
+      // Build name inputs
+      vofNamesList.innerHTML = '';
+      vofPlayers.forEach(function (p, idx) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'name-input-wrapper';
+        wrapper.style.animation = 'slideIn 0.3s ease-out ' + (idx * 0.05) + 's forwards';
+        wrapper.style.opacity = '0';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Jugador ' + (idx + 1);
+        input.value = savedVofNames[idx] || '';
+        input.dataset.playerId = p.id;
+        input.className = 'name-input';
+        wrapper.appendChild(input);
+        vofNamesList.appendChild(wrapper);
+      });
+
+      vofNames.style.display = 'block';
+      updateArrowVisibility();
+    }
+
+    // Start VoF game
+    startVofGameBtn.addEventListener('click', () => {
+      unlockAudioWithUserGesture();
+      playStartGameSound();
+
+      // Save player names
+      const savedVofNames = [];
+      Array.from(vofNamesList.children).forEach(function (wrapper) {
+        const input = wrapper.querySelector('input');
+        const id = parseInt(input.dataset.playerId);
+        const name = input.value.trim() || ('Jugador ' + (id + 1));
+        vofPlayers[id].name = name;
+        savedVofNames[id] = input.value.trim();
+      });
+
+      try {
+        localStorage.setItem('playerNames', JSON.stringify(savedVofNames));
+      } catch (e) { }
+
+      // Select exactly one liar
+      vofLiarIndex = randInt(numVofPlayers);
+
+      // Pick unique facts for civilians (shuffle and assign)
+      const shuffledFacts = shuffleArray(vofFacts);
+      vofPlayerFacts = [];
+      let factIdx = 0;
+      for (let i = 0; i < numVofPlayers; i++) {
+        if (i === vofLiarIndex) {
+          vofPlayerFacts.push(null); // liar gets no fact
+        } else {
+          vofPlayerFacts.push(shuffledFacts[factIdx++]);
+        }
+      }
+
+      // Start the pass-and-reveal phase
+      currentVofPlayerIndex = 0;
+      vofNames.style.display = 'none';
+      vofPass.style.display = 'block';
+      updateVofPlayerIndicator();
+      updateArrowVisibility();
+    });
+
+    function updateVofPlayerIndicator() {
+      const p = vofPlayers[currentVofPlayerIndex];
+      vofPlayerIndicator.textContent = p.name;
+      vofPlayerNumber.textContent = 'Jugador ' + (currentVofPlayerIndex + 1) + ' de ' + numVofPlayers;
+    }
+
+    // Reveal role button
+    vofRevealRoleBtn.addEventListener('click', () => {
+      playPopSound();
+      vofPass.style.display = 'none';
+      vofRoleView.style.display = 'block';
+
+      const p = vofPlayers[currentVofPlayerIndex];
+      const isLiar = currentVofPlayerIndex === vofLiarIndex;
+
+      if (isLiar) {
+        vofRoleContent.innerHTML =
+          '<div style="font-size:48px;margin-bottom:16px;">🤥</div>' +
+          '<div style="font-family:\'Fredoka One\',cursive;font-size:22px;color:#ff5252;margin-bottom:12px;">¡Eres el mentiroso!</div>' +
+          '<div class="muted" style="font-size:16px;line-height:1.6;padding:14px 10px;background:rgba(255,82,82,0.1);border-radius:12px;border:1px solid rgba(255,82,82,0.3);">' +
+          'Invéntate algo para salir desapercibido entre los civiles.' +
+          '</div>' +
+          '<div style="height:8px"></div>' +
+          '<div class="muted" style="font-size:13px;">Cuando llegue la fase de votación, di algo creíble en voz alta.</div>';
+      } else {
+        const fact = vofPlayerFacts[currentVofPlayerIndex];
+        vofRoleContent.innerHTML =
+          '<div style="font-size:48px;margin-bottom:16px;">🏙️</div>' +
+          '<div style="font-family:\'Fredoka One\',cursive;font-size:22px;color:#ffc107;margin-bottom:14px;">Tu dato real es:</div>' +
+          '<div style="font-size:17px;line-height:1.65;padding:18px 16px;background:rgba(255,193,7,0.12);border-radius:14px;border:1px solid rgba(255,193,7,0.35);color:#fff;font-weight:500;">' +
+          fact +
+          '</div>' +
+          '<div style="height:8px"></div>' +
+          '<div class="muted" style="font-size:13px;">Memoriza este dato. En la votación deberás decirlo en voz alta.</div>';
+      }
+
+      if (currentVofPlayerIndex === numVofPlayers - 1) {
+        vofRoleNextBtn.textContent = 'Empezar votación';
+      } else {
+        vofRoleNextBtn.textContent = 'Entendido ✓';
+      }
+
+      updateArrowVisibility();
+    });
+
+    // Next player / start voting
+    vofRoleNextBtn.addEventListener('click', () => {
+      playClickSound();
+
+      if (currentVofPlayerIndex < numVofPlayers - 1) {
+        currentVofPlayerIndex++;
+        vofRoleView.style.display = 'none';
+        vofPass.style.display = 'block';
+        updateVofPlayerIndicator();
+      } else {
+        // All roles revealed - show voting screen
+        vofRoleView.style.display = 'none';
+        showVofVoteScreen();
+      }
+
+      updateArrowVisibility();
+    });
+
+    function showVofVoteScreen() {
+      // Build player list for voting
+      vofVoteList.innerHTML = '';
+      let selectedVofId = -1;
+
+      // Reset confirm button state
+      const confirmBtn = document.getElementById('vofConfirmVoteBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.5';
+
+      vofPlayers.forEach(function (p) {
+        const card = document.createElement('div');
+        card.style.cssText =
+          'background:#2a2d3a;padding:14px;border-radius:12px;border:2px solid #353847;' +
+          'cursor:pointer;transition:all 0.2s;margin-bottom:8px;';
+        card.dataset.id = p.id;
+        card.innerHTML =
+          '<div style="color:#ffc107;font-weight:600;font-size:16px;">' + p.name + '</div>';
+
+        card.addEventListener('click', function () {
+          playPopSound();
+          const wasSelected = card.classList.contains('vof-selected');
+
+          // Deselect all
+          Array.from(vofVoteList.children).forEach(function (c) {
+            c.classList.remove('vof-selected');
+            c.style.border = '2px solid #353847';
+            c.style.background = '#2a2d3a';
+          });
+
+          const cb = document.getElementById('vofConfirmVoteBtn');
+          if (!wasSelected) {
+            card.classList.add('vof-selected');
+            card.style.border = '2px solid #ffc107';
+            card.style.background = '#353847';
+            selectedVofId = parseInt(card.dataset.id);
+            cb.disabled = false;
+            cb.style.opacity = '1';
+          } else {
+            selectedVofId = -1;
+            cb.disabled = true;
+            cb.style.opacity = '0.5';
+          }
+        });
+
+        vofVoteList.appendChild(card);
+      });
+
+      confirmBtn.onclick = function () {
+        const sel = Array.from(vofVoteList.children).find(function (c) {
+          return c.classList.contains('vof-selected');
+        });
+        if (!sel) return;
+        playClickSound();
+        const guessedId = parseInt(sel.dataset.id);
+        vofVote.style.display = 'none';
+        showVofResults(guessedId);
+      };
+
+      vofVote.style.display = 'block';
+      updateArrowVisibility();
+    }
+
+    function showVofResults(guessedId) {
+      vofResults.style.display = 'block';
+
+      const guessedPlayer = vofPlayers.find(function (p) { return p.id === guessedId; });
+      const actualLiar = vofPlayers[vofLiarIndex];
+      const isCorrect = guessedId === vofLiarIndex;
+
+      if (isCorrect) {
+        vofResultText.innerHTML =
+          '<div style="font-size:24px;font-family:\'Fredoka One\',cursive;color:#4fd1c5;margin-bottom:12px;">🎉 ¡Encontrasteis al mentiroso! 🎉</div>' +
+          '<div class="muted" style="margin-bottom:12px;">¡<strong>' + guessedPlayer.name + '</strong> era el mentiroso!</div>' +
+          '<div style="margin-top:16px;font-size:15px;color:#d0d3e1;line-height:1.6;">' +
+          '<div style="margin-bottom:8px;">Los civiles tenían datos reales. El mentiroso no tenía ninguno y tuvo que inventarse algo.</div>' +
+          '</div>';
+        playSuccessSound();
+      } else {
+        vofResultText.innerHTML =
+          '<div style="font-size:24px;font-family:\'Fredoka One\',cursive;color:#ff3b3b;margin-bottom:12px;">❌ ¡El mentiroso os engañó! ❌</div>' +
+          '<div class="muted" style="margin-bottom:12px;"><strong>' + guessedPlayer.name + '</strong> NO era el mentiroso.</div>' +
+          '<div class="muted" style="margin-bottom:16px;">El mentiroso era: <strong>' + actualLiar.name + '</strong></div>' +
+          '<div style="font-size:15px;color:#d0d3e1;">¡' + actualLiar.name + ' consiguió engañar a todos los civiles!</div>';
+        playFailSound();
+      }
+
+      updateArrowVisibility();
+    }
+
+    // VoF new game button
+    vofNewGameBtn.addEventListener('click', () => {
+      playClickSound();
+      vofResults.style.display = 'none';
+      vofPlayersDisplay.textContent = numVofPlayers;
+      vofSetup.style.display = 'block';
       updateArrowVisibility();
     });
 
@@ -5368,6 +6095,39 @@
         // 0b. Si estamos en VoF Setup -> Volver a selección de modo
         if (vofSetup.style.display === 'block') {
           vofSetup.style.display = 'none';
+          gameModeSelection.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0b2. Si estamos en VoF Names -> Volver a VoF Setup
+        if (vofNames.style.display === 'block') {
+          vofNames.style.display = 'none';
+          vofPlayersDisplay.textContent = numVofPlayers;
+          vofSetup.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0b3. Si estamos en VoF Pass -> Volver a VoF Names
+        if (vofPass.style.display === 'block') {
+          vofPass.style.display = 'none';
+          vofNames.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0b4. Si estamos en VoF Role View -> Volver a VoF Pass
+        if (vofRoleView.style.display === 'block') {
+          vofRoleView.style.display = 'none';
+          vofPass.style.display = 'block';
+          updateArrowVisibility();
+          return;
+        }
+
+        // 0b5. Si estamos en VoF Vote -> Volver al menú principal
+        if (vofVote.style.display === 'block') {
+          vofVote.style.display = 'none';
           gameModeSelection.style.display = 'block';
           updateArrowVisibility();
           return;
