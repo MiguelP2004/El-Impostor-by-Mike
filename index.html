@@ -1813,8 +1813,13 @@
         // Evento principal: se registra al parsear, así no se pierde
         introFill.addEventListener('animationend', launchGame);
 
-        // Fallback de seguridad (3.1s desde parseo del script)
-        setTimeout(launchGame, 3100);
+        // Fallback de seguridad: calcula el tiempo restante basándose en cuánto
+        // tiempo ha pasado desde que se cargó la página, para cubrir el caso en
+        // que animationend no se dispare (página lenta o animación ya terminada)
+        const animDuration = 3000; // debe coincidir con la duración CSS (3s)
+        const elapsed = (typeof performance !== 'undefined' && performance.now) ? performance.now() : 0;
+        const remaining = Math.max(0, animDuration - elapsed);
+        setTimeout(launchGame, remaining + 200);
       } else {
         launchGame();
       }
