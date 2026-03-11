@@ -1344,6 +1344,12 @@
     body.locked-interactions * {
       pointer-events: none !important;
     }
+
+    /* Fade-in rápido para cambios de pantalla */
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 
@@ -1389,7 +1395,7 @@
               <span class="mode-label">Tabú</span>
             </button>
             <button class="game-mode-card" id="selectLiarMode">
-              <span class="mode-emoji">🤥</span>
+              <span class="mode-emoji">🤥❓</span>
               <span class="mode-label">El Mentiroso</span>
             </button>
             <button class="game-mode-card" id="selectVofMode">
@@ -1402,7 +1408,7 @@
 
       <section id="tabooSetup" class="card" style="display:none">
         <div class="center">
-          <p class="muted" style="margin-bottom:16px;font-weight:700;">Configuración del Tabú</p>
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">Tabú</p>
           <div>
             <label>Número de Equipos</label>
             <div class="counter">
@@ -1575,7 +1581,7 @@
       <!-- VoF (Verdadero o Falso) Game Sections -->
       <section id="vofSetup" class="card" style="display:none">
         <div class="center">
-          <p class="muted" style="margin-bottom:16px;font-weight:700;">Configuración del Impostor (V o F)</p>
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">¿Verdadero o Falso?</p>
           <div>
             <label>Número de Jugadores</label>
             <div class="counter">
@@ -1643,7 +1649,7 @@
       <!-- Liar Game Sections -->
       <section id="liarSetup" class="card" style="display:none">
         <div class="center">
-          <p class="muted" style="margin-bottom:16px;font-weight:700;">Configuración del Mentiroso</p>
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">El Mentiroso</p>
           <div>
             <label>Número de Jugadores</label>
             <div class="counter">
@@ -1721,6 +1727,25 @@
         document.body.classList.remove('locked-interactions');
       }, 400); // 0.4 segundos de protección
     }
+
+    // Fade-in automático cuando una sección se muestra
+    (function () {
+      const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (m) {
+          if (m.type === 'attributes' && m.attributeName === 'style') {
+            const el = m.target;
+            if (el.tagName === 'SECTION' && el.style.display === 'block') {
+              el.style.animation = 'none';
+              el.offsetHeight; // reflow
+              el.style.animation = 'pageFadeIn 0.15s ease-out';
+            }
+          }
+        });
+      });
+      document.querySelectorAll('#app > section').forEach(function (s) {
+        observer.observe(s, { attributes: true, attributeFilter: ['style'] });
+      });
+    })();
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
         navigator.serviceWorker.register('sw.js').then(function (registration) {
@@ -1732,15 +1757,9 @@
       });
     }
     // --- LÓGICA DE INICIO AUTOMÁTICA (SINCRONIZADA) ---
-    window.addEventListener('load', () => {
-
-      // Initialize touch animations for all buttons
-      if (typeof initializeTouchAnimations === 'function') {
-        initializeTouchAnimations();
-      }
-
-      // --- LÓGICA DE INICIO INSTANTÁNEA (OPTIMIZADA) ---
-
+    // --- LÓGICA DE INICIO (REGISTRO INMEDIATO) ---
+    // Registramos el listener al parsear el script para no perder el animationend
+    (function () {
       const introScreenEl = document.getElementById('introScreen');
       const introFill = document.querySelector('.intro-progress-fill');
       let hasGameStarted = false;
@@ -1751,16 +1770,11 @@
 
         // 1. PRIORIDAD VISUAL: Iniciar desaparición INMEDIATAMENTE
         if (introScreenEl) {
-          // Ocultamos la barra de carga ya mismo para que no moleste
           if (introFill && introFill.parentElement) {
             introFill.parentElement.style.display = 'none';
           }
-
-          // Aplicamos el desvanecimiento rápido (0.3s es el punto dulce entre bonito y rápido)
           introScreenEl.style.transition = 'opacity 0.3s ease-out';
           introScreenEl.style.opacity = '0';
-
-          // La eliminamos del HTML justo cuando termine de desvanecerse
           setTimeout(() => { introScreenEl.remove(); document.documentElement.classList.add('intro-done'); }, 300);
         }
 
@@ -1774,26 +1788,18 @@
         if (typeof updateArrowVisibility === 'function') updateArrowVisibility();
 
         // 3. TAREAS DE FONDO (Audio y Scroll iPhone)
-        // Las metemos en un timeout mínimo (10ms) para que el navegador 
-        // priorice pintar la desaparición de la intro antes de procesar esto.
         setTimeout(() => {
-          // Audio
           if (typeof unlockAudioWithUserGesture === 'function') {
             unlockAudioWithUserGesture().catch(() => { });
           }
-
-          // Corrección Scroll y Fondo iPhone
           window.scrollTo(0, 0);
           document.body.style.overflowY = 'auto';
           document.body.style.overflowX = 'hidden';
-
-          // El balanceo rápido
           window.scrollTo(0, 1);
           setTimeout(() => window.scrollTo(0, 0), 50);
         }, 10);
       }
 
-      // EJECUCIÓN
       if (introFill && introScreenEl) {
         // Unlock audio on intro screen tap/click
         const unlockAudioHandler = () => {
@@ -1801,17 +1807,23 @@
             unlockAudioWithUserGesture().catch(() => { });
           }
         };
-        
         introScreenEl.addEventListener('touchstart', unlockAudioHandler, { once: true, passive: true });
         introScreenEl.addEventListener('click', unlockAudioHandler, { once: true });
 
-        // Evento principal
+        // Evento principal: se registra al parsear, así no se pierde
         introFill.addEventListener('animationend', launchGame);
 
-        // Fallback sincronizado EXACTO con el CSS (3000ms) para eliminar el delay extra
-        setTimeout(launchGame, 3000);
+        // Fallback de seguridad (3.1s desde parseo del script)
+        setTimeout(launchGame, 3100);
       } else {
         launchGame();
+      }
+    })();
+
+    window.addEventListener('load', () => {
+      // Initialize touch animations for all buttons
+      if (typeof initializeTouchAnimations === 'function') {
+        initializeTouchAnimations();
       }
     });
 
@@ -4128,7 +4140,7 @@
       "Los caracoles pueden dormir hasta 3 años seguidos.",
       "Los pulpos tienen tres corazones.",
       "Los flamencos son rosas porque comen camarones y algas con betacaroteno.",
-      "Las vacas tienen cuatro estómagos.",
+      "Se dice coloquialmente que las vacas tienen cuatro estómagos.",
       "Los tiburones son más antiguos que los árboles en la Tierra.",
       "Los delfines se llaman entre sí por un silbido único, como si tuvieran un nombre.",
       "Las abejas pueden reconocer caras humanas.",
@@ -4254,7 +4266,7 @@
       "La mayoría de las personas solo recuerdan el 10% de sus sueños.",
       "El cerebro humano es más activo durante el sueño que cuando vemos televisión.",
       "El ojo humano puede distinguir entre 10 millones de colores diferentes.",
-      "El corazón humano late unas 100.000 veces al día.",
+      "El corazón humano late aproximadamente 100.000 veces al día.",
       "El cuerpo humano tiene unos 206 huesos de adulto, pero nacemos con unos 270.",
       "Los humanos son los únicos primates que cocinan sus alimentos.",
       "El sentido del olfato está directamente conectado con la memoria y las emociones.",
@@ -4268,7 +4280,6 @@
       "Los dinosaurios dominaron la Tierra durante más de 165 millones de años.",
       "El Homo sapiens lleva unos 300.000 años en la Tierra.",
       "Los primeros Juegos Olímpicos modernos se celebraron en Atenas en 1896.",
-      "El primer código legal conocido es el Código de Hammurabi de Babilonia.",
       "El papel fue inventado en China alrededor del año 105 d.C.",
       "Roma fue fundada, según la leyenda, en el 753 a.C. por Rómulo y Remo.",
       "Aristóteles fue el primer pensador en sistematizar la lógica.",
@@ -4458,8 +4469,156 @@
       "Los humanos han explorado solo el 5% del fondo marino.",
       "El aire que respiramos es 78% nitrógeno y solo 21% oxígeno.",
       "El cuerpo humano produce suficiente calor en 30 minutos para hervir medio litro de agua.",
-      "La velocidad de la luz en el vacío es de 299.792.458 metros por segundo.",
-      "Un año luz equivale a aproximadamente 9,46 billones de kilómetros."
+      "La velocidad de la luz en el vacío es de 300.000 kilómetros por segundo aproximadamente.",
+      "Un año luz equivale a aproximadamente 9,5 billones de kilómetros.",
+      "Los perezosos pueden aguantar la respiración bajo el agua más tiempo que los delfines.",
+      "La córnea es la única parte del cuerpo humano que no recibe suministro de sangre.",
+      "Las manzanas flotan en el agua porque están compuestas por un 25% de aire.",
+      "La guerra más corta de la historia duró unos 38 minutos, entre Zanzíbar y el Reino Unido.",
+      "El algodón de azúcar fue inventado por un dentista.",
+      "En la antigua Roma, a los soldados se les pagaba en ocasiones con sal, de ahí la palabra 'salario'.",
+      "Los plátanos son ligeramente radiactivos porque contienen potasio.",
+      "Hay un lago en Australia llamado Lago Hillier que es de color rosa brillante de forma natural.",
+      "Escocia tiene más de 400 palabras diferentes para referirse a la nieve.",
+      "El cacahuete crece bajo tierra, no en los árboles.",
+      "Las semillas de fresa son las únicas que crecen en el exterior de la fruta.",
+      "Las nutrias tienen un bolsillo en la piel donde guardan su piedra favorita.",
+      "Los cuernos de los rinocerontes están hechos de queratina, como las uñas humanas.",
+      "La letra 'J' es la única letra que no aparece en la tabla periódica de los elementos.",
+      "El agua caliente se congela más rápido que el agua fría bajo ciertas condiciones, un fenómeno llamado Efecto Mpemba.",
+      "Las jirafas tienen la misma cantidad de vértebras en el cuello que los humanos (siete).",
+      "Los murciélagos siempre giran a la izquierda cuando salen de una cueva.",
+      "El alfabeto hawaiano tradicional tiene solo 13 letras.",
+      "El vuelo comercial más corto del mundo dura menos de dos minutos, en Escocia.",
+      "Las vacas no tienen dientes frontales superiores.",
+      "Los kiwis (aves) son casi ciegos y cazan utilizando el olfato.",
+      "La sangre humana tiene casi la misma concentración de sal que el agua del mar.",
+      "Un solo relámpago contiene suficiente energía para tostar 100.000 rebanadas de pan.",
+      "Hay un pueblo en Noruega llamado 'Hell' (Infierno) que se congela habitualmente en invierno.",
+      "Los castores tienen los dientes de color naranja porque contienen hierro para hacerlos más fuertes.",
+      "El ruido que hace tu estómago cuando tienes hambre tiene un nombre médico: borborigmo.",
+      "Júpiter es el planeta que gira más rápido sobre su propio eje en el sistema solar.",
+      "Las huellas de los astronautas del Apolo en la Luna probablemente permanecerán allí millones de años.",
+      "El ketchup se vendía en el siglo XIX como medicina para curar la indigestión.",
+      "La piel de un tigre también está rayada bajo el pelaje, y el patrón es único en cada individuo.",
+      "En los caballitos de mar, son los machos los que se quedan embarazados y dan a luz.",
+      "El corazón de una jirafa adulta pesa unos 11 kilos.",
+      "Las ardillas plantan miles de árboles accidentalmente cada año al olvidar dónde enterraron sus bellotas.",
+      "El sudor humano brilla bajo la luz ultravioleta.",
+      "El inventor de la silla eléctrica fue un dentista estadounidense.",
+      "En Japón, hay una isla habitada casi exclusivamente por conejos amistosos, llamada Ōkunoshima.",
+      "Los cocodrilos a veces tragan piedras para poder bucear a mayor profundidad.",
+      "La miel de abeja es el único alimento natural que contiene todo lo necesario para mantener la vida humana.",
+      "Las lágrimas de tristeza y las lágrimas producidas al picar cebolla tienen estructuras químicas diferentes.",
+      "Un lápiz estándar tiene suficiente grafito para escribir una línea de unos 56 kilómetros de longitud.",
+      "Los camaleones tienen la lengua tan larga como su propio cuerpo.",
+      "En el espacio, los astronautas no pueden eructar de forma normal porque la falta de gravedad impide que el gas se separe del líquido en el estómago.",
+      "Las cebras son de color negro con rayas blancas, y no blancas con rayas negras.",
+      "Los patos tienen un plumaje impermeable gracias a una glándula que segrega aceite.",
+      "La Torre Inclinada de Pisa nunca fue recta; empezó a inclinarse ya durante su construcción.",
+      "Las hormigas reina de algunas especies pueden vivir hasta 30 años.",
+      "Los mosquitos parecen tener preferencia por picar a las personas con tipo de sangre O.",
+      "Las manzanas, las peras y las ciruelas pertenecen a la misma familia botánica que las rosas.",
+      "Existe una especie de medusa (Turritopsis dohrnii) que es biológicamente inmortal.",
+      "El nombre completo de la muñeca Barbie es Barbara Millicent Roberts.",
+      "La letra 'E' es la vocal más utilizada en el idioma español.",
+      "Los pingüinos tienen una glándula especial sobre los ojos que filtra la sal del agua marina.",
+      "El monte Everest cuenta con cobertura de red móvil 5G desde el año 2020.",
+      "Los plátanos crecen con una curva porque apuntan hacia arriba, buscando la luz del sol.",
+      "El cerebro humano está compuesto aproximadamente en un 73% de agua.",
+      "Las ostras tienen la capacidad de cambiar de género a lo largo de su vida.",
+      "Hay más estatuas de leones en el mundo que leones reales vivos.",
+      "El creador del frisbee fue incinerado tras su muerte y sus cenizas se moldearon para formar un frisbee.",
+      "La Vía Láctea contiene formiato de etilo, la sustancia que da a las frambuesas su sabor.",
+      "El chasquido de un látigo se produce porque la punta rompe la barrera del sonido, creando un mini estallido sónico.",
+      "En el antiguo Egipto, los sirvientes del faraón Pepi II eran untados con miel para atraer las moscas lejos del monarca.",
+      "Los pulpos tienen sangre basada en cobre en lugar de hierro, lo que le da un color azulado.",
+      "Un huracán promedio libera en un día la energía equivalente a medio millón de bombas atómicas.",
+      "Los koalas pueden dormir hasta 22 horas al día debido a su dieta baja en nutrientes.",
+      "El icónico cuerno del narval es en realidad un diente canino hipertrofiado que crece a través de su labio.",
+      "El color real del sol es blanco; es la atmósfera de la Tierra la que dispersa la luz y lo hace parecer amarillo.",
+      "Las estrellas de mar no tienen cerebro ni tampoco sangre en su interior.",
+      "Es físicamente imposible tararear una canción mientras te tapas la nariz por completo.",
+      "Los humanos emiten una ligera bioluminiscencia en la oscuridad, pero es mil veces más débil de lo que nuestros ojos pueden detectar.",
+      "El hielo seco no se derrite, sino que se sublima pasando directamente de estado sólido a gas.",
+      "Las ballenas francas tienen los testículos más grandes del reino animal, pesando hasta una tonelada cada uno.",
+      "Las vacas forman lazos de amistad profundos y pueden sufrir ataques de pánico si se les separa de su mejor amiga.",
+      "Islandia es uno de los pocos lugares habitados del mundo donde no existen los mosquitos.",
+      "La sangre del insecto conocido como ciervo volador es de un color amarillo o verde claro.",
+      "Los caracoles pueden reparar roturas menores en su propia concha utilizando el calcio de su dieta.",
+      "El tiburón de Groenlandia es el vertebrado más longevo conocido, superando los 400 años de edad.",
+      "Se ha demostrado científicamente que las avispas de papel pueden recordar y reconocer las caras de otras avispas.",
+      "La orina de los gatos brilla intensamente cuando se expone a una luz ultravioleta o luz negra.",
+      "El aguacate es originario de México y su nombre proviene de la palabra náhuatl 'ahuacatl', que significa testículo.",
+      "Las patatas fritas de bolsa fueron creadas por accidente en 1853 por un chef molesto con un cliente que se quejaba del grosor de sus patatas.",
+      "Las almendras y los melocotones pertenecen a la misma familia botánica.",
+      "El azafrán puro es, gramo a gramo, más caro que el oro debido a su difícil recolección manual.",
+      "El aceite de los cacahuetes puede procesarse para producir glicerol, utilizado para hacer nitroglicerina para dinamita.",
+      "La mermelada se inventó originalmente no como un dulce, sino como un método para conservar la fruta para el invierno.",
+      "Lo que comemos del brócoli es en realidad una flor masiva que aún no ha florecido.",
+      "La nuez moscada consumida en dosis muy grandes puede tener efectos tóxicos y alucinógenos.",
+      "Los antiguos médicos griegos y romanos usaban telarañas como vendajes rudimentarios para coagular heridas.",
+      "En el siglo XVI, el azúcar era tan caro en Europa que la aristocracia consideraba los dientes ennegrecidos un símbolo de riqueza.",
+      "La palabra 'karaoke' significa literalmente 'orquesta vacía' en japonés.",
+      "El himno nacional de España, la Marcha Real, es uno de los pocos en el mundo que no tiene letra oficial.",
+      "El diseño de la bandera actual de los Estados Unidos con 50 estrellas fue un proyecto de clase de un estudiante de secundaria.",
+      "Suiza cuenta con suficientes búnkeres nucleares para albergar al 114% de su población total.",
+      "El Estado de la Ciudad del Vaticano tiene una de las tasas de criminalidad per cápita más altas del mundo, casi en su totalidad por carteristas.",
+      "En Francia es legal, bajo circunstancias muy excepcionales y con permiso presidencial, casarse con una persona fallecida.",
+      "La ciudad de Churchill, en Canadá, tiene una 'cárcel' específica para osos polares que se acercan demasiado al pueblo.",
+      "El rascacielos Empire State Building en Nueva York es tan grande que tiene asignado su propio código postal exclusivo.",
+      "En la ciudad de Susami, Japón, existe un buzón de correos oficial ubicado a 10 metros bajo el agua al que los buceadores envían cartas.",
+      "La Gran Pirámide de Guiza no tiene cuatro lados, sino ocho; cada cara está ligeramente hundida en el centro.",
+      "Cuando Julio César fue secuestrado por piratas a los 25 años, se sintió insultado por el bajo rescate que pedían y exigió que lo duplicaran.",
+      "Los vikingos forjaban sus espadas mezclando hierro con cenizas de huesos de animales muertos, creando accidentalmente una forma primitiva de acero.",
+      "Durante la Guerra Fría, la CIA gastó millones en el proyecto 'Acoustic Kitty', intentando usar gatos como micrófonos espías.",
+      "A Albert Einstein se le ofreció formalmente la presidencia del Estado de Israel en 1952, pero declinó amablemente la oferta.",
+      "El primer registro del uso de papel higiénico data de la China del siglo VI d.C.",
+      "La famosa fotografía de Albert Einstein sacando la lengua fue tomada por un fotógrafo pesado la noche de su 72º cumpleaños.",
+      "En los antiguos Juegos Olímpicos griegos, los atletas competían completamente desnudos para celebrar el cuerpo humano.",
+      "Antes del siglo XVII, casi todas las zanahorias cultivadas eran de color morado o amarillo.",
+      "En 1919, un enorme tanque reventó en Boston, creando una ola de melaza a 55 km/h que destruyó calles enteras.",
+      "La reina Cleopatra no tenía sangre egipcia; era la última de la dinastía ptolemaica, de origen macedonio griego.",
+      "Los egipcios se afeitaban las cejas en señal de luto cuando su gato mascota fallecía.",
+      "Los estudios muestran que las mujeres parpadean en promedio unas 19 veces por minuto, frente a las 11 veces de los hombres.",
+      "El cartílago de tus orejas y tu nariz es el único tejido del cuerpo humano que sigue creciendo durante toda la vida.",
+      "La fuerza aerodinámica de un estornudo humano puede propulsar gotas a distancias de más de 8 metros.",
+      "Si nos basamos puramente en el peso que puede ejercer, el masetero, el músculo de la mandíbula, es el más fuerte del cuerpo.",
+      "Solo alrededor del 10% de la población mundial es zurda, y los científicos aún no saben exactamente por qué existe esta proporción.",
+      "Onza por onza, el hueso humano compacto es más resistente a la compresión que el hormigón o el acero.",
+      "Una persona con una esperanza de vida media camina el equivalente a dar tres vueltas completas al planeta Tierra.",
+      "Perder el dedo meñique de la mano te haría perder aproximadamente el 50% de tu fuerza de agarre general.",
+      "Debido a la longitud de tu brazo y la estructura de tu hombro, es anatómicamente imposible lamerte tu propio codo.",
+      "La piel es considerada el órgano más grande del cuerpo humano, pesando alrededor del 16% del peso corporal total.",
+      "El dedo pulgar tiene su propia arteria principal, razón por la cual tiene un pulso que puedes sentir fácilmente.",
+      "El ser humano promedio nace con unas 10.000 papilas gustativas, pero pierde aproximadamente la mitad de ellas al cumplir 60 años.",
+      "Tu estómago debe producir una nueva capa de mucosidad cada dos semanas; de lo contrario, sus propios ácidos lo digerirían.",
+      "Al igual que las yemas de los dedos, la superficie de la lengua humana tiene un patrón geométrico único en cada individuo.",
+      "La migración completa de la mariposa monarca lleva tantas semanas que se completa a lo largo de varias generaciones de mariposas.",
+      "El cangrejo cacerola o cangrejo herradura tiene sangre azul debido a la presencia de hemocianina, muy valorada en la industria farmacéutica.",
+      "Las termitas africanas construyen montículos con conductos de ventilación que mantienen una temperatura constante sin importar el calor exterior.",
+      "Un solo árbol maduro puede absorber hasta 21 kilogramos de gases nocivos y dióxido de carbono en un solo año.",
+      "El icónico zumbido del sable de luz en Star Wars se diseñó grabando el motor en ralentí de un proyector de cine de 35 mm.",
+      "En su primera aparición en el juego Donkey Kong, el personaje de Mario no era fontanero, sino carpintero, y se llamaba 'Jumpman'.",
+      "El mundialmente famoso logo 'Swoosh' de Nike fue diseñado por una estudiante universitaria a la que le pagaron solo 35 dólares por el trabajo.",
+      "Las famosas marcas deportivas Puma y Adidas fueron fundadas por dos hermanos alemanes (Rudolf y Adolf Dassler) tras una fuerte pelea familiar.",
+      "Frank Oz, el titiritero y actor de voz que dio vida a Yoda en inglés, es la misma persona que le dio voz a la cerdita Miss Piggy.",
+      "En la mítica película 'Psicosis' de Alfred Hitchcock, la sangre utilizada en la escena de la ducha era en realidad sirope de chocolate Boscos.",
+      "El color rojo del capote del torero no enfurece a los toros, ya que son daltónicos al rojo; lo que atacan es el movimiento brusco de la tela.",
+      "Las cajas negras de los aviones comerciales son en realidad de un color naranja brillante para facilitar su localización entre los escombros.",
+      "Existen aproximadamente 500.000 terremotos detectables en el mundo cada año, pero los humanos solo llegan a sentir unos 100.000.",
+      "El oro es el metal más maleable del mundo: un solo gramo puede extenderse para formar una lámina de un metro cuadrado.",
+      "Los girasoles son acumuladores de toxinas y se han utilizado con éxito para extraer radiación del suelo en Chernóbil y Fukushima.",
+      "El organismo vivo más grande del mundo no es la ballena azul, sino un hongo en Oregón que cubre 8,9 kilómetros cuadrados bajo tierra.",
+      "Los astronautas pueden usar lápices normales en el espacio porque no dependen de la gravedad para que la tinta fluya, sino de la fricción del grafito.",
+      "La tiza que usan los profesores en las pizarras hoy en día casi nunca es tiza real, sino que está fabricada a partir de yeso comprimido.",
+      "La palabra 'astronauta' proviene de las palabras griegas 'astron' (estrella) y 'nautes' (marinero), significando 'marinero de las estrellas'.",
+      "En 1990, los cosmonautas soviéticos en la estación Mir lograron cultivar rábanos, siendo de las primeras plantas germinadas en el espacio.",
+      "Gracias a las prohibiciones globales de aerosoles CFC, el agujero en la capa de ozono de la Tierra se está reduciendo lentamente.",
+      "En una sola cucharadita de tierra de un jardín saludable hay más microorganismos vivos que seres humanos en todo el planeta Tierra.",
+      "Una sola nube de tormenta cumulonimbus puede llegar a contener un peso en agua equivalente a varios millones de toneladas.",
+      "Debido a la distancia astronómica, cuando vemos el sol en el cielo, en realidad estamos viendo cómo era hace 8 minutos y 20 segundos.",
+      "La inmensa fuerza gravitatoria de Júpiter atrae y desvía constantemente asteroides, funcionando como un escudo protector para la Tierra."
     ];
     // Phase trackers
     let revealIndex = 0;
@@ -4496,7 +4655,12 @@
     }
 
     // Game mode button transition animation
+    let modeAnimating = false;
+
     function triggerModeTransition(btn, color, callback) {
+      if (modeAnimating) return;
+      modeAnimating = true;
+
       unlockAudioWithUserGesture();
       playStartGameSound();
 
@@ -4537,6 +4701,7 @@
 
       setTimeout(function () {
         callback();
+        modeAnimating = false;
         setTimeout(function () {
           if (overlay.parentNode) overlay.remove();
         }, 300);
@@ -4956,8 +5121,11 @@
         liarQuestionPass.style.display = 'block';
         updateLiarPlayerIndicator();
       } else {
-        // All players done - show reveal
-        showLiarRevealScreen();
+        // All players done - show countdown then reveal
+        liarQuestionView.style.display = 'none';
+        showCountdownGeneric(function () {
+          showLiarRevealScreen();
+        });
       }
     });
 
@@ -5227,18 +5395,19 @@
         vofPass.style.display = 'block';
         updateVofPlayerIndicator();
       } else {
-        // All roles revealed - show voting screen
+        // All roles revealed - show countdown then voting screen
         vofRoleView.style.display = 'none';
-        showVofVoteScreen();
+        showCountdownGeneric(function () {
+          showVofVoteScreen();
+        });
       }
 
       updateArrowVisibility();
     });
 
     function showVofVoteScreen() {
-      // Build player list for voting
+      // Build player list for voting using same style as Impostor
       vofVoteList.innerHTML = '';
-      let selectedVofId = -1;
 
       // Reset confirm button state
       const confirmBtn = document.getElementById('vofConfirmVoteBtn');
@@ -5246,46 +5415,37 @@
       confirmBtn.style.opacity = '0.5';
 
       vofPlayers.forEach(function (p) {
-        const card = document.createElement('div');
-        card.style.cssText =
-          'background:#2a2d3a;padding:14px;border-radius:12px;border:2px solid #353847;' +
-          'cursor:pointer;transition:all 0.2s;margin-bottom:8px;';
-        card.dataset.id = p.id;
-        card.innerHTML =
-          '<div style="color:#ffc107;font-weight:600;font-size:16px;">' + p.name + '</div>';
+        const el = document.createElement('div');
+        el.className = 'player-pill';
+        el.dataset.id = p.id;
+        el.textContent = p.name;
 
-        card.addEventListener('click', function () {
+        el.addEventListener('click', function () {
           playPopSound();
-          const wasSelected = card.classList.contains('vof-selected');
+          const wasSelected = el.classList.contains('selected');
 
           // Deselect all
           Array.from(vofVoteList.children).forEach(function (c) {
-            c.classList.remove('vof-selected');
-            c.style.border = '2px solid #353847';
-            c.style.background = '#2a2d3a';
+            c.classList.remove('selected');
           });
 
           const cb = document.getElementById('vofConfirmVoteBtn');
           if (!wasSelected) {
-            card.classList.add('vof-selected');
-            card.style.border = '2px solid #ffc107';
-            card.style.background = '#353847';
-            selectedVofId = parseInt(card.dataset.id);
+            el.classList.add('selected');
             cb.disabled = false;
             cb.style.opacity = '1';
           } else {
-            selectedVofId = -1;
             cb.disabled = true;
             cb.style.opacity = '0.5';
           }
         });
 
-        vofVoteList.appendChild(card);
+        vofVoteList.appendChild(el);
       });
 
       confirmBtn.onclick = function () {
         const sel = Array.from(vofVoteList.children).find(function (c) {
-          return c.classList.contains('vof-selected');
+          return c.classList.contains('selected');
         });
         if (!sel) return;
         playClickSound();
@@ -5310,7 +5470,7 @@
           '<div style="font-size:24px;font-family:\'Fredoka One\',cursive;color:#4fd1c5;margin-bottom:12px;">🎉 ¡Encontrasteis al mentiroso! 🎉</div>' +
           '<div class="muted" style="margin-bottom:12px;">¡<strong>' + guessedPlayer.name + '</strong> era el mentiroso!</div>' +
           '<div style="margin-top:16px;font-size:15px;color:#d0d3e1;line-height:1.6;">' +
-          '<div style="margin-bottom:8px;">Los civiles tenían datos reales. El mentiroso no tenía ninguno y tuvo que inventarse algo.</div>' +
+          '<div style="margin-bottom:8px;">¡Los civiles ganan!</div>' +
           '</div>';
         playSuccessSound();
       } else {
@@ -5868,6 +6028,42 @@
       displayNumber();
     }
 
+    // Cuenta atrás genérica reutilizable para Mentiroso y VoF
+    function showCountdownGeneric(callback) {
+      if (backArrowBtn) backArrowBtn.style.display = 'none';
+
+      const countdownScreen = document.createElement('div');
+      countdownScreen.className = 'countdown-screen';
+      document.body.appendChild(countdownScreen);
+      const innerContent = document.createElement('div');
+      innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
+      countdownScreen.appendChild(innerContent);
+
+      let count = 3;
+      function tick() {
+        innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
+        if (count === 3) playSound(600, 0.15, 0.25);
+        else if (count === 2) playSound(750, 0.15, 0.25);
+        else if (count === 1) playSound(900, 0.15, 0.25);
+        count--;
+        if (count >= 1) {
+          setTimeout(tick, 1000);
+        } else {
+          setTimeout(() => {
+            innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
+            playSound(1200, 0.3, 0.3);
+            setTimeout(() => playSound(1400, 0.2, 0.25), 150);
+            setTimeout(() => {
+              countdownScreen.remove();
+              updateArrowVisibility();
+              if (callback) callback();
+            }, 1500);
+          }, 1000);
+        }
+      }
+      tick();
+    }
+
     function buildDiscussionVoteList() {
       discussionVoteList.innerHTML = '';
       players.filter(p => !p.eliminated).forEach(p => {
@@ -6258,56 +6454,6 @@
       tabooSetup.style.display = 'block';
       updateArrowVisibility();
     });
-
-    // --- LÓGICA DE INICIO INSTANTÁNEA (SIN BOTÓN) ---
-
-    const introScreenEl = document.getElementById('introScreen');
-    const introFill = document.querySelector('.intro-progress-fill');
-    let hasGameStarted = false;
-
-    // Función que arranca el juego
-    function launchGame() {
-      if (hasGameStarted) return;
-      hasGameStarted = true;
-
-      // 1. Ocultar la barra de carga inmediatamente para que no moleste
-      if (introFill) introFill.parentElement.style.display = 'none';
-
-      // 2. Intentar desbloquear audio (silencioso)
-      if (typeof unlockAudioWithUserGesture === 'function') {
-        unlockAudioWithUserGesture().catch(() => { });
-      }
-
-      // 3. --- CORRECCIÓN SCROLL IPHONE (FRANJA) ---
-      // Forzamos la posición 0,0 y desbloqueamos el scroll vertical
-      window.scrollTo(0, 0);
-      document.body.style.overflowY = 'auto';
-      document.body.style.overflowX = 'hidden';
-
-      // Doble check por seguridad
-      setTimeout(() => window.scrollTo(0, 0), 10);
-
-      // 4. Ejecutar la transición visual
-      if (typeof handleContinueFromIntro === 'function') {
-        handleContinueFromIntro();
-      } else {
-        // Fallback por si acaso
-        if (introScreenEl) { introScreenEl.remove(); document.documentElement.classList.add('intro-done'); }
-        document.getElementById('mainContainer').style.opacity = '1';
-      }
-    }
-
-    // EJECUCIÓN
-    if (introFill && introScreenEl) {
-      // Usamos 'animationend' para que sea EXACTO al terminar la barra CSS (sin delay)
-      introFill.addEventListener('animationend', launchGame);
-
-      // Fallback de seguridad (3.1s) por si el navegador falla el evento
-      setTimeout(launchGame, 3100);
-    } else {
-      // Si no hay intro, arrancar directo
-      launchGame();
-    }
 
     // --- FIX: PREVENIR ANIMACIÓN PEGAJOSA DE BOTONES ---
     // En dispositivos táctiles, los botones pueden mantener el estado :active
