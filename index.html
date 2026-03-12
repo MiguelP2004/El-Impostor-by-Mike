@@ -1365,6 +1365,72 @@
 
   </div>
 
+  <!-- Script independiente para la intro -->
+  <script>
+    (function () {
+      var done = false;
+
+      function hideIntroAndShowMenu() {
+        if (done) return;
+        done = true;
+
+        var intro = document.getElementById('introScreen');
+        if (intro) {
+          // Forzar fade-out: primero aplicamos transición, luego en el siguiente frame cambiamos opacity
+          intro.style.transition = 'opacity 0.4s ease-out';
+          requestAnimationFrame(function () {
+            intro.style.opacity = '0';
+          });
+          // Tras la transición, eliminar del DOM
+          setTimeout(function () {
+            intro.style.display = 'none';
+            try { intro.remove(); } catch (e) { }
+            document.documentElement.classList.add('intro-done');
+          }, 450);
+        }
+
+        // Mostrar contenedor principal y menú de modos
+        var main = document.getElementById('mainContainer');
+        if (main) { main.style.transition = 'opacity 0.3s ease'; main.style.opacity = '1'; }
+
+        var gameMode = document.getElementById('gameModeSelection');
+        if (gameMode) gameMode.style.display = 'block';
+
+        if (typeof updateArrowVisibility === 'function') updateArrowVisibility();
+
+        setTimeout(function () {
+          if (typeof unlockAudioWithUserGesture === 'function') {
+            try { unlockAudioWithUserGesture(); } catch (e) { }
+          }
+          window.scrollTo(0, 0);
+          document.body.style.overflowY = 'auto';
+          document.body.style.overflowX = 'hidden';
+        }, 50);
+      }
+
+      window.__introLaunchGame = hideIntroAndShowMenu;
+
+      // Esperar a que el DOM esté completo antes de programar la transición
+      function setup() {
+        var introFill = document.querySelector('.intro-progress-fill');
+        if (introFill) {
+          introFill.addEventListener('animationend', hideIntroAndShowMenu);
+        }
+        // Fallback absoluto: 3.5s después de DOMContentLoaded
+        setTimeout(hideIntroAndShowMenu, 3500);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setup);
+      } else {
+        setup();
+      }
+
+      // Fallback de último recurso: 5s desde ahora pase lo que pase
+      setTimeout(hideIntroAndShowMenu, 5000);
+    })();
+  </script>
+
   <button id="backArrowBtn" class="back-arrow-btn">
     <svg viewBox="0 0 24 24">
       <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
@@ -1756,74 +1822,7 @@
         });
       });
     }
-    // --- LÓGICA DE INICIO AUTOMÁTICA (SINCRONIZADA) ---
-    // --- LÓGICA DE INICIO (REGISTRO INMEDIATO) ---
-    // Registramos el listener al parsear el script para no perder el animationend
-    (function () {
-      const introScreenEl = document.getElementById('introScreen');
-      const introFill = document.querySelector('.intro-progress-fill');
-      let hasGameStarted = false;
-
-      function launchGame() {
-        if (hasGameStarted) return;
-        hasGameStarted = true;
-
-        // 1. PRIORIDAD VISUAL: Iniciar desaparición INMEDIATAMENTE
-        if (introScreenEl) {
-          if (introFill && introFill.parentElement) {
-            introFill.parentElement.style.display = 'none';
-          }
-          introScreenEl.style.transition = 'opacity 0.3s ease-out';
-          introScreenEl.style.opacity = '0';
-          setTimeout(() => { introScreenEl.remove(); document.documentElement.classList.add('intro-done'); }, 300);
-        }
-
-        // 2. Mostrar el menú del juego detrás
-        const main = document.getElementById('mainContainer');
-        if (main) main.style.opacity = '1';
-
-        const gameMode = document.getElementById('gameModeSelection');
-        if (gameMode) gameMode.style.display = 'block';
-
-        if (typeof updateArrowVisibility === 'function') updateArrowVisibility();
-
-        // 3. TAREAS DE FONDO (Audio y Scroll iPhone)
-        setTimeout(() => {
-          if (typeof unlockAudioWithUserGesture === 'function') {
-            unlockAudioWithUserGesture().catch(() => { });
-          }
-          window.scrollTo(0, 0);
-          document.body.style.overflowY = 'auto';
-          document.body.style.overflowX = 'hidden';
-          window.scrollTo(0, 1);
-          setTimeout(() => window.scrollTo(0, 0), 50);
-        }, 10);
-      }
-
-      if (introFill && introScreenEl) {
-        // Unlock audio on intro screen tap/click
-        const unlockAudioHandler = () => {
-          if (typeof unlockAudioWithUserGesture === 'function') {
-            unlockAudioWithUserGesture().catch(() => { });
-          }
-        };
-        introScreenEl.addEventListener('touchstart', unlockAudioHandler, { once: true, passive: true });
-        introScreenEl.addEventListener('click', unlockAudioHandler, { once: true });
-
-        // Evento principal: se registra al parsear, así no se pierde
-        introFill.addEventListener('animationend', launchGame);
-
-        // Fallback de seguridad: calcula el tiempo restante basándose en cuánto
-        // tiempo ha pasado desde que se cargó la página, para cubrir el caso en
-        // que animationend no se dispare (página lenta o animación ya terminada)
-        const animDuration = 3000; // debe coincidir con la duración CSS (3s)
-        const elapsed = (typeof performance !== 'undefined' && performance.now) ? performance.now() : 0;
-        const remaining = Math.max(0, animDuration - elapsed);
-        setTimeout(launchGame, remaining + 200);
-      } else {
-        launchGame();
-      }
-    })();
+    // --- LÓGICA DE INICIO movida a script independiente antes del body ---
 
     window.addEventListener('load', () => {
       // Initialize touch animations for all buttons
