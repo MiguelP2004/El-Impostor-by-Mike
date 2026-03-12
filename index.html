@@ -1638,6 +1638,7 @@
       <!-- VoF Voting Screen -->
       <section id="vofVote" class="card" style="display:none;margin-top:12px">
         <div class="center">
+          <div class="first-speaker" id="vofFirstSpeakerName" style="display:none"></div>
           <p style="font-family:'Fredoka One',cursive;font-size:20px;color:#ffc107;margin-bottom:8px;">🗳️ ¡A votar!</p>
           <p class="muted" style="font-weight:600;margin-bottom:4px;">Cada civil ha dicho su dato en voz alta.</p>
           <p class="muted" style="font-weight:700;margin-bottom:16px;">¿Quién creéis que es el mentiroso?</p>
@@ -5034,10 +5035,45 @@
         liarQuestionPass.style.display = 'block';
         updateLiarPlayerIndicator();
       } else {
-        // All players done - show reveal
-        showLiarRevealScreen();
+        // All players done - show countdown then reveal
+        liarQuestionView.style.display = 'none';
+        showLiarCountdown();
       }
     });
+
+    function showLiarCountdown() {
+      if (backArrowBtn) backArrowBtn.style.display = 'none';
+
+      const countdownScreen = document.createElement('div');
+      countdownScreen.className = 'countdown-screen';
+      document.body.appendChild(countdownScreen);
+      const innerContent = document.createElement('div');
+      innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
+      countdownScreen.appendChild(innerContent);
+
+      let count = 3;
+      function displayNumber() {
+        innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
+        if (count === 3) playSound(600, 0.15, 0.25);
+        else if (count === 2) playSound(750, 0.15, 0.25);
+        else if (count === 1) playSound(900, 0.15, 0.25);
+        count--;
+        if (count >= 1) {
+          setTimeout(displayNumber, 1000);
+        } else {
+          setTimeout(() => {
+            innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
+            playSound(1200, 0.3, 0.3);
+            setTimeout(() => playSound(1400, 0.2, 0.25), 150);
+            setTimeout(() => {
+              countdownScreen.remove();
+              showLiarRevealScreen();
+            }, 1500);
+          }, 1000);
+        }
+      }
+      displayNumber();
+    }
 
     function showLiarRevealScreen() {
       liarQuestionView.style.display = 'none';
@@ -5311,13 +5347,52 @@
         vofPass.style.display = 'block';
         updateVofPlayerIndicator();
       } else {
-        // All roles revealed - show voting screen
+        // All roles revealed - show countdown then voting screen
         vofRoleView.style.display = 'none';
-        showVofVoteScreen();
+        showVofCountdown();
       }
 
       updateArrowVisibility();
     });
+
+    function showVofCountdown() {
+      if (backArrowBtn) backArrowBtn.style.display = 'none';
+
+      const countdownScreen = document.createElement('div');
+      countdownScreen.className = 'countdown-screen';
+      document.body.appendChild(countdownScreen);
+      const innerContent = document.createElement('div');
+      innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
+      countdownScreen.appendChild(innerContent);
+
+      let count = 3;
+      function displayNumber() {
+        innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
+        if (count === 3) playSound(600, 0.15, 0.25);
+        else if (count === 2) playSound(750, 0.15, 0.25);
+        else if (count === 1) playSound(900, 0.15, 0.25);
+        count--;
+        if (count >= 1) {
+          setTimeout(displayNumber, 1000);
+        } else {
+          setTimeout(() => {
+            innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#ff3b3b">¡A VOTAR!</div>`;
+            playSound(1200, 0.3, 0.3);
+            setTimeout(() => playSound(1400, 0.2, 0.25), 150);
+            setTimeout(() => {
+              countdownScreen.remove();
+              // Selección aleatoria del primer jugador en hablar
+              const firstVofSpeaker = vofPlayers[randInt(vofPlayers.length)];
+              const vofFirstSpeakerEl = document.getElementById('vofFirstSpeakerName');
+              vofFirstSpeakerEl.innerHTML = `🎤 Empieza hablando: <span style="font-size:28px;color:#ffffff;text-shadow:0 4px 14px rgba(255,255,255,0.8)">${firstVofSpeaker.name}</span>`;
+              vofFirstSpeakerEl.style.display = 'block';
+              showVofVoteScreen();
+            }, 1500);
+          }, 1000);
+        }
+      }
+      displayNumber();
+    }
 
     function showVofVoteScreen() {
       // Build player list for voting
