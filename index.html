@@ -197,7 +197,7 @@
       /* CAMBIO DE ANCHURA: */
       width: 88%;
       /* Antes 92% (Un pelín menos ancha en móviles) */
-      max-width: 440px;
+      max-width: 410px;
       /* Antes 500px (Más estrecha en PC/Tablets) */
 
       background: linear-gradient(180deg, rgba(42, 45, 58, 0.98), rgba(35, 38, 48, 0.95));
@@ -774,9 +774,9 @@
 
     .team-score {
       flex: 1;
-      padding: 8px;
+      padding: 6px;
       /* Reducido de 16px */
-      border-radius: 14px;
+      border-radius: 12px;
       text-align: center;
       color: white;
       font-family: 'Fredoka One', cursive;
@@ -801,7 +801,7 @@
     }
 
     .score-label {
-      font-size: 12px;
+      font-size: 10px;
       /* Reducido de 14px */
       opacity: 0.9;
       margin-bottom: 2px;
@@ -810,7 +810,7 @@
     }
 
     .score-val {
-      font-size: 28px;
+      font-size: 24px;
       /* Reducido de 36px */
       line-height: 1.2;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -5571,8 +5571,8 @@ const vofFacts = [
 
     function updateTabooTurnDisplay() {
       const team = teamConfig[currentTabooTeam];
-      turnDisplay.textContent = `Turno: Equipo ${team.name}`;
-      turnDisplay.style.color = team.color;
+      turnDisplay.innerHTML = `<span style="color:#ffffff">Turno: </span><span style="color:${team.color}">Equipo ${team.name}</span>`;
+      turnDisplay.style.color = '';
     }
 
     function toggleTabooTeam() {
