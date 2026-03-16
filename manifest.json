@@ -1,7 +1,7 @@
 {
   "name": "Mike's games",
   "short_name": "Mike's games",
-  "description": "Juegos divertidos creados por Mike",
+  "description": "creado por Mike",
   "start_url": "./?utm_source=homescreen",
   "scope": "./",
   "display": "standalone",
