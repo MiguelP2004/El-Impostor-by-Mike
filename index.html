@@ -1752,6 +1752,20 @@
     // --- LÓGICA DE INICIO AUTOMÁTICA (SINCRONIZADA) ---
     window.addEventListener('load', () => {
 
+      function runImperceptibleInitialScrollShake() {
+        const originalY = window.scrollY || window.pageYOffset || 0;
+
+        // Simula un micro-balanceo vertical de dedo en el primer frame.
+        requestAnimationFrame(() => {
+          window.scrollTo(0, originalY + 1);
+          requestAnimationFrame(() => {
+            window.scrollTo(0, originalY);
+          });
+        });
+      }
+
+      runImperceptibleInitialScrollShake();
+
       // Initialize touch animations for all buttons
       if (typeof initializeTouchAnimations === 'function') {
         initializeTouchAnimations();
