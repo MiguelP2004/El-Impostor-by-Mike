@@ -296,6 +296,17 @@
       animation: wobble 4s ease-in-out infinite;
     }
 
+    .dog-logo.logo-swap-anim {
+      animation: logoSwapPulse 0.7s ease-in-out;
+    }
+
+    @keyframes logoSwapPulse {
+      0% { transform: scale(1) rotate(-3deg); }
+      30% { transform: scale(1.12) rotate(0deg); }
+      60% { transform: scale(1.02) rotate(2deg); }
+      100% { transform: scale(1) rotate(-3deg); }
+    }
+
     @keyframes wobble {
 
       0%,
@@ -2200,6 +2211,7 @@
     const activeCategoryBanner = document.getElementById('activeCategoryBanner');
     const backArrowBtn = document.getElementById('backArrowBtn');
     const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const topLogo = document.querySelector('header .dog-logo');
 
     // NUEVOS ELEMENTOS TABÚ Y SELECCIÓN DE MODO
     const gameModeSelection = document.getElementById('gameModeSelection');
@@ -4173,7 +4185,135 @@
       { word: "PANADERO", forbidden: ["Pan", "Horno", "Amasar", "Harina"] },
       { word: "PASTELERO", forbidden: ["Pasteles", "Dulce", "Horno", "Repostería"] },
       { word: "CARNICERO", forbidden: ["Carne", "Cortar", "Tienda", "Filete"] },
-      { word: "TENDERO", forbidden: ["Tienda", "Vender", "Mostrador", "Comercio"] }
+      { word: "TENDERO", forbidden: ["Tienda", "Vender", "Mostrador", "Comercio"] },
+
+      // TABÚ EXTRA
+      { word: "BRÚJULA", forbidden: ["Norte", "Dirección", "Imán", "Mapa"] },
+      { word: "MAPAMUNDI", forbidden: ["Mundo", "Países", "Continentes", "Mapa"] },
+      { word: "PARALELO", forbidden: ["Líneas", "Geografía", "Perpendicular", "Dibujo"] },
+      { word: "ECUADOR", forbidden: ["Línea", "Planeta", "Mitad", "Latitud"] },
+      { word: "HEMISFERIO", forbidden: ["Mitad", "Tierra", "Norte", "Sur"] },
+      { word: "LONGITUD", forbidden: ["Meridiano", "Coordenadas", "Grados", "Geografía"] },
+      { word: "ARCHIPIÉLAGO", forbidden: ["Islas", "Mar", "Conjunto", "Océano"] },
+      { word: "PENÍNSULA", forbidden: ["Tierra", "Mar", "Costa", "Istmo"] },
+      { word: "SABANA", forbidden: ["África", "Hierba", "Leones", "Llanura"] },
+      { word: "PRADERA", forbidden: ["Hierba", "Campo", "Llanura", "Verde"] },
+      { word: "VENTISCA", forbidden: ["Nieve", "Viento", "Frío", "Temporal"] },
+      { word: "TORNADO", forbidden: ["Viento", "Embudo", "Tormenta", "Giro"] },
+      { word: "MAREA", forbidden: ["Mar", "Subir", "Bajar", "Luna"] },
+      { word: "ECLIPSE", forbidden: ["Sol", "Luna", "Sombra", "Astronomía"] },
+      { word: "CONSTELACIÓN", forbidden: ["Estrellas", "Cielo", "Dibujo", "Zodiaco"] },
+      { word: "TELESCOPIO", forbidden: ["Lentes", "Espacio", "Observar", "Astronomía"] },
+      { word: "MICROSCOPIO", forbidden: ["Lentes", "Pequeño", "Laboratorio", "Células"] },
+      { word: "TERMÓMETRO", forbidden: ["Temperatura", "Grados", "Fiebre", "Medir"] },
+      { word: "BARÓMETRO", forbidden: ["Presión", "Atmosférica", "Medir", "Tiempo"] },
+      { word: "GRAVEDAD", forbidden: ["Caer", "Fuerza", "Tierra", "Atracción"] },
+      { word: "ENERGÍA", forbidden: ["Fuerza", "Trabajo", "Potencia", "Electricidad"] },
+      { word: "ÁTOMO", forbidden: ["Núcleo", "Electrón", "Pequeño", "Química"] },
+      { word: "MOLÉCULA", forbidden: ["Átomos", "Enlace", "Química", "Compuesto"] },
+      { word: "ELECTRÓN", forbidden: ["Negativo", "Órbita", "Átomo", "Partícula"] },
+      { word: "CÉLULA", forbidden: ["Vida", "Membrana", "Núcleo", "Biología"] },
+      { word: "ADN", forbidden: ["Genes", "Mono", "Herencia", "Genética"] },
+      { word: "ANTIBIÓTICO", forbidden: ["Bacteria", "Medicina", "Infección", "Tratamiento"] },
+      { word: "DIAGNÓSTICO", forbidden: ["Enfermedad", "Médico", "Pruebas", "Resultado"] },
+      { word: "CIRUGÍA", forbidden: ["Operación", "Hospital", "Quirófano", "Médico"] },
+      { word: "FRACTURA", forbidden: ["Hueso", "Rotura", "Yeso", "Golpe"] },
+      { word: "ESGUINCE", forbidden: ["Tobillo", "Ligamento", "Torcedura", "Dolor"] },
+      { word: "INSOMNIO", forbidden: ["Dormir", "Noche", "Sueño", "Desvelo"] },
+      { word: "ALERGIA", forbidden: ["Estornudos", "Polen", "Reacción", "Picor"] },
+      { word: "PULSO", forbidden: ["Corazón", "Latidos", "Muñeca", "Medir"] },
+      { word: "TENSIÓN", forbidden: ["Presión", "Sangre", "Alta", "Baja"] },
+      { word: "RESPIRACIÓN", forbidden: ["Pulmones", "Aire", "Inhalar", "Exhalar"] },
+      { word: "DIGESTIÓN", forbidden: ["Estómago", "Comida", "Intestino", "Proceso"] },
+      { word: "NUTRICIÓN", forbidden: ["Alimentos", "Salud", "Dieta", "Nutrientes"] },
+      { word: "HORMONA", forbidden: ["Glándula", "Sangre", "Mensajero", "Regulación"] },
+      { word: "NEURONA", forbidden: ["Cerebro", "Nervio", "Impulso", "Sinapsis"] },
+      { word: "MEMORIA", forbidden: ["Recordar", "Cerebro", "Recuerdos", "Olvido"] },
+      { word: "CONCIENCIA", forbidden: ["Pensar", "Mente", "Despertar", "Percepción"] },
+      { word: "CREATIVIDAD", forbidden: ["Ideas", "Imaginación", "Original", "Arte"] },
+      { word: "CURIOSIDAD", forbidden: ["Preguntar", "Interés", "Descubrir", "Saber"] },
+      { word: "EMPATÍA", forbidden: ["Comprender", "Sentir", "Otro", "Emoción"] },
+      { word: "HONESTIDAD", forbidden: ["Verdad", "Sinceridad", "Ética", "Confianza"] },
+      { word: "VALENTÍA", forbidden: ["Coraje", "Miedo", "Atreverse", "Fuerza"] },
+      { word: "COBARDÍA", forbidden: ["Miedo", "Huida", "Falta valor", "Temor"] },
+      { word: "ORGULLO", forbidden: ["Ego", "Satisfacción", "Altivez", "Arrogancia"] },
+      { word: "VERGÜENZA", forbidden: ["Rubor", "Timidez", "Bochorno", "Pena"] },
+      { word: "NOSTALGIA", forbidden: ["Recuerdos", "Pasado", "Infancia", "Añorar"] },
+      { word: "PASIÓN", forbidden: ["Intensidad", "Amor", "Fuego", "Sentimiento"] },
+      { word: "CALMA", forbidden: ["Tranquilidad", "Paz", "Relajar", "Sereno"] },
+      { word: "ANSIEDAD", forbidden: ["Nervios", "Preocupación", "Estrés", "Inquietud"] },
+      { word: "ESTRÉS", forbidden: ["Tensión", "Agobio", "Nervios", "Presión"] },
+      { word: "RELAJACIÓN", forbidden: ["Descanso", "Calma", "Respirar", "Tranquilidad"] },
+      { word: "MEDITACIÓN", forbidden: ["Respirar", "Silencio", "Mente", "Zen"] },
+      { word: "YOGA", forbidden: ["Posturas", "Estirar", "Respirar", "Esterilla"] },
+      { word: "PILATES", forbidden: ["Ejercicio", "Core", "Esterilla", "Control"] },
+      { word: "DECATLÓN", forbidden: ["Pruebas", "Atleta", "Pista", "Combinada"] },
+      { word: "ESGRIMA", forbidden: ["Espada", "Duelo", "Máscara", "Pista"] },
+      { word: "BÁDMINTON", forbidden: ["Raqueta", "Volante", "Red", "Pista"] },
+      { word: "BALONMANO", forbidden: ["Portería", "Balón", "Pases", "Equipo"] },
+      { word: "VOLEIBOL", forbidden: ["Red", "Remate", "Saque", "Equipo"] },
+      { word: "APNEA", forbidden: ["Respirar", "Agua", "Aguantar", "Pulmones"] },
+      { word: "JUDO", forbidden: ["Tatami", "Llave", "Proyección", "Kimono"] },
+      { word: "TAEKWONDO", forbidden: ["Patada", "Cinturón", "Dojang", "Combate"] },
+      { word: "ESCALADA", forbidden: ["Roca", "Arnés", "Altura", "Cuerda"] },
+      { word: "SENDERISMO", forbidden: ["Montaña", "Ruta", "Caminar", "Naturaleza"] },
+      { word: "PATINAJE", forbidden: ["Ruedas", "Hielo", "Patines", "Deslizar"] },
+      { word: "SNOWBOARD", forbidden: ["Tabla", "Nieve", "Esquiar", "Montaña"] },
+      { word: "TRIATLÓN", forbidden: ["Nadar", "Bicicleta", "Correr", "Prueba"] },
+      { word: "MARATÓN", forbidden: ["42", "Carrera", "Kilómetros", "Resistencia"] },
+      { word: "LIENZO", forbidden: ["Pintura", "Cuadro", "Tela", "Pincel"] },
+      { word: "MURAL", forbidden: ["Pared", "Pintura", "Grande", "Arte"] },
+      { word: "BOCETO", forbidden: ["Dibujo", "Borrador", "Idea", "Lápiz"] },
+      { word: "RETRATO", forbidden: ["Cara", "Pintura", "Foto", "Persona"] },
+      { word: "ESCENARIO", forbidden: ["Teatro", "Luces", "Público", "Actuar"] },
+      { word: "GUION", forbidden: ["Película", "Diálogo", "Escena", "Escribir"] },
+      { word: "NOVELA", forbidden: ["Libro", "Historia", "Autor", "Capítulos"] },
+      { word: "POESÍA", forbidden: ["Versos", "Rima", "Poema", "Literatura"] },
+      { word: "METÁFORA", forbidden: ["Figura", "Lenguaje", "Comparación", "Poesía"] },
+      { word: "RIMA", forbidden: ["Verso", "Poema", "Sonido", "Palabras"] },
+      { word: "SONETO", forbidden: ["Poema", "Catorce", "Versos", "Rima"] },
+      { word: "LEYENDA", forbidden: ["Relato", "Tradición", "Mito", "Historia"] },
+      { word: "MITO", forbidden: ["Antiguo", "Dioses", "Relato", "Leyenda"] },
+      { word: "ENSAYO", forbidden: ["Texto", "Argumento", "Ideas", "Literatura"] },
+      { word: "ENCICLOPEDIA", forbidden: ["Información", "Diccionario", "Consulta", "Conocimiento"] },
+      { word: "POLITÉCNICA", forbidden: ["Ingeniería", "Campus", "Estudios", "Superior"] },
+      { word: "ACADEMIA", forbidden: ["Clases", "Aprender", "Curso", "Profesor"] },
+      { word: "LABORATORIO", forbidden: ["Experimentos", "Ciencia", "Batas", "Cura"] },
+      { word: "COMPÁS", forbidden: ["Círculo", "Dibujo", "Punta", "Geometría"] },
+      { word: "ESCUADRA", forbidden: ["Triángulo", "Regla", "Ángulo recto", "Cartabón"] },
+      { word: "CARTABÓN", forbidden: ["Triángulo", "Dibujo", "Escuadra", "Regla"] },
+      { word: "CALCULADORA", forbidden: ["Números", "Teclas", "Sumar", "Pantalla"] },
+      { word: "CALENDARIO", forbidden: ["Meses", "Días", "Fechas", "Año"] },
+      { word: "SEMÁFORO", forbidden: ["Rojo", "Verde", "Ámbar", "Tráfico"] },
+      { word: "GLORIETA", forbidden: ["Rotonda", "Coches", "Cruce", "Circular"] },
+      { word: "ANDÉN", forbidden: ["Tren", "Estación", "Esperar", "Vía"] },
+      { word: "TÚNEL", forbidden: ["Subterráneo", "Paso", "Montaña", "Carretera"] },
+      { word: "AUTOPISTA", forbidden: ["Carriles", "Velocidad", "Peaje", "Coche"] },
+      { word: "CARRETERA", forbidden: ["Asfalto", "Coches", "Viaje", "Curvas"] },
+      { word: "AVENIDA", forbidden: ["Calle", "Ancha", "Árboles", "Ciudad"] },
+      { word: "CALLEJÓN", forbidden: ["Estrecho", "Calle", "Paso", "Ciudad"] },
+      { word: "RASCACIELOS", forbidden: ["Edificio", "Alto", "Ciudad", "Pisos"] },
+      { word: "APARTAMENTO", forbidden: ["Piso", "Vivienda", "Edificio", "Casa"] },
+      { word: "MONTACARGAS", forbidden: ["Subir", "Bajar", "Carga", "Plataforma"] },
+      { word: "BARANDILLA", forbidden: ["Escalera", "Agarrar", "Seguridad", "Pasamanos"] },
+      { word: "TIMBRE", forbidden: ["Puerta", "Sonar", "Botón", "Casa"] },
+      { word: "CERRADURA", forbidden: ["Llave", "Puerta", "Abrir", "Seguridad"] },
+      { word: "PESTILLO", forbidden: ["Cerrar", "Puerta", "Seguro", "Pasador"] },
+      { word: "PERSIANA", forbidden: ["Ventana", "Subir", "Bajar", "Luz"] },
+      { word: "AZOTEA", forbidden: ["Tejado", "Arriba", "Edificio", "Terraza"] },
+      { word: "DESVÁN", forbidden: ["Ático", "Guardar", "Techo", "Trastos"] },
+      { word: "TRASTERO", forbidden: ["Guardar", "Cosas", "Pequeño", "Cuarto"] },
+      { word: "SECADORA", forbidden: ["Ropa", "Secar", "Calor", "Tambor"] },
+      { word: "TENDEDERO", forbidden: ["Ropa", "Pinzas", "Secar", "Cuerda"] },
+      { word: "PINZA", forbidden: ["Sujetar", "Ropa", "Tender", "Plástico"] },
+      { word: "RECOGEDOR", forbidden: ["Basura", "Suelo", "Escoba", "Recoger"] },
+      { word: "DETERGENTE", forbidden: ["Lavar", "Ropa", "Jabón", "Espuma"] },
+      { word: "GOMINA", forbidden: ["Pelo", "Peinado", "Fijar", "Estilo"] },
+      { word: "ACONDICIONADOR", forbidden: ["Pelo", "Suave", "Crema", "Shampoo"] },
+      { word: "CEPILLO DE DIENTES", forbidden: ["Dientes", "Pasta", "Baño", "Cepillar"] },
+      { word: "MAQUILLAJE", forbidden: ["Cara", "Cosmética", "Pintar", "Base"] },
+      { word: "PERFUME", forbidden: ["Olor", "Fragancia", "Colonia", "Rociar"] },
+      { word: "NEUMÁTICO", forbidden: ["Rueda", "Coche", "Goma", "Aire"] }
     ];
     const defaultWords = classifiedWords.map(entry => entry.word);
 
@@ -4796,6 +4936,66 @@ const vofFacts = [
 
     // Fade transition for screen changes
     const appElement = document.getElementById('app');
+
+    // Animate top logo briefly when switching visible page section.
+    let logoResetTimer = null;
+    function playTopLogoSwapAnimation() {
+      if (!topLogo) return;
+
+      if (logoResetTimer) {
+        clearTimeout(logoResetTimer);
+        logoResetTimer = null;
+      }
+
+      topLogo.classList.remove('logo-swap-anim');
+      void topLogo.offsetWidth;
+      topLogo.src = 'indiHappy.png';
+      topLogo.classList.add('logo-swap-anim');
+
+      logoResetTimer = setTimeout(() => {
+        topLogo.src = 'indiBola.png';
+        topLogo.classList.remove('logo-swap-anim');
+      }, 700);
+    }
+
+    let logoSwapDebounceTimer = null;
+    function scheduleTopLogoSwap() {
+      if (!topLogo) return;
+      if (logoSwapDebounceTimer) clearTimeout(logoSwapDebounceTimer);
+      logoSwapDebounceTimer = setTimeout(playTopLogoSwapAnimation, 80);
+    }
+
+    const appSections = Array.from(document.querySelectorAll('#app > section[id]'));
+    let visibleSectionId = null;
+
+    function getVisibleSectionId() {
+      for (const section of appSections) {
+        if (window.getComputedStyle(section).display !== 'none') {
+          return section.id;
+        }
+      }
+      return null;
+    }
+
+    function detectSectionChangeForLogo() {
+      const nextVisibleSectionId = getVisibleSectionId();
+      if (visibleSectionId && nextVisibleSectionId && visibleSectionId !== nextVisibleSectionId) {
+        scheduleTopLogoSwap();
+      }
+      visibleSectionId = nextVisibleSectionId;
+    }
+
+    if (appSections.length > 0) {
+      visibleSectionId = getVisibleSectionId();
+      const sectionObserver = new MutationObserver(() => {
+        detectSectionChangeForLogo();
+      });
+
+      for (const section of appSections) {
+        sectionObserver.observe(section, { attributes: true, attributeFilter: ['style', 'class'] });
+      }
+    }
+
     function fadeTransition(callback) {
       appElement.classList.remove('screen-fade-in');
       appElement.classList.add('screen-fade-out');
