@@ -10,7 +10,7 @@
   <meta name="viewport"
     content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 
-  <meta name="description" content="Juegos divertidos creados por Mike">
+  <meta name="description" content="Juegos divertidos creados por Mike ">
 
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="indiBola.png">
@@ -134,6 +134,15 @@
       z-index: 0;
     }
 
+    .bg-star {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     @keyframes floatCircle1 {
       0% {
         transform: translate(0, 0) scale(1);
@@ -191,6 +200,49 @@
       100% {
         transform: translate(80vw, 90vh) scale(1.3);
         opacity: 0;
+      }
+    }
+
+    @keyframes driftStar1 {
+      0% {
+        transform: translate(0, 0);
+        opacity: 0;
+      }
+
+      12% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(20vw, -30vh);
+        opacity: 0;
+      }
+    }
+
+    @keyframes driftStar2 {
+      0% {
+        transform: translate(0, 0);
+        opacity: 0;
+      }
+
+      12% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-25vw, 22vh);
+        opacity: 0;
+      }
+    }
+
+    @keyframes twinkleStar {
+      0%,
+      100% {
+        filter: brightness(1);
+      }
+
+      50% {
+        filter: brightness(1.8);
       }
     }
 
@@ -793,6 +845,32 @@
       fill: #3e2723;
       stroke: #3e2723;
       stroke-width: 2.5;
+    }
+
+    .music-toggle-btn {
+      left: auto;
+      right: 20px;
+      display: flex;
+      opacity: 1;
+      z-index: 11001;
+    }
+
+    .music-toggle-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: #3e2723;
+      stroke-width: 2.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .music-toggle-btn .mute-slash {
+      display: none;
+    }
+
+    .music-toggle-btn.muted .mute-slash {
+      display: block;
     }
 
     /* ESTILOS TABÚ */
@@ -1432,6 +1510,15 @@
     </svg>
   </button>
 
+  <button id="musicToggleBtn" class="back-arrow-btn music-toggle-btn" aria-label="Música de fondo">
+    <svg viewBox="0 0 24 24">
+      <path d="M14 5l-5 4H5v6h4l5 4V5z"></path>
+      <path d="M17 9.5a4 4 0 010 5"></path>
+      <path d="M19.5 7a7 7 0 010 10"></path>
+      <path class="mute-slash" d="M4 20L20 4"></path>
+    </svg>
+  </button>
+
   <div class="container" id="mainContainer" style="opacity:0">
     <header>
       <img src="indiBola.png" alt="Logo" class="dog-logo">
@@ -1930,13 +2017,48 @@
       }, duration * 1000);
     }
 
+    function createBackgroundStar() {
+      const star = document.createElement('div');
+      star.className = 'bg-star';
+
+      const size = Math.random() * 2.2 + 1.2;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+
+      const startX = Math.random() * window.innerWidth;
+      const startY = Math.random() * window.innerHeight;
+      star.style.left = startX + 'px';
+      star.style.top = startY + 'px';
+
+      const driftAnimations = ['driftStar1', 'driftStar2'];
+      const drift = driftAnimations[Math.floor(Math.random() * driftAnimations.length)];
+      const driftDuration = Math.random() * 16 + 16;
+      const twinkleDuration = Math.random() * 1.8 + 1.3;
+
+      star.style.animation = `${drift} ${driftDuration}s linear forwards, twinkleStar ${twinkleDuration}s ease-in-out infinite`;
+
+      document.body.appendChild(star);
+
+      setTimeout(() => {
+        star.remove();
+      }, driftDuration * 1000);
+    }
+
     for (let i = 0; i < 6; i++) {
       setTimeout(() => createBackgroundCircle(), i * 1200);
+    }
+
+    for (let i = 0; i < 24; i++) {
+      setTimeout(() => createBackgroundStar(), i * 220);
     }
 
     setInterval(() => {
       createBackgroundCircle();
     }, 4000);
+
+    setInterval(() => {
+      createBackgroundStar();
+    }, 850);
     // --- FIN CÍRCULOS DE FONDO ---
 
     // --- AUDIO UNLOCK PATCH ---
@@ -2077,6 +2199,7 @@
     const categoryButtons = document.getElementById('categoryButtons');
     const activeCategoryBanner = document.getElementById('activeCategoryBanner');
     const backArrowBtn = document.getElementById('backArrowBtn');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
 
     // NUEVOS ELEMENTOS TABÚ Y SELECCIÓN DE MODO
     const gameModeSelection = document.getElementById('gameModeSelection');
@@ -4706,6 +4829,7 @@ const vofFacts = [
         src.connect(ctx.destination);
         src.start(0);
         audioUnlocked = true;
+        ensureBackgroundMusicPlayback();
         return true;
       } catch (err) {
         console.warn('No se pudo desbloquear audio:', err);
@@ -4742,6 +4866,36 @@ const vofFacts = [
       setTimeout(() => playSound(700, 0.1, 0.2), 80);
       setTimeout(() => playSound(900, 0.1, 0.22), 160);
       setTimeout(() => playSound(1200, 0.15, 0.25), 240);
+    }
+
+    let backgroundMusic = null;
+    let isBackgroundMusicEnabled = true;
+
+    function createBackgroundMusicPlayer() {
+      if (!backgroundMusic) {
+        backgroundMusic = new Audio('musica_fondo.mp3');
+        backgroundMusic.loop = true;
+        backgroundMusic.preload = 'auto';
+        backgroundMusic.volume = 0.35;
+      }
+      return backgroundMusic;
+    }
+
+    function updateMusicButtonIcon() {
+      if (!musicToggleBtn) return;
+      musicToggleBtn.classList.toggle('muted', !isBackgroundMusicEnabled);
+    }
+
+    function ensureBackgroundMusicPlayback() {
+      const music = createBackgroundMusicPlayer();
+      music.loop = true;
+      music.muted = !isBackgroundMusicEnabled;
+      if (music.paused) {
+        const playPromise = music.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => { });
+        }
+      }
     }
 
     // Counter controls
@@ -4833,6 +4987,11 @@ const vofFacts = [
       // 7. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
       else {
         backArrowBtn.style.display = 'none';
+      }
+
+      if (musicToggleBtn) {
+        musicToggleBtn.style.display = 'flex';
+        musicToggleBtn.style.opacity = '1';
       }
     }
 
@@ -6514,6 +6673,19 @@ const vofFacts = [
         else {
           updateArrowVisibility();
         }
+      });
+    }
+
+    if (musicToggleBtn) {
+      updateMusicButtonIcon();
+      musicToggleBtn.addEventListener('click', () => {
+        playClickSound();
+        isBackgroundMusicEnabled = !isBackgroundMusicEnabled;
+        updateMusicButtonIcon();
+        if (typeof unlockAudioWithUserGesture === 'function') {
+          unlockAudioWithUserGesture().catch(() => { });
+        }
+        ensureBackgroundMusicPlayback();
       });
     }
 
