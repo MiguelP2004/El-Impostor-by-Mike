@@ -4958,45 +4958,8 @@ const vofFacts = [
       }, 700);
     }
 
-    let logoSwapDebounceTimer = null;
-    function scheduleTopLogoSwap() {
-      if (!topLogo) return;
-      if (logoSwapDebounceTimer) clearTimeout(logoSwapDebounceTimer);
-      logoSwapDebounceTimer = setTimeout(playTopLogoSwapAnimation, 80);
-    }
-
-    const appSections = Array.from(document.querySelectorAll('#app > section[id]'));
-    let visibleSectionId = null;
-
-    function getVisibleSectionId() {
-      for (const section of appSections) {
-        if (window.getComputedStyle(section).display !== 'none') {
-          return section.id;
-        }
-      }
-      return null;
-    }
-
-    function detectSectionChangeForLogo() {
-      const nextVisibleSectionId = getVisibleSectionId();
-      if (visibleSectionId && nextVisibleSectionId && visibleSectionId !== nextVisibleSectionId) {
-        scheduleTopLogoSwap();
-      }
-      visibleSectionId = nextVisibleSectionId;
-    }
-
-    if (appSections.length > 0) {
-      visibleSectionId = getVisibleSectionId();
-      const sectionObserver = new MutationObserver(() => {
-        detectSectionChangeForLogo();
-      });
-
-      for (const section of appSections) {
-        sectionObserver.observe(section, { attributes: true, attributeFilter: ['style', 'class'] });
-      }
-    }
-
     function fadeTransition(callback) {
+      playTopLogoSwapAnimation();
       appElement.classList.remove('screen-fade-in');
       appElement.classList.add('screen-fade-out');
       setTimeout(function () {
@@ -5197,6 +5160,7 @@ const vofFacts = [
 
     // --- SELECCIÓN DE MODO ---
     selectImpostorMode.addEventListener('click', () => {
+      playTopLogoSwapAnimation();
       triggerModeTransition(selectImpostorMode, '#e53935', () => {
         // Sync player count from liar game (in case they came from there)
         if (numLiarPlayers >= 3 && numLiarPlayers <= 15) {
@@ -5223,6 +5187,7 @@ const vofFacts = [
     });
 
     selectTabooMode.addEventListener('click', () => {
+      playTopLogoSwapAnimation();
       triggerModeTransition(selectTabooMode, '#7c4dff', () => {
         // Hide mode selection, show taboo setup
         gameModeSelection.style.display = 'none';
@@ -5232,6 +5197,7 @@ const vofFacts = [
     });
 
     selectLiarMode.addEventListener('click', () => {
+      playTopLogoSwapAnimation();
       triggerModeTransition(selectLiarMode, '#00bfa5', () => {
         // Sync player count from impostor game
         numLiarPlayers = numPlayers;
@@ -5248,6 +5214,7 @@ const vofFacts = [
     });
 
     selectVofMode.addEventListener('click', () => {
+      playTopLogoSwapAnimation();
       triggerModeTransition(selectVofMode, '#ffb300', () => {
         // Sync player count
         numVofPlayers = numPlayers;
@@ -5413,6 +5380,7 @@ const vofFacts = [
     // Reveal question button
     liarRevealQuestionBtn.addEventListener('click', () => {
       playPopSound();
+      playTopLogoSwapAnimation();
       liarQuestionPass.style.display = 'none';
       liarQuestionView.style.display = 'block';
       
@@ -5441,6 +5409,7 @@ const vofFacts = [
 
     // Next player or finish
     liarNextPlayerBtn.addEventListener('click', () => {
+      playTopLogoSwapAnimation();
       const answer = liarAnswerInput.value.trim();
       if (!answer) {
         alert('Por favor, escribe tu respuesta antes de continuar.');
@@ -5725,6 +5694,7 @@ const vofFacts = [
     // Reveal role button
     vofRevealRoleBtn.addEventListener('click', () => {
       playPopSound();
+      playTopLogoSwapAnimation();
       vofPass.style.display = 'none';
       vofRoleView.style.display = 'block';
 
@@ -5764,6 +5734,7 @@ const vofFacts = [
     // Next player / start voting
     vofRoleNextBtn.addEventListener('click', () => {
       playClickSound();
+      playTopLogoSwapAnimation();
 
       if (currentVofPlayerIndex < numVofPlayers - 1) {
         currentVofPlayerIndex++;
@@ -5865,6 +5836,7 @@ const vofFacts = [
         });
         if (!sel) return;
         playClickSound();
+        playTopLogoSwapAnimation();
         const guessedId = parseInt(sel.dataset.id);
         vofVote.style.display = 'none';
         showVofResults(guessedId);
@@ -6140,6 +6112,7 @@ const vofFacts = [
 
     tabooCorrectBtn.addEventListener('click', () => {
       playSuccessSound();
+      playTopLogoSwapAnimation();
       tabooTeamScores[currentTabooTeam]++;
       const scoreDisplay = document.getElementById(`score${currentTabooTeam}`);
       if (scoreDisplay) {
@@ -6591,11 +6564,13 @@ const vofFacts = [
     revealBtn.addEventListener('click', () => {
       unlockAudioWithUserGesture();
       playPopSound();
+      playTopLogoSwapAnimation();
       showRoleFor(revealIndex);
     });
 
     nextBtn.addEventListener('click', () => {
       playClickSound();
+      playTopLogoSwapAnimation();
       roleArea.style.display = 'none';
       revealBtn.style.display = 'inline-block';
       nextBtn.style.display = 'none';
@@ -6616,6 +6591,7 @@ const vofFacts = [
         return;
       }
       playSuccessSound();
+      playTopLogoSwapAnimation();
       const votedId = parseInt(sel.dataset.id);
       showResults(votedId);
     });
