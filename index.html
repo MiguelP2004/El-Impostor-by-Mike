@@ -6344,11 +6344,12 @@ const vofFacts = [
         hint.style.marginTop = '4px';
         hint.textContent = 'Pasa desapercibido entre los civiles.';
         roleArea.appendChild(hint);
-        if (clueModeEnabled && currentWordCategory) {
+        if ((clueModeEnabled || selectedCategoryFilter) && currentWordCategory) {
+          const clueLabel = clueModeEnabled ? 'La pista es:' : 'La categoría es:';
           const clue = document.createElement('div');
           clue.className = 'impostor-clue';
           clue.innerHTML = `
-            <span class="impostor-clue-label">La pista es:</span>
+            <span class="impostor-clue-label">${clueLabel}</span>
             <span class="impostor-clue-word">${currentWordCategory}</span>
           `;
           roleArea.appendChild(clue);
