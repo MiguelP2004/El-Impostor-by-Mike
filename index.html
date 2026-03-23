@@ -1521,7 +1521,7 @@
     </svg>
   </button>
 
-  <button id="musicToggleBtn" class="back-arrow-btn music-toggle-btn" aria-label="Música de fondo">
+  <button id="musicToggleBtn" class="back-arrow-btn music-toggle-btn" aria-label="Volumen">
     <svg viewBox="0 0 24 24">
       <path d="M14 5l-5 4H5v6h4l5 4V5z"></path>
       <path d="M17 9.5a4 4 0 010 5"></path>
@@ -4970,17 +4970,7 @@ const vofFacts = [
     }
 
     // Sound effects
-    let audioContext = null;
-
-    function initAudioContext() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      return audioContext;
-    }
+    let isSoundEnabled = true;
 
     async function unlockAudioWithUserGesture() {
       try {
@@ -4992,7 +4982,6 @@ const vofFacts = [
         src.connect(ctx.destination);
         src.start(0);
         audioUnlocked = true;
-        ensureBackgroundMusicPlayback();
         return true;
       } catch (err) {
         console.warn('No se pudo desbloquear audio:', err);
@@ -5002,6 +4991,7 @@ const vofFacts = [
 
     function playSound(frequency, duration, volume = 0.3) {
       try {
+        if (!isSoundEnabled) return;
         const ctx = createSharedAudioContext();
         if (ctx.state === 'suspended') return;
         const oscillator = ctx.createOscillator();
@@ -5031,34 +5021,9 @@ const vofFacts = [
       setTimeout(() => playSound(1200, 0.15, 0.25), 240);
     }
 
-    let backgroundMusic = null;
-    let isBackgroundMusicEnabled = true;
-
-    function createBackgroundMusicPlayer() {
-      if (!backgroundMusic) {
-        backgroundMusic = new Audio('musica_fondo.mp3');
-        backgroundMusic.loop = true;
-        backgroundMusic.preload = 'auto';
-        backgroundMusic.volume = 0.35;
-      }
-      return backgroundMusic;
-    }
-
-    function updateMusicButtonIcon() {
+    function updateVolumeButtonIcon() {
       if (!musicToggleBtn) return;
-      musicToggleBtn.classList.toggle('muted', !isBackgroundMusicEnabled);
-    }
-
-    function ensureBackgroundMusicPlayback() {
-      const music = createBackgroundMusicPlayer();
-      music.loop = true;
-      music.muted = !isBackgroundMusicEnabled;
-      if (music.paused) {
-        const playPromise = music.play();
-        if (playPromise && typeof playPromise.catch === 'function') {
-          playPromise.catch(() => { });
-        }
-      }
+      musicToggleBtn.classList.toggle('muted', !isSoundEnabled);
     }
 
     // Counter controls
@@ -6854,15 +6819,16 @@ const vofFacts = [
     }
 
     if (musicToggleBtn) {
-      updateMusicButtonIcon();
+      updateVolumeButtonIcon();
       musicToggleBtn.addEventListener('click', () => {
-        playClickSound();
-        isBackgroundMusicEnabled = !isBackgroundMusicEnabled;
-        updateMusicButtonIcon();
+        isSoundEnabled = !isSoundEnabled;
+        updateVolumeButtonIcon();
         if (typeof unlockAudioWithUserGesture === 'function') {
           unlockAudioWithUserGesture().catch(() => { });
         }
-        ensureBackgroundMusicPlayback();
+        if (isSoundEnabled) {
+          playClickSound();
+        }
       });
     }
 
