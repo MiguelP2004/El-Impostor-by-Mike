@@ -260,6 +260,8 @@
       padding: 20px;
 
       animation: float 6s ease-in-out infinite;
+      will-change: transform;
+      transform: translateZ(0);
       position: relative;
       z-index: 1;
     }
@@ -1371,10 +1373,28 @@
     #selectLiarMode { background: linear-gradient(135deg, #00bfa5, #00796b); border-color: #00574d; }
     #selectVofMode { background: linear-gradient(135deg, #ffb300, #e65100); border-color: #9e3200; }
 
+    /* Sway animation for game mode buttons */
+    @keyframes cardSway {
+      0%, 100% { transform: rotate(-1.5deg); }
+      50%       { transform: rotate(1.5deg);  }
+    }
+
+    .game-mode-grid .game-mode-card {
+      animation: cardSway 3s ease-in-out infinite;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    #selectImpostorMode { animation-delay: 0s;    }
+    #selectTabooMode    { animation-delay: 0.75s; }
+    #selectLiarMode     { animation-delay: 1.5s;  }
+    #selectVofMode      { animation-delay: 2.25s; }
+
     /* Animación al pulsar (mobile-friendly con :active) */
     .game-mode-card:active {
-      transform: scale(0.93);
+      transform: scale(0.93) !important;
       filter: brightness(0.85);
+      animation: none;
     }
 
     /* Fade transition for screen changes */
@@ -5166,8 +5186,8 @@ const vofFacts = [
       triggerModeTransition(selectLiarMode, '#00bfa5', () => {
         // Sync player count from impostor game
         numLiarPlayers = numPlayers;
-        // Cap at 7 for liar game
-        if (numLiarPlayers > 7) numLiarPlayers = 7;
+        // Cap at 10 for liar game
+        if (numLiarPlayers > 10) numLiarPlayers = 10;
         if (numLiarPlayers < 3) numLiarPlayers = 3;
         liarPlayersDisplay.textContent = numLiarPlayers;
 
@@ -5224,7 +5244,7 @@ const vofFacts = [
     });
 
     incLiarPlayers.addEventListener('click', () => {
-      if (numLiarPlayers < 7) {
+      if (numLiarPlayers < 10) {
         numLiarPlayers++;
         liarPlayersDisplay.textContent = numLiarPlayers;
         playPopSound();
