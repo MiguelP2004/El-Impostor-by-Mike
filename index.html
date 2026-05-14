@@ -1487,6 +1487,16 @@
       box-shadow: 0 6px 16px rgba(255, 77, 77, 0.4);
     }
 
+    .guess-remove-life-btn {
+      background: linear-gradient(180deg, #ff8a8a, #ff4d4d);
+      color: #141010;
+      box-shadow: 0 8px 22px rgba(255, 77, 77, 0.45);
+    }
+
+    .guess-remove-life-btn:hover {
+      box-shadow: 0 12px 28px rgba(255, 77, 77, 0.6);
+    }
+
     .impostor-clue {
       margin-top: 12px;
       text-align: center;
@@ -1962,9 +1972,13 @@
           <div class="first-speaker" id="guessFirstSpeakerName" style="display:none"></div>
           <p class="muted" style="font-weight:700;margin-bottom:8px;">Solo preguntas de SÍ y NO</p>
           <p class="muted" style="margin-bottom:12px;">Si alguien falla al decir quién es, restadle una vida manualmente.</p>
-          <div class="players-list" id="guessLivesList"></div>
+          <div style="display:grid;gap:10px;max-width:360px;margin:0 auto 14px;">
+            <select id="guessPlayerSelect" class="name-input"></select>
+            <div id="guessSelectedLives" style="font-family:'Fredoka One',cursive;font-size:30px;color:#ffc107;"></div>
+          </div>
+          <button class="btn medium guess-remove-life-btn" id="guessRemoveLifeBtn">Quitar vida</button>
           <div style="height:14px"></div>
-          <button class="btn big secondary" id="guessNewGameBtn">Nueva partida</button>
+          <button class="btn big secondary" id="guessNewGameBtn">Finalizar partida</button>
         </div>
       </section>
 
@@ -2341,7 +2355,9 @@
     const guessPromptNextBtn = document.getElementById('guessPromptNextBtn');
     const guessRound = document.getElementById('guessRound');
     const guessFirstSpeakerName = document.getElementById('guessFirstSpeakerName');
-    const guessLivesList = document.getElementById('guessLivesList');
+    const guessPlayerSelect = document.getElementById('guessPlayerSelect');
+    const guessSelectedLives = document.getElementById('guessSelectedLives');
+    const guessRemoveLifeBtn = document.getElementById('guessRemoveLifeBtn');
     const guessNewGameBtn = document.getElementById('guessNewGameBtn');
     const decTeams = document.getElementById('decTeams');
     const incTeams = document.getElementById('incTeams');
@@ -6231,46 +6247,47 @@ const vofFacts = [
       displayNumber();
     }
 
-    function buildGuessLivesList() {
-      guessLivesList.innerHTML = '';
-      guessPlayers.forEach(player => {
-        const row = document.createElement('div');
-        row.style.cssText = 'display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;background:rgba(42,45,58,0.95);border:2px solid #353847;border-radius:12px;';
-
-        const name = document.createElement('div');
-        name.style.cssText = 'font-family:\'Fredoka One\',cursive;font-size:16px;color:#ffc107;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
-        name.textContent = player.name;
-
-        const controls = document.createElement('div');
-        controls.style.cssText = 'display:flex;align-items:center;gap:8px;';
-
-        const lives = document.createElement('div');
-        lives.id = `guessLives-${player.id}`;
-        lives.style.cssText = 'font-weight:700;color:#f0f1f5;min-width:60px;text-align:center;';
-        lives.textContent = `❤️ ${player.lives}`;
-
-        const loseLifeBtn = document.createElement('button');
-        loseLifeBtn.className = 'btn medium secondary';
-        loseLifeBtn.style.width = 'auto';
-        loseLifeBtn.textContent = '-1 vida';
-        loseLifeBtn.disabled = player.lives <= 0;
-        loseLifeBtn.style.opacity = player.lives <= 0 ? '0.5' : '1';
-        loseLifeBtn.addEventListener('click', () => {
-          if (player.lives <= 0) return;
-          player.lives--;
-          playFailSound();
-          lives.textContent = `❤️ ${player.lives}`;
-          loseLifeBtn.disabled = player.lives <= 0;
-          loseLifeBtn.style.opacity = player.lives <= 0 ? '0.5' : '1';
-        });
-
-        controls.appendChild(lives);
-        controls.appendChild(loseLifeBtn);
-        row.appendChild(name);
-        row.appendChild(controls);
-        guessLivesList.appendChild(row);
-      });
+    function updateGuessSelectedLifeDisplay() {
+      const selectedPlayerId = parseInt(guessPlayerSelect.value, 10);
+      const selectedPlayer = guessPlayers.find(player => player.id === selectedPlayerId);
+      if (!selectedPlayer) {
+        guessSelectedLives.textContent = '❤️ 0';
+        guessRemoveLifeBtn.disabled = true;
+        guessRemoveLifeBtn.style.opacity = '0.5';
+        return;
+      }
+      guessSelectedLives.textContent = `❤️ ${selectedPlayer.lives}`;
+      guessRemoveLifeBtn.disabled = selectedPlayer.lives <= 0;
+      guessRemoveLifeBtn.style.opacity = selectedPlayer.lives <= 0 ? '0.5' : '1';
     }
+
+    function buildGuessLivesList() {
+      guessPlayerSelect.innerHTML = '';
+      guessPlayers.forEach(player => {
+        const option = document.createElement('option');
+        option.value = String(player.id);
+        option.textContent = player.name;
+        guessPlayerSelect.appendChild(option);
+      });
+      if (guessPlayers.length > 0) {
+        guessPlayerSelect.value = String(guessPlayers[0].id);
+      }
+      updateGuessSelectedLifeDisplay();
+    }
+
+    guessPlayerSelect.addEventListener('change', () => {
+      playPopSound();
+      updateGuessSelectedLifeDisplay();
+    });
+
+    guessRemoveLifeBtn.addEventListener('click', () => {
+      const selectedPlayerId = parseInt(guessPlayerSelect.value, 10);
+      const selectedPlayer = guessPlayers.find(player => player.id === selectedPlayerId);
+      if (!selectedPlayer || selectedPlayer.lives <= 0) return;
+      selectedPlayer.lives--;
+      playFailSound();
+      updateGuessSelectedLifeDisplay();
+    });
 
     function showGuessRound() {
       const firstSpeaker = guessPlayers[randInt(guessPlayers.length)];
