@@ -1372,6 +1372,7 @@
     #selectTabooMode { background: linear-gradient(135deg, #7c4dff, #4a148c); border-color: #5f2ca5; }
     #selectLiarMode { background: linear-gradient(135deg, #00bfa5, #00796b); border-color: #00574d; }
     #selectVofMode { background: linear-gradient(135deg, #ffb300, #e65100); border-color: #9e3200; }
+    #selectGuessMode { background: linear-gradient(135deg, #26c6da, #006064); border-color: #00434a; }
 
     /* Sway animation for game mode buttons */
     @keyframes cardSway {
@@ -1391,6 +1392,7 @@
     #selectTabooMode    { animation-delay: 0.75s; }
     #selectLiarMode     { animation-delay: 1.5s;  }
     #selectVofMode      { animation-delay: 2.25s; }
+    #selectGuessMode    { animation-delay: 3s; }
 
     /* Animación al pulsar (mobile-friendly con :active) */
     .game-mode-card:active {
@@ -1582,6 +1584,10 @@
             <button class="game-mode-card" id="selectVofMode">
               <span class="mode-emoji">✅❌</span>
               <span class="mode-label">¿Verdadero o Falso?</span>
+            </button>
+            <button class="game-mode-card" id="selectGuessMode">
+              <span class="mode-emoji">🧩❔</span>
+              <span class="mode-label">Adivina el...</span>
             </button>
           </div>
         </div>
@@ -1893,6 +1899,71 @@
         <div style="height:20px"></div>
         <div class="center">
           <button class="btn big secondary" id="liarNewGameBtn">Nueva partida</button>
+        </div>
+      </section>
+
+      <!-- Guess Game Sections -->
+      <section id="guessSetup" class="card" style="display:none">
+        <div class="center">
+          <p class="muted" style="margin-bottom:16px;font-weight:700;">Adivina el...</p>
+          <div>
+            <label>Número de Jugadores</label>
+            <div class="counter">
+              <button class="counter-btn" id="decGuessPlayers">−</button>
+              <div class="counter-value" id="guessPlayersDisplay">4</div>
+              <button class="counter-btn" id="incGuessPlayers">+</button>
+            </div>
+          </div>
+          <div style="margin-top:16px" class="center mode-buttons">
+            <div class="mode-buttons-row">
+              <button class="btn big secondary" id="guessCharacterModeBtn">Adivina el personaje</button>
+              <button class="btn big secondary" id="guessCountryModeBtn">Adivina el país</button>
+            </div>
+            <div class="mode-buttons-row single">
+              <button class="btn big secondary" id="guessFamousModeBtn">Adivina el famoso</button>
+            </div>
+          </div>
+          <div style="margin-top:16px">
+            <button class="btn big" id="guessContinueBtn" disabled style="opacity:0.5;">Continuar</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="guessNames" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:18px;color:#ffc107;margin-bottom:16px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">
+            Jugadores</p>
+          <div id="guessNamesList" style="display:grid;gap:10px;margin-bottom:16px"></div>
+          <button class="btn big" id="startGuessGameBtn">Empezar partida</button>
+        </div>
+      </section>
+
+      <section id="guessPass" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="player-indicator" id="guessPlayerIndicator">Jugador</div>
+          <div class="player-number" id="guessPlayerNumber">Jugador 1 de 4</div>
+          <div style="height:8px"></div>
+          <button class="btn big secondary" id="guessRevealPromptBtn">🔍 Ver siguiente reto</button>
+        </div>
+      </section>
+
+      <section id="guessPromptView" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="player-indicator" id="guessPromptPlayerName">Jugador</div>
+          <div style="height:16px"></div>
+          <div id="guessPromptText" style="font-size:20px;font-weight:600;color:#f0f1f5;margin-bottom:20px;line-height:1.4;padding:0 10px;"></div>
+          <button class="btn big" id="guessPromptNextBtn">Siguiente</button>
+        </div>
+      </section>
+
+      <section id="guessRound" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <div class="first-speaker" id="guessFirstSpeakerName" style="display:none"></div>
+          <p class="muted" style="font-weight:700;margin-bottom:8px;">Solo preguntas de SÍ y NO</p>
+          <p class="muted" style="margin-bottom:12px;">Si alguien falla al decir quién es, restadle una vida manualmente.</p>
+          <div class="players-list" id="guessLivesList"></div>
+          <div style="height:14px"></div>
+          <button class="btn big secondary" id="guessNewGameBtn">Nueva partida</button>
         </div>
       </section>
 
@@ -2243,6 +2314,7 @@
     const selectTabooMode = document.getElementById('selectTabooMode');
     const selectLiarMode = document.getElementById('selectLiarMode');
     const selectVofMode = document.getElementById('selectVofMode');
+    const selectGuessMode = document.getElementById('selectGuessMode');
     const vofSetup = document.getElementById('vofSetup');
     const vofPlayersDisplay = document.getElementById('vofPlayersDisplay');
     const decVofPlayers = document.getElementById('decVofPlayers');
@@ -2264,6 +2336,29 @@
     const vofResults = document.getElementById('vofResults');
     const vofResultText = document.getElementById('vofResultText');
     const vofNewGameBtn = document.getElementById('vofNewGameBtn');
+    const guessSetup = document.getElementById('guessSetup');
+    const decGuessPlayers = document.getElementById('decGuessPlayers');
+    const incGuessPlayers = document.getElementById('incGuessPlayers');
+    const guessPlayersDisplay = document.getElementById('guessPlayersDisplay');
+    const guessCharacterModeBtn = document.getElementById('guessCharacterModeBtn');
+    const guessCountryModeBtn = document.getElementById('guessCountryModeBtn');
+    const guessFamousModeBtn = document.getElementById('guessFamousModeBtn');
+    const guessContinueBtn = document.getElementById('guessContinueBtn');
+    const guessNames = document.getElementById('guessNames');
+    const guessNamesList = document.getElementById('guessNamesList');
+    const startGuessGameBtn = document.getElementById('startGuessGameBtn');
+    const guessPass = document.getElementById('guessPass');
+    const guessPlayerIndicator = document.getElementById('guessPlayerIndicator');
+    const guessPlayerNumber = document.getElementById('guessPlayerNumber');
+    const guessRevealPromptBtn = document.getElementById('guessRevealPromptBtn');
+    const guessPromptView = document.getElementById('guessPromptView');
+    const guessPromptPlayerName = document.getElementById('guessPromptPlayerName');
+    const guessPromptText = document.getElementById('guessPromptText');
+    const guessPromptNextBtn = document.getElementById('guessPromptNextBtn');
+    const guessRound = document.getElementById('guessRound');
+    const guessFirstSpeakerName = document.getElementById('guessFirstSpeakerName');
+    const guessLivesList = document.getElementById('guessLivesList');
+    const guessNewGameBtn = document.getElementById('guessNewGameBtn');
     const decTeams = document.getElementById('decTeams');
     const incTeams = document.getElementById('incTeams');
     const teamsDisplay = document.getElementById('teamsDisplay');
@@ -4389,6 +4484,26 @@
     let currentVofPlayerIndex = 0;
     let vofPlayerFacts = [];
 
+    // Guess game variables
+    const MIN_GUESS_PLAYERS = 2;
+    const MAX_GUESS_PLAYERS = 8;
+    let numGuessPlayers = 4;
+    let guessPlayers = [];
+    let selectedGuessCategoryKey = null;
+    let currentGuessPlayerIndex = 0;
+    const guessCategoryConfig = {
+      PERSONAJE: { label: 'personaje', sourceCategory: 'PERSONAJE' },
+      PAIS: { label: 'país', sourceCategory: 'LUGAR' },
+      FAMOSO: { label: 'famoso', sourceCategory: 'FAMOSO' }
+    };
+    const nonCountryLugarWords = new Set([
+      'Chernóbil', 'París', 'Londres', 'Nueva York', 'Tokio', 'Roma', 'Barcelona', 'Moscú', 'Berlín', 'Sídney',
+      'Los Ángeles', 'Madrid', 'Machu Picchu', 'Taj Mahal', 'Gran Cañón', 'Monte Everest', 'Torre Eiffel',
+      'Estatua de la Libertad', 'Gran Muralla', 'Sagrada Familia', 'Marte', 'Júpiter', 'Saturno', 'Mercurio',
+      'Venus', 'Urano', 'Neptuno', 'Plutón', 'Sol', 'Luna', 'Vía Láctea', 'Budapest', 'Dubai', 'Hawái', 'Hollywood',
+      'Antártida', 'Las Vegas', 'Ibiza', 'Tenerife'
+    ]);
+
     // Load persisted settings from localStorage
     (function () {
       try {
@@ -4397,15 +4512,18 @@
         if (_s.numImpostors >= 1) numImpostors = Math.min(Math.max(1, _s.numImpostors), getMaxImpostors(numPlayers));
         if (_s.numLiarPlayers >= 3 && _s.numLiarPlayers <= 7) numLiarPlayers = _s.numLiarPlayers;
         if (_s.numVofPlayers >= 3 && _s.numVofPlayers <= MAX_VOF_PLAYERS) numVofPlayers = _s.numVofPlayers;
+        if (_s.numGuessPlayers >= MIN_GUESS_PLAYERS && _s.numGuessPlayers <= MAX_GUESS_PLAYERS) numGuessPlayers = _s.numGuessPlayers;
       } catch (e) {}
       const plDisp = document.getElementById('playersDisplay');
       const impDisp = document.getElementById('impostorsDisplay');
       const liarDisp = document.getElementById('liarPlayersDisplay');
       const vofDisp = document.getElementById('vofPlayersDisplay');
+      const guessDisp = document.getElementById('guessPlayersDisplay');
       if (plDisp) plDisp.textContent = numPlayers;
       if (impDisp) impDisp.textContent = numImpostors;
       if (liarDisp) liarDisp.textContent = numLiarPlayers;
       if (vofDisp) vofDisp.textContent = numVofPlayers;
+      if (guessDisp) guessDisp.textContent = numGuessPlayers;
     })();
 
     let liarIndex = -1;
@@ -4890,7 +5008,7 @@ const vofFacts = [
 
     function saveGameSettings() {
       try {
-        localStorage.setItem('impostorSettings', JSON.stringify({ numPlayers, numImpostors, numLiarPlayers, numVofPlayers }));
+        localStorage.setItem('impostorSettings', JSON.stringify({ numPlayers, numImpostors, numLiarPlayers, numVofPlayers, numGuessPlayers }));
       } catch (e) {}
     }
 
@@ -5098,7 +5216,7 @@ const vofFacts = [
       if (gameModeSelection.style.display === 'block') {
         backArrowBtn.style.display = 'none';
       }
-      // 2. Pantallas de Configuración (Setup, Categoría, Nombres, Taboo Setup, Liar Setup, Liar Names, VoF Setup, VoF Names) -> VISIBLE
+      // 2. Pantallas de Configuración -> VISIBLE
       else if (setup.style.display === 'block' ||
         categorySelection.style.display === 'block' ||
         namesSection.style.display === 'block' ||
@@ -5106,7 +5224,9 @@ const vofFacts = [
         liarSetup.style.display === 'block' ||
         liarNames.style.display === 'block' ||
         vofSetup.style.display === 'block' ||
-        vofNames.style.display === 'block') {
+        vofNames.style.display === 'block' ||
+        guessSetup.style.display === 'block' ||
+        guessNames.style.display === 'block') {
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
@@ -5134,7 +5254,14 @@ const vofFacts = [
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
-      // 7. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
+      // 7. Juego Adivina (Pass, View, Ronda) -> VISIBLE
+      else if (guessPass.style.display === 'block' ||
+               guessPromptView.style.display === 'block' ||
+               guessRound.style.display === 'block') {
+        backArrowBtn.style.display = 'flex';
+        backArrowBtn.style.opacity = '1';
+      }
+      // 8. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
       else {
         backArrowBtn.style.display = 'none';
       }
@@ -5216,6 +5343,18 @@ const vofFacts = [
       });
     });
 
+    selectGuessMode.addEventListener('click', () => {
+      playTopLogoSwapAnimation();
+      triggerModeTransition(selectGuessMode, '#26c6da', () => {
+        numGuessPlayers = Math.min(MAX_GUESS_PLAYERS, Math.max(MIN_GUESS_PLAYERS, numPlayers));
+        guessPlayersDisplay.textContent = numGuessPlayers;
+        resetGuessCategorySelection();
+        gameModeSelection.style.display = 'none';
+        guessSetup.style.display = 'block';
+        updateArrowVisibility();
+      });
+    });
+
     // VoF player counter controls
     decVofPlayers.addEventListener('click', () => {
       if (numVofPlayers > 3) {
@@ -5233,6 +5372,38 @@ const vofFacts = [
         playPopSound();
         saveGameSettings();
       }
+    });
+
+    // Guess player counter controls
+    decGuessPlayers.addEventListener('click', () => {
+      if (numGuessPlayers > MIN_GUESS_PLAYERS) {
+        numGuessPlayers--;
+        guessPlayersDisplay.textContent = numGuessPlayers;
+        playClickSound();
+        saveGameSettings();
+      }
+    });
+
+    incGuessPlayers.addEventListener('click', () => {
+      if (numGuessPlayers < MAX_GUESS_PLAYERS) {
+        numGuessPlayers++;
+        guessPlayersDisplay.textContent = numGuessPlayers;
+        playPopSound();
+        saveGameSettings();
+      }
+    });
+
+    guessCharacterModeBtn.addEventListener('click', () => selectGuessCategory('PERSONAJE'));
+    guessCountryModeBtn.addEventListener('click', () => selectGuessCategory('PAIS'));
+    guessFamousModeBtn.addEventListener('click', () => selectGuessCategory('FAMOSO'));
+
+    guessContinueBtn.addEventListener('click', () => {
+      if (!selectedGuessCategoryKey) {
+        alert('Selecciona una opción para continuar.');
+        return;
+      }
+      playSuccessSound();
+      showGuessNamesScreen();
     });
 
     // Liar player counter controls
@@ -5867,6 +6038,264 @@ const vofFacts = [
         vofResults.style.display = 'none';
         vofPlayersDisplay.textContent = numVofPlayers;
         vofSetup.style.display = 'block';
+        updateArrowVisibility();
+      });
+    });
+
+    function resetGuessCategorySelection() {
+      selectedGuessCategoryKey = null;
+      const allGuessButtons = [guessCharacterModeBtn, guessCountryModeBtn, guessFamousModeBtn];
+      allGuessButtons.forEach(btn => {
+        btn.style.boxShadow = 'none';
+        btn.style.transform = 'none';
+      });
+      guessContinueBtn.disabled = true;
+      guessContinueBtn.style.opacity = '0.5';
+    }
+
+    function selectGuessCategory(categoryKey) {
+      selectedGuessCategoryKey = categoryKey;
+      const allGuessButtons = [
+        { key: 'PERSONAJE', btn: guessCharacterModeBtn },
+        { key: 'PAIS', btn: guessCountryModeBtn },
+        { key: 'FAMOSO', btn: guessFamousModeBtn }
+      ];
+      allGuessButtons.forEach(({ key, btn }) => {
+        if (key === categoryKey) {
+          btn.style.boxShadow = '0 0 0 3px rgba(255,193,7,0.75)';
+          btn.style.transform = 'scale(1.03)';
+        } else {
+          btn.style.boxShadow = 'none';
+          btn.style.transform = 'none';
+        }
+      });
+      playPopSound();
+      guessContinueBtn.disabled = false;
+      guessContinueBtn.style.opacity = '1';
+    }
+
+    function getGuessWordPool(categoryKey) {
+      if (categoryKey === 'PAIS') {
+        const countries = classifiedWords
+          .filter(entry => entry.category === 'LUGAR' && !nonCountryLugarWords.has(entry.word))
+          .map(entry => entry.word);
+        return Array.from(new Set(countries));
+      }
+      const source = guessCategoryConfig[categoryKey];
+      if (!source) return [];
+      return classifiedWords
+        .filter(entry => entry.category === source.sourceCategory)
+        .map(entry => entry.word);
+    }
+
+    function showGuessNamesScreen() {
+      fadeTransition(() => {
+        guessSetup.style.display = 'none';
+
+        guessPlayers = [];
+        for (let i = 0; i < numGuessPlayers; i++) {
+          guessPlayers.push({ id: i, name: `Jugador ${i + 1}`, lives: 3, clueForNext: '' });
+        }
+
+        let savedGuessNames = [];
+        try {
+          const stored = localStorage.getItem('playerNames');
+          if (stored) savedGuessNames = JSON.parse(stored);
+        } catch (e) { savedGuessNames = []; }
+
+        guessNamesList.innerHTML = '';
+        guessPlayers.forEach((p, idx) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'name-input-wrapper';
+          wrapper.style.animation = `slideIn 0.3s ease-out ${idx * 0.05}s forwards`;
+          wrapper.style.opacity = '0';
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.placeholder = `Jugador ${idx + 1}`;
+          input.value = savedGuessNames[idx] || '';
+          input.dataset.playerId = p.id;
+          input.className = 'name-input';
+          wrapper.appendChild(input);
+          guessNamesList.appendChild(wrapper);
+        });
+
+        guessNames.style.display = 'block';
+        updateArrowVisibility();
+      });
+    }
+
+    startGuessGameBtn.addEventListener('click', () => {
+      unlockAudioWithUserGesture();
+      playStartGameSound();
+
+      const savedGuessNames = [];
+      Array.from(guessNamesList.children).forEach(wrapper => {
+        const input = wrapper.querySelector('input');
+        const id = parseInt(input.dataset.playerId);
+        const name = input.value.trim() || `Jugador ${id + 1}`;
+        guessPlayers[id].name = name;
+        guessPlayers[id].lives = 3;
+        savedGuessNames[id] = input.value.trim();
+      });
+
+      try {
+        localStorage.setItem('playerNames', JSON.stringify(savedGuessNames));
+      } catch (e) { }
+
+      const wordPool = shuffleArray(getGuessWordPool(selectedGuessCategoryKey));
+      if (!wordPool.length) {
+        alert('No hay palabras disponibles para esta opción.');
+        return;
+      }
+
+      for (let i = 0; i < guessPlayers.length; i++) {
+        guessPlayers[i].clueForNext = wordPool[i % wordPool.length];
+      }
+
+      currentGuessPlayerIndex = 0;
+      fadeTransition(() => {
+        guessNames.style.display = 'none';
+        guessPass.style.display = 'block';
+        updateGuessPlayerIndicator();
+        updateArrowVisibility();
+      });
+    });
+
+    function updateGuessPlayerIndicator() {
+      const p = guessPlayers[currentGuessPlayerIndex];
+      guessPlayerIndicator.textContent = p.name;
+      guessPlayerNumber.textContent = `Jugador ${currentGuessPlayerIndex + 1} de ${numGuessPlayers}`;
+    }
+
+    guessRevealPromptBtn.addEventListener('click', () => {
+      playPopSound();
+      playTopLogoSwapAnimation();
+      guessPass.style.display = 'none';
+      guessPromptView.style.display = 'block';
+
+      const currentPlayer = guessPlayers[currentGuessPlayerIndex];
+      const targetIndex = (currentGuessPlayerIndex + 1) % numGuessPlayers;
+      const isLastPlayer = currentGuessPlayerIndex === numGuessPlayers - 1;
+      const targetText = isLastPlayer ? 'al primer jugador' : 'al siguiente jugador';
+      const xLabel = guessCategoryConfig[selectedGuessCategoryKey].label;
+
+      guessPromptPlayerName.textContent = currentPlayer.name;
+      guessPromptText.innerHTML =
+        `<div class="muted" style="margin-bottom:10px;">${targetText}, su ${xLabel} será...</div>` +
+        `<div style="font-size:32px;color:#4fd1c5;font-family:'Fredoka One',cursive;text-shadow:0 3px 10px rgba(79,209,197,0.55);">${guessPlayers[currentGuessPlayerIndex].clueForNext}</div>` +
+        `<div class="muted" style="margin-top:12px;">(Esto es para ${guessPlayers[targetIndex].name})</div>`;
+
+      guessPromptNextBtn.textContent = isLastPlayer ? 'Empezar ronda' : 'Siguiente';
+      updateArrowVisibility();
+    });
+
+    guessPromptNextBtn.addEventListener('click', () => {
+      playClickSound();
+      playTopLogoSwapAnimation();
+      if (currentGuessPlayerIndex < numGuessPlayers - 1) {
+        currentGuessPlayerIndex++;
+        guessPromptView.style.display = 'none';
+        guessPass.style.display = 'block';
+        updateGuessPlayerIndicator();
+        updateArrowVisibility();
+      } else {
+        guessPromptView.style.display = 'none';
+        showGuessCountdown();
+      }
+    });
+
+    function showGuessCountdown() {
+      if (backArrowBtn) backArrowBtn.style.display = 'none';
+
+      const countdownScreen = document.createElement('div');
+      countdownScreen.className = 'countdown-screen';
+      document.body.appendChild(countdownScreen);
+      const innerContent = document.createElement('div');
+      innerContent.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:550px;width:90%;text-align:center;';
+      countdownScreen.appendChild(innerContent);
+
+      let count = 3;
+      function displayNumber() {
+        innerContent.innerHTML = `<div class="countdown-number">${count}</div>`;
+        if (count === 3) playSound(600, 0.15, 0.25);
+        else if (count === 2) playSound(750, 0.15, 0.25);
+        else if (count === 1) playSound(900, 0.15, 0.25);
+        count--;
+        if (count >= 1) {
+          setTimeout(displayNumber, 1000);
+        } else {
+          setTimeout(() => {
+            innerContent.innerHTML = `<div class="countdown-number" style="font-size:50px;color:#4fd1c5">¡A JUGAR!</div>`;
+            playSound(1200, 0.3, 0.3);
+            setTimeout(() => playSound(1400, 0.2, 0.25), 150);
+            setTimeout(() => {
+              countdownScreen.remove();
+              showGuessRound();
+            }, 1500);
+          }, 1000);
+        }
+      }
+      displayNumber();
+    }
+
+    function buildGuessLivesList() {
+      guessLivesList.innerHTML = '';
+      guessPlayers.forEach(player => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:rgba(42,45,58,0.95);border:2px solid #353847;border-radius:12px;';
+
+        const name = document.createElement('div');
+        name.style.cssText = 'font-family:\'Fredoka One\',cursive;font-size:16px;color:#ffc107;';
+        name.textContent = player.name;
+
+        const controls = document.createElement('div');
+        controls.style.cssText = 'display:flex;align-items:center;gap:8px;';
+
+        const lives = document.createElement('div');
+        lives.id = `guessLives-${player.id}`;
+        lives.style.cssText = 'font-weight:700;color:#f0f1f5;min-width:60px;text-align:center;';
+        lives.textContent = `❤️ ${player.lives}`;
+
+        const loseLifeBtn = document.createElement('button');
+        loseLifeBtn.className = 'btn medium secondary';
+        loseLifeBtn.style.width = 'auto';
+        loseLifeBtn.textContent = '-1 vida';
+        loseLifeBtn.disabled = player.lives <= 0;
+        loseLifeBtn.style.opacity = player.lives <= 0 ? '0.5' : '1';
+        loseLifeBtn.addEventListener('click', () => {
+          if (player.lives <= 0) return;
+          player.lives--;
+          playFailSound();
+          lives.textContent = `❤️ ${player.lives}`;
+          loseLifeBtn.disabled = player.lives <= 0;
+          loseLifeBtn.style.opacity = player.lives <= 0 ? '0.5' : '1';
+        });
+
+        controls.appendChild(lives);
+        controls.appendChild(loseLifeBtn);
+        row.appendChild(name);
+        row.appendChild(controls);
+        guessLivesList.appendChild(row);
+      });
+    }
+
+    function showGuessRound() {
+      const firstSpeaker = guessPlayers[randInt(guessPlayers.length)];
+      guessFirstSpeakerName.innerHTML = `🎤 Empieza preguntando: <span style="font-size:28px;color:#ffffff;text-shadow:0 4px 14px rgba(255,255,255,0.8)">${firstSpeaker.name}</span>`;
+      guessFirstSpeakerName.style.display = 'block';
+
+      buildGuessLivesList();
+      guessRound.style.display = 'block';
+      updateArrowVisibility();
+    }
+
+    guessNewGameBtn.addEventListener('click', () => {
+      playClickSound();
+      fadeTransition(() => {
+        guessRound.style.display = 'none';
+        guessPlayersDisplay.textContent = numGuessPlayers;
+        resetGuessCategorySelection();
+        guessSetup.style.display = 'block';
         updateArrowVisibility();
       });
     });
@@ -6529,6 +6958,11 @@ const vofFacts = [
       tabooSetup.style.display = 'none';
       tabooGame.style.display = 'none';
       document.getElementById('tabooResults').style.display = 'none';
+      guessSetup.style.display = 'none';
+      guessNames.style.display = 'none';
+      guessPass.style.display = 'none';
+      guessPromptView.style.display = 'none';
+      guessRound.style.display = 'none';
       updateArrowVisibility();
     }
 
@@ -6690,6 +7124,63 @@ const vofFacts = [
         if (vofVote.style.display === 'block') {
           fadeTransition(() => {
             vofVote.style.display = 'none';
+            gameModeSelection.style.display = 'block';
+            updateArrowVisibility();
+          });
+          return;
+        }
+
+        // 0b6. Si estamos en Guess Setup -> Volver a selección de modo
+        if (guessSetup.style.display === 'block') {
+          fadeTransition(() => {
+            guessSetup.style.display = 'none';
+            gameModeSelection.style.display = 'block';
+            updateArrowVisibility();
+          });
+          return;
+        }
+
+        // 0b7. Si estamos en Guess Names -> Volver a Guess Setup
+        if (guessNames.style.display === 'block') {
+          const savedGuessNamesBack = [];
+          Array.from(guessNamesList.children).forEach(wrapper => {
+            const input = wrapper.querySelector('input');
+            const id = parseInt(input.dataset.playerId);
+            savedGuessNamesBack[id] = input.value.trim();
+          });
+          try { localStorage.setItem('playerNames', JSON.stringify(savedGuessNamesBack)); } catch (e) { }
+          fadeTransition(() => {
+            guessNames.style.display = 'none';
+            guessSetup.style.display = 'block';
+            updateArrowVisibility();
+          });
+          return;
+        }
+
+        // 0b8. Si estamos en Guess Pass -> Volver a Guess Names
+        if (guessPass.style.display === 'block') {
+          fadeTransition(() => {
+            guessPass.style.display = 'none';
+            guessNames.style.display = 'block';
+            updateArrowVisibility();
+          });
+          return;
+        }
+
+        // 0b9. Si estamos en Guess Prompt View -> Volver a Guess Pass
+        if (guessPromptView.style.display === 'block') {
+          fadeTransition(() => {
+            guessPromptView.style.display = 'none';
+            guessPass.style.display = 'block';
+            updateArrowVisibility();
+          });
+          return;
+        }
+
+        // 0b10. Si estamos en Guess Round -> Volver al menú principal
+        if (guessRound.style.display === 'block') {
+          fadeTransition(() => {
+            guessRound.style.display = 'none';
             gameModeSelection.style.display = 'block';
             updateArrowVisibility();
           });
