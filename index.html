@@ -81,6 +81,7 @@
       /* DESBLOQUEO: Permite mover la pantalla verticalmente */
       overflow-y: auto;
       overflow-x: hidden;
+      overscroll-behavior-y: contain;
 
       /* Padding ajustado para evitar cortes abajo */
       padding: 15px;
@@ -1372,7 +1373,7 @@
     #selectTabooMode { background: linear-gradient(135deg, #7c4dff, #4a148c); border-color: #5f2ca5; }
     #selectLiarMode { background: linear-gradient(135deg, #00bfa5, #00796b); border-color: #00574d; }
     #selectVofMode { background: linear-gradient(135deg, #ffb300, #e65100); border-color: #9e3200; }
-    #selectGuessMode { background: linear-gradient(135deg, #26c6da, #006064); border-color: #00434a; }
+    #selectGuessMode { background: linear-gradient(135deg, #ffd54f, #f9a825); border-color: #b28704; }
 
     /* Sway animation for game mode buttons */
     @keyframes cardSway {
@@ -1916,11 +1917,11 @@
           </div>
           <div style="margin-top:16px" class="center mode-buttons">
             <div class="mode-buttons-row">
-              <button class="btn big secondary" id="guessCharacterModeBtn">Adivina el personaje</button>
-              <button class="btn big secondary" id="guessCountryModeBtn">Adivina el país</button>
+              <button class="btn big" id="guessCharacterModeBtn">Adivina el personaje 🦸</button>
+              <button class="btn big secondary" id="guessCountryModeBtn">Adivina el país 🌍</button>
             </div>
             <div class="mode-buttons-row single">
-              <button class="btn big secondary" id="guessFamousModeBtn">Adivina el famoso</button>
+              <button class="btn big" id="guessFamousModeBtn">Adivina el famoso 🌟</button>
             </div>
           </div>
           <div style="margin-top:16px">
@@ -1993,20 +1994,6 @@
     // --- LÓGICA DE INICIO AUTOMÁTICA (SINCRONIZADA) ---
     window.addEventListener('load', () => {
 
-      function runImperceptibleInitialScrollShake() {
-        const originalY = window.scrollY || window.pageYOffset || 0;
-
-        // Simula un micro-balanceo vertical de dedo en el primer frame.
-        requestAnimationFrame(() => {
-          window.scrollTo(0, originalY + 1);
-          requestAnimationFrame(() => {
-            window.scrollTo(0, originalY);
-          });
-        });
-      }
-
-      runImperceptibleInitialScrollShake();
-
       // Initialize touch animations for all buttons
       if (typeof initializeTouchAnimations === 'function') {
         initializeTouchAnimations();
@@ -2060,9 +2047,6 @@
           document.body.style.overflowY = 'auto';
           document.body.style.overflowX = 'hidden';
 
-          // El balanceo rápido
-          window.scrollTo(0, 1);
-          setTimeout(() => window.scrollTo(0, 0), 50);
         }, 10);
       }
 
@@ -5345,7 +5329,7 @@ const vofFacts = [
 
     selectGuessMode.addEventListener('click', () => {
       playTopLogoSwapAnimation();
-      triggerModeTransition(selectGuessMode, '#26c6da', () => {
+      triggerModeTransition(selectGuessMode, '#ffd54f', () => {
         numGuessPlayers = Math.min(MAX_GUESS_PLAYERS, Math.max(MIN_GUESS_PLAYERS, numPlayers));
         guessPlayersDisplay.textContent = numGuessPlayers;
         resetGuessCategorySelection();
@@ -6049,6 +6033,15 @@ const vofFacts = [
         btn.style.boxShadow = 'none';
         btn.style.transform = 'none';
       });
+      guessCharacterModeBtn.style.background = '';
+      guessCharacterModeBtn.style.color = '';
+      guessCharacterModeBtn.style.boxShadow = '';
+      guessCountryModeBtn.style.background = '';
+      guessCountryModeBtn.style.color = '';
+      guessCountryModeBtn.style.boxShadow = '';
+      guessFamousModeBtn.style.background = 'linear-gradient(180deg, #ff8a8a, #ff4d4d)';
+      guessFamousModeBtn.style.color = '#141010';
+      guessFamousModeBtn.style.boxShadow = '0 8px 22px rgba(255, 77, 77, 0.45)';
       guessContinueBtn.disabled = true;
       guessContinueBtn.style.opacity = '0.5';
     }
@@ -6242,10 +6235,10 @@ const vofFacts = [
       guessLivesList.innerHTML = '';
       guessPlayers.forEach(player => {
         const row = document.createElement('div');
-        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:rgba(42,45,58,0.95);border:2px solid #353847;border-radius:12px;';
+        row.style.cssText = 'display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;background:rgba(42,45,58,0.95);border:2px solid #353847;border-radius:12px;';
 
         const name = document.createElement('div');
-        name.style.cssText = 'font-family:\'Fredoka One\',cursive;font-size:16px;color:#ffc107;';
+        name.style.cssText = 'font-family:\'Fredoka One\',cursive;font-size:16px;color:#ffc107;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
         name.textContent = player.name;
 
         const controls = document.createElement('div');
@@ -7356,56 +7349,6 @@ const vofFacts = [
         updateArrowVisibility();
       });
     });
-
-    // --- LÓGICA DE INICIO INSTANTÁNEA (SIN BOTÓN) ---
-
-    const introScreenEl = document.getElementById('introScreen');
-    const introFill = document.querySelector('.intro-progress-fill');
-    let hasGameStarted = false;
-
-    // Función que arranca el juego
-    function launchGame() {
-      if (hasGameStarted) return;
-      hasGameStarted = true;
-
-      // 1. Ocultar la barra de carga inmediatamente para que no moleste
-      if (introFill) introFill.parentElement.style.display = 'none';
-
-      // 2. Intentar desbloquear audio (silencioso)
-      if (typeof unlockAudioWithUserGesture === 'function') {
-        unlockAudioWithUserGesture().catch(() => { });
-      }
-
-      // 3. --- CORRECCIÓN SCROLL IPHONE (FRANJA) ---
-      // Forzamos la posición 0,0 y desbloqueamos el scroll vertical
-      window.scrollTo(0, 0);
-      document.body.style.overflowY = 'auto';
-      document.body.style.overflowX = 'hidden';
-
-      // Doble check por seguridad
-      setTimeout(() => window.scrollTo(0, 0), 10);
-
-      // 4. Ejecutar la transición visual
-      if (typeof handleContinueFromIntro === 'function') {
-        handleContinueFromIntro();
-      } else {
-        // Fallback por si acaso
-        if (introScreenEl) { introScreenEl.remove(); document.documentElement.classList.add('intro-done'); }
-        document.getElementById('mainContainer').style.opacity = '1';
-      }
-    }
-
-    // EJECUCIÓN
-    if (introFill && introScreenEl) {
-      // Usamos 'animationend' para que sea EXACTO al terminar la barra CSS (sin delay)
-      introFill.addEventListener('animationend', launchGame);
-
-      // Fallback de seguridad (3.1s) por si el navegador falla el evento
-      setTimeout(launchGame, 3100);
-    } else {
-      // Si no hay intro, arrancar directo
-      launchGame();
-    }
 
     // --- FIX: PREVENIR ANIMACIÓN PEGAJOSA DE BOTONES ---
     // En dispositivos táctiles, los botones pueden mantener el estado :active
