@@ -1535,10 +1535,65 @@
     body.locked-interactions * {
       pointer-events: none !important;
     }
+
+    /* Solo vertical: en horizontal se bloquea el juego */
+    #portraitOnlyOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: rgba(26, 26, 46, 0.96);
+      padding: 18px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: all;
+      touch-action: none;
+      overscroll-behavior: none;
+    }
+
+    #portraitOnlyOverlay .portrait-only-card {
+      width: min(520px, 100%);
+      background: var(--card);
+      border-radius: var(--round);
+      padding: 18px 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+    }
+
+    #portraitOnlyOverlay .portrait-only-title {
+      font-family: 'Fredoka One', cursive;
+      letter-spacing: 0.5px;
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    #portraitOnlyOverlay .portrait-only-sub {
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    @media (orientation: landscape) {
+      #portraitOnlyOverlay {
+        display: flex;
+      }
+
+      body {
+        overflow: hidden !important;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <div id="portraitOnlyOverlay" role="dialog" aria-modal="true" aria-label="Solo vertical">
+    <div class="portrait-only-card">
+      <div class="portrait-only-title">Gira el móvil</div>
+      <div class="portrait-only-sub">Este juego solo se puede jugar en vertical.</div>
+    </div>
+  </div>
   <div class="intro-screen" id="introScreen">
     <div class="intro-glow"></div>
     <img src="indiBola.png" alt="Logo" class="intro-logo">
