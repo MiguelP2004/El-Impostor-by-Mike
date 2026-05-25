@@ -7,7 +7,7 @@
   "display": "standalone",
   "background_color": "#1a1635",
   "theme_color": "#ffc107",
-  "orientation": "portrait",
+  "orientation": "any",
   "icons": [
     {
       "src": "indiBola.png",

@@ -71,6 +71,7 @@
       /* Asegura altura completa */
       min-height: 100vh;
       min-height: 100dvh;
+      min-height: var(--app-height, 100dvh);
       width: 100%;
 
       display: flex;
@@ -100,10 +101,10 @@
     body::after {
       content: "";
       position: fixed;
-      top: -10vh;
+      top: -120px;
       left: 0;
       width: 100vw;
-      height: 120vh;
+      height: calc(var(--app-height, 100vh) + 240px);
       background: #1a1a2e;
       /* Tu color de fondo principal */
       z-index: -999;
@@ -1472,6 +1473,23 @@
       box-shadow: 0 6px 16px rgba(32, 87, 204, 0.4);
     }
 
+    /* Modo "Adivina el número": mismo azul que las categorías del Impostor */
+    #guessNumberModeBtn {
+      background: linear-gradient(180deg, #7fb4ff, #3a7bff);
+      color: #0e1c33;
+      box-shadow: 0 6px 16px rgba(32, 87, 204, 0.4);
+    }
+
+    /* Evita que herede el hover de .btn.secondary (amarillo) */
+    #guessNumberModeBtn:hover {
+      box-shadow: 0 10px 24px rgba(255, 193, 7, 0.6);
+    }
+
+    /* Mantiene el mismo "pressed" que un .btn normal */
+    #guessNumberModeBtn.touch-pressed {
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    }
+
     #categoryModeBtn {
       background: linear-gradient(180deg, #ff8a8a, #ff4d4d);
       color: #141010;
@@ -1536,64 +1554,10 @@
       pointer-events: none !important;
     }
 
-    /* Solo vertical: en horizontal se bloquea el juego */
-    #portraitOnlyOverlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      background: rgba(26, 26, 46, 0.96);
-      padding: 18px;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      pointer-events: all;
-      touch-action: none;
-      overscroll-behavior: none;
-    }
-
-    #portraitOnlyOverlay .portrait-only-card {
-      width: min(520px, 100%);
-      background: var(--card);
-      border-radius: var(--round);
-      padding: 18px 18px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      border: 2px solid rgba(255, 255, 255, 0.08);
-    }
-
-    #portraitOnlyOverlay .portrait-only-title {
-      font-family: 'Fredoka One', cursive;
-      letter-spacing: 0.5px;
-      font-size: 22px;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    #portraitOnlyOverlay .portrait-only-sub {
-      color: var(--muted);
-      font-weight: 600;
-      line-height: 1.35;
-    }
-
-    @media (orientation: landscape) {
-      #portraitOnlyOverlay {
-        display: flex;
-      }
-
-      body {
-        overflow: hidden !important;
-      }
-    }
   </style>
 </head>
 
 <body>
-  <div id="portraitOnlyOverlay" role="dialog" aria-modal="true" aria-label="Solo vertical">
-    <div class="portrait-only-card">
-      <div class="portrait-only-title">Gira el móvil</div>
-      <div class="portrait-only-sub">Este juego solo se puede jugar en vertical.</div>
-    </div>
-  </div>
   <div class="intro-screen" id="introScreen">
     <div class="intro-glow"></div>
     <img src="indiBola.png" alt="Logo" class="intro-logo">
@@ -1988,6 +1952,9 @@
             <div class="mode-buttons-row single">
               <button class="btn big" id="guessFamousModeBtn">Adivina el famoso 🌟</button>
             </div>
+            <div class="mode-buttons-row single">
+              <button class="btn big secondary" id="guessNumberModeBtn">Adivina el número 🔢</button>
+            </div>
           </div>
           <div style="margin-top:16px">
             <button class="btn big" id="guessContinueBtn" disabled style="opacity:0.5;">Continuar</button>
@@ -2025,8 +1992,8 @@
       <section id="guessRound" class="card" style="display:none;margin-top:12px">
         <div class="center">
           <div class="first-speaker" id="guessFirstSpeakerName" style="display:none"></div>
-          <p class="muted" style="font-weight:700;margin-bottom:8px;">Solo preguntas de SÍ y NO</p>
-          <p class="muted" style="margin-bottom:12px;">Si alguien falla al decir quién es, restadle una vida manualmente.</p>
+          <p class="muted" id="guessRoundRuleTitle" style="font-weight:700;margin-bottom:8px;">Solo preguntas de SÍ y NO</p>
+          <p class="muted" id="guessRoundRuleSub" style="margin-bottom:12px;">Si alguien falla al decir quién es, restadle una vida manualmente.</p>
           <div style="display:grid;gap:10px;max-width:360px;margin:0 auto 14px;">
             <select id="guessPlayerSelect" class="name-input"></select>
             <div id="guessSelectedLives" style="font-family:'Fredoka One',cursive;font-size:30px;color:#ffc107;"></div>
@@ -2043,6 +2010,72 @@
   </div>
 
   <script>
+    // --- ESTABILIZACIÓN DE VIEWPORT (anti-tembleque tras rotar) ---
+    // iOS (y algunos Android) pueden dejar el layout "descolocado" tras cambiar de orientación
+    // hasta que el usuario hace un pequeño scroll. Aquí fijamos una altura estable y, cuando
+    // detectamos cambio real de orientación, reajustamos el scroll de forma suave y debounced.
+    (function setupStableViewportHeight() {
+      const root = document.documentElement;
+      let rafId = 0;
+      let settleTimer = 0;
+      let lastOrientationIsLandscape = window.matchMedia && window.matchMedia('(orientation: landscape)').matches;
+
+      function getViewportHeightPx() {
+        const vv = window.visualViewport;
+        if (vv && typeof vv.height === 'number' && vv.height > 0) return Math.round(vv.height);
+        return Math.round(window.innerHeight);
+      }
+
+      function applyAppHeightVar() {
+        const h = getViewportHeightPx();
+        if (h > 0) root.style.setProperty('--app-height', h + 'px');
+      }
+
+      function isEditingText() {
+        const el = document.activeElement;
+        if (!el) return false;
+        const tag = el.tagName;
+        return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable === true;
+      }
+
+      function resetScrollAfterOrientationChange() {
+        if (isEditingText()) return;
+        // Doble rAF: ayuda a iOS a estabilizar tras el cambio.
+        requestAnimationFrame(() => {
+          window.scrollTo(0, 0);
+          requestAnimationFrame(() => window.scrollTo(0, 0));
+        });
+      }
+
+      function scheduleSettle(checkOrientationFlip) {
+        if (settleTimer) clearTimeout(settleTimer);
+        settleTimer = setTimeout(() => {
+          applyAppHeightVar();
+          if (checkOrientationFlip) resetScrollAfterOrientationChange();
+        }, 220);
+      }
+
+      function onResize() {
+        // Agrupamos múltiples resize seguidos (barras del navegador, rotaciones, etc.).
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          applyAppHeightVar();
+
+          const isLandscape = window.matchMedia && window.matchMedia('(orientation: landscape)').matches;
+          const flipped = typeof isLandscape === 'boolean' && isLandscape !== lastOrientationIsLandscape;
+          if (flipped) lastOrientationIsLandscape = isLandscape;
+          scheduleSettle(flipped);
+        });
+      }
+
+      applyAppHeightVar();
+      window.addEventListener('resize', onResize, { passive: true });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', onResize, { passive: true });
+      }
+    })();
+
     // Register Service Worker
     function lockScreenTransition() {
       document.body.classList.add('locked-interactions');
@@ -2396,6 +2429,7 @@
     const guessCharacterModeBtn = document.getElementById('guessCharacterModeBtn');
     const guessCountryModeBtn = document.getElementById('guessCountryModeBtn');
     const guessFamousModeBtn = document.getElementById('guessFamousModeBtn');
+    const guessNumberModeBtn = document.getElementById('guessNumberModeBtn');
     const guessContinueBtn = document.getElementById('guessContinueBtn');
     const guessNames = document.getElementById('guessNames');
     const guessNamesList = document.getElementById('guessNamesList');
@@ -2410,6 +2444,8 @@
     const guessPromptNextBtn = document.getElementById('guessPromptNextBtn');
     const guessRound = document.getElementById('guessRound');
     const guessFirstSpeakerName = document.getElementById('guessFirstSpeakerName');
+    const guessRoundRuleTitle = document.getElementById('guessRoundRuleTitle');
+    const guessRoundRuleSub = document.getElementById('guessRoundRuleSub');
     const guessPlayerSelect = document.getElementById('guessPlayerSelect');
     const guessSelectedLives = document.getElementById('guessSelectedLives');
     const guessRemoveLifeBtn = document.getElementById('guessRemoveLifeBtn');
@@ -4549,7 +4585,8 @@
     const guessCategoryConfig = {
       PERSONAJE: { label: 'personaje', sourceCategory: 'PERSONAJE' },
       PAIS: { label: 'país', sourceCategory: 'LUGAR' },
-      FAMOSO: { label: 'famoso', sourceCategory: 'FAMOSO' }
+      FAMOSO: { label: 'famoso', sourceCategory: 'FAMOSO' },
+      NUMERO: { label: 'número', sourceCategory: null }
     };
     const nonCountryLugarWords = new Set([
       'Chernóbil', 'París', 'Londres', 'Nueva York', 'Tokio', 'Roma', 'Barcelona', 'Moscú', 'Berlín', 'Sídney',
@@ -5451,6 +5488,7 @@ const vofFacts = [
     guessCharacterModeBtn.addEventListener('click', () => selectGuessCategory('PERSONAJE'));
     guessCountryModeBtn.addEventListener('click', () => selectGuessCategory('PAIS'));
     guessFamousModeBtn.addEventListener('click', () => selectGuessCategory('FAMOSO'));
+    guessNumberModeBtn.addEventListener('click', () => selectGuessCategory('NUMERO'));
 
     guessContinueBtn.addEventListener('click', () => {
       if (!selectedGuessCategoryKey) {
@@ -6099,7 +6137,7 @@ const vofFacts = [
 
     function resetGuessCategorySelection() {
       selectedGuessCategoryKey = null;
-      const allGuessButtons = [guessCharacterModeBtn, guessCountryModeBtn, guessFamousModeBtn];
+      const allGuessButtons = [guessCharacterModeBtn, guessCountryModeBtn, guessFamousModeBtn, guessNumberModeBtn];
       allGuessButtons.forEach(btn => {
         btn.style.boxShadow = 'none';
         btn.style.transform = 'none';
@@ -6113,6 +6151,9 @@ const vofFacts = [
       guessFamousModeBtn.style.background = 'linear-gradient(180deg, #ff8a8a, #ff4d4d)';
       guessFamousModeBtn.style.color = '#141010';
       guessFamousModeBtn.style.boxShadow = '0 8px 22px rgba(255, 77, 77, 0.45)';
+      guessNumberModeBtn.style.background = '';
+      guessNumberModeBtn.style.color = '';
+      guessNumberModeBtn.style.boxShadow = '';
       guessContinueBtn.disabled = true;
       guessContinueBtn.style.opacity = '0.5';
     }
@@ -6122,7 +6163,8 @@ const vofFacts = [
       const allGuessButtons = [
         { key: 'PERSONAJE', btn: guessCharacterModeBtn },
         { key: 'PAIS', btn: guessCountryModeBtn },
-        { key: 'FAMOSO', btn: guessFamousModeBtn }
+        { key: 'FAMOSO', btn: guessFamousModeBtn },
+        { key: 'NUMERO', btn: guessNumberModeBtn }
       ];
       allGuessButtons.forEach(({ key, btn }) => {
         if (key === categoryKey) {
@@ -6139,6 +6181,9 @@ const vofFacts = [
     }
 
     function getGuessWordPool(categoryKey) {
+      if (categoryKey === 'NUMERO') {
+        return Array.from({ length: 11 }, function (_, i) { return String(i); });
+      }
       if (categoryKey === 'PAIS') {
         const countries = classifiedWords
           .filter(entry => entry.category === 'LUGAR' && !nonCountryLugarWords.has(entry.word))
@@ -6206,14 +6251,20 @@ const vofFacts = [
         localStorage.setItem('playerNames', JSON.stringify(savedGuessNames));
       } catch (e) { }
 
-      const wordPool = shuffleArray(getGuessWordPool(selectedGuessCategoryKey));
-      if (!wordPool.length) {
-        alert('No hay palabras disponibles para esta opción.');
-        return;
-      }
+      if (selectedGuessCategoryKey === 'NUMERO') {
+        for (let i = 0; i < guessPlayers.length; i++) {
+          guessPlayers[i].clueForNext = String(randInt(11));
+        }
+      } else {
+        const wordPool = shuffleArray(getGuessWordPool(selectedGuessCategoryKey));
+        if (!wordPool.length) {
+          alert('No hay palabras disponibles para esta opción.');
+          return;
+        }
 
-      for (let i = 0; i < guessPlayers.length; i++) {
-        guessPlayers[i].clueForNext = wordPool[i % wordPool.length];
+        for (let i = 0; i < guessPlayers.length; i++) {
+          guessPlayers[i].clueForNext = wordPool[i % wordPool.length];
+        }
       }
 
       currentGuessPlayerIndex = 0;
@@ -6348,6 +6399,15 @@ const vofFacts = [
       const firstSpeaker = guessPlayers[randInt(guessPlayers.length)];
       guessFirstSpeakerName.innerHTML = `🎤 Empieza preguntando: <span style="font-size:28px;color:#ffffff;text-shadow:0 4px 14px rgba(255,255,255,0.8)">${firstSpeaker.name}</span>`;
       guessFirstSpeakerName.style.display = 'block';
+
+      if (guessRoundRuleTitle) {
+        guessRoundRuleTitle.textContent = selectedGuessCategoryKey === 'NUMERO'
+          ? 'En este modo NO es solo SÍ/NO'
+          : 'Solo preguntas de SÍ y NO';
+      }
+      if (guessRoundRuleSub) {
+        guessRoundRuleSub.textContent = 'Si alguien falla al decir quién es, restadle una vida manualmente.';
+      }
 
       buildGuessLivesList();
       guessRound.style.display = 'block';
