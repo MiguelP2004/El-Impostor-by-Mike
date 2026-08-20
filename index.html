@@ -6297,7 +6297,7 @@ const vofFacts = [
 
     function getGuessWordPool(categoryKey) {
       if (categoryKey === 'NUMERO') {
-        return Array.from({ length: 11 }, function (_, i) { return String(i); });
+        return Array.from({ length: 101 }, function (_, i) { return String(i); });
       }
       if (categoryKey === 'PAIS') {
         const countries = classifiedWords
@@ -6368,7 +6368,7 @@ const vofFacts = [
 
       if (selectedGuessCategoryKey === 'NUMERO') {
         for (let i = 0; i < guessPlayers.length; i++) {
-          guessPlayers[i].clueForNext = String(randInt(11));
+          guessPlayers[i].clueForNext = String(randInt(101));
         }
       } else {
         const wordPool = shuffleArray(getGuessWordPool(selectedGuessCategoryKey));
@@ -6395,6 +6395,9 @@ const vofFacts = [
       const p = guessPlayers[currentGuessPlayerIndex];
       guessPlayerIndicator.textContent = p.name;
       guessPlayerNumber.textContent = `Jugador ${currentGuessPlayerIndex + 1} de ${numGuessPlayers}`;
+
+      const xLabel = guessCategoryConfig[selectedGuessCategoryKey].label;
+      guessRevealPromptBtn.innerHTML = `🔍 Ver siguiente ${xLabel}`;
     }
 
     guessRevealPromptBtn.addEventListener('click', () => {
@@ -6992,7 +6995,7 @@ const vofFacts = [
       if (p.role === 'impostor') {
         const b = document.createElement('div');
         b.className = 'impostor-badge';
-        b.textContent = '🤫🔥¡Eres el IMPOSTOR!🔥🤫';
+        b.textContent = '🔥 Eres el IMPOSTOR 🔥';
         b.style.marginTop = '-40px';
         roleArea.appendChild(b);
         const hint = document.createElement('div');
@@ -7597,31 +7600,32 @@ const vofFacts = [
       });
     });
 
-    // --- FIX: PREVENIR ANIMACIÓN PEGAJOSA DE BOTONES ---
-    // En dispositivos táctiles, los botones pueden mantener el estado :active
-    // incluso después de soltar. Forzamos blur() en todos los botones tras cualquier interacción.
     document.addEventListener('pointerup', (e) => {
-      if (e.target && typeof e.target.blur === 'function') {
-        e.target.blur();
+      const btn = e.target.closest('button');
+      if (btn && typeof btn.blur === 'function') {
+        btn.blur();
       }
     });
+    
     document.addEventListener('touchend', (e) => {
-      if (e.target && typeof e.target.blur === 'function') {
-        e.target.blur();
+      const btn = e.target.closest('button');
+      if (btn && typeof btn.blur === 'function') {
+        btn.blur();
       }
     });
     
-    // Additional fix: Prevent any button from maintaining focus/active state
     document.addEventListener('touchcancel', (e) => {
-      if (e.target && typeof e.target.blur === 'function') {
-        e.target.blur();
+      const btn = e.target.closest('button');
+      if (btn && typeof btn.blur === 'function') {
+        btn.blur();
       }
     });
     
-    // Ensure buttons lose focus after mouseup as well
     document.addEventListener('mouseup', (e) => {
-      const btn = e.target.tagName === 'BUTTON' ? e.target : e.target.closest('button');
-      if (btn) btn.blur();
+      const btn = e.target.closest('button');
+      if (btn && typeof btn.blur === 'function') {
+        btn.blur();
+      }
     });
   </script>
 </body>
