@@ -1375,6 +1375,7 @@
     #selectLiarMode { background: linear-gradient(135deg, #00bfa5, #00796b); border-color: #00574d; }
     #selectVofMode { background: linear-gradient(135deg, #ffb300, #e65100); border-color: #9e3200; }
     #selectGuessMode { background: linear-gradient(135deg, #ffd54f, #f9a825); border-color: #b28704; }
+    #selectWordleMode { background: linear-gradient(135deg, #4caf50, #2e7d32); border-color: #1b5e20; }
 
     /* Sway animation for game mode buttons */
     @keyframes cardSway {
@@ -1395,6 +1396,168 @@
     #selectLiarMode     { animation-delay: 1.5s;  }
     #selectVofMode      { animation-delay: 2.25s; }
     #selectGuessMode    { animation-delay: 3s; }
+    #selectWordleMode   { animation-delay: 3.75s; }
+
+    /* ESTILOS WORDLE */
+    .wordle-board {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 10px 0 18px;
+      width: 100%;
+    }
+
+    .wordle-legend {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px 2px 34px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #d0d3e1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .wordle-legend-colors {
+      display: flex;
+      gap: 6px;
+    }
+
+    .wordle-legend-pill {
+      width: 40px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .wordle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 7px 9px;
+      border-radius: 16px;
+      border: 2px solid rgba(255, 193, 7, 0.2);
+      transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+      animation: slideIn 0.3s ease-out forwards;
+      opacity: 0;
+    }
+
+    .wordle-row.has-word {
+      border-color: rgba(255, 193, 7, 0.6);
+      background: rgba(255, 193, 7, 0.08);
+    }
+
+    .wordle-row.row-solved {
+      border-color: #66bb6a;
+      background: rgba(102, 187, 106, 0.18);
+      box-shadow: 0 0 16px rgba(102, 187, 106, 0.35);
+    }
+
+    .wordle-row-num {
+      font-family: 'Fredoka One', cursive;
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffc107;
+      min-width: 18px;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+    }
+
+    input[type=text].wordle-word-input {
+      flex: 1;
+      min-width: 0;
+      padding: 8px 4px 8px 11px;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 193, 7, 0.35);
+      background: var(--card-light);
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 7px;
+      text-transform: uppercase;
+      text-align: center;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    input[type=text].wordle-word-input::placeholder {
+      color: rgba(208, 211, 225, 0.35);
+      letter-spacing: 5px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    input[type=text].wordle-word-input:focus {
+      outline: none;
+      border-color: #ffc107;
+      background: #3d4152;
+      box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25), inset 0 2px 6px rgba(0, 0, 0, 0.3);
+      transform: scale(1.02);
+    }
+
+    .wordle-counters {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .wordle-color-btn {
+      width: 40px;
+      height: 42px;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.28);
+      font-size: 19px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.12s cubic-bezier(0.68, -0.55, 0.265, 1.55), box-shadow 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0;
+    }
+
+    .wordle-color-btn.btn-red {
+      background: linear-gradient(180deg, #ff5252, #d32f2f);
+      box-shadow: 0 4px 0 #8e1414, 0 6px 12px rgba(211, 47, 47, 0.35);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .wordle-color-btn.btn-yellow {
+      background: linear-gradient(180deg, #ffeb3b, #fbc02d);
+      color: #3e2723;
+      border-color: rgba(255, 255, 255, 0.45);
+      box-shadow: 0 4px 0 #b28704, 0 6px 12px rgba(251, 192, 45, 0.35);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .wordle-color-btn.btn-green {
+      background: linear-gradient(180deg, #66bb6a, #2e7d32);
+      box-shadow: 0 4px 0 #1b5e20, 0 6px 12px rgba(46, 125, 50, 0.35);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+
+    .wordle-color-btn:active,
+    .wordle-color-btn.touch-pressed {
+      transform: translateY(3px) scale(0.94);
+    }
+
+    .wordle-color-btn.btn-red:active,
+    .wordle-color-btn.btn-red.touch-pressed {
+      box-shadow: 0 1px 0 #8e1414, 0 3px 6px rgba(211, 47, 47, 0.3);
+    }
+
+    .wordle-color-btn.btn-yellow:active,
+    .wordle-color-btn.btn-yellow.touch-pressed {
+      box-shadow: 0 1px 0 #b28704, 0 3px 6px rgba(251, 192, 45, 0.3);
+    }
+
+    .wordle-color-btn.btn-green:active,
+    .wordle-color-btn.btn-green.touch-pressed {
+      box-shadow: 0 1px 0 #1b5e20, 0 3px 6px rgba(46, 125, 50, 0.3);
+    }
 
     /* Animación al pulsar (mobile-friendly con :active) */
     .game-mode-card:active {
@@ -1618,6 +1781,10 @@
             <button class="game-mode-card" id="selectGuessMode">
               <span class="mode-emoji">🧩❔</span>
               <span class="mode-label">Adivina el...</span>
+            </button>
+            <button class="game-mode-card" id="selectWordleMode">
+              <span class="mode-emoji">🧩🔤</span>
+              <span class="mode-label">Wordle</span>
             </button>
           </div>
         </div>
@@ -2001,6 +2168,24 @@
           <button class="btn medium guess-remove-life-btn" id="guessRemoveLifeBtn">Quitar vida</button>
           <div style="height:14px"></div>
           <button class="btn big secondary" id="guessNewGameBtn">Finalizar partida</button>
+        </div>
+      </section>
+
+      <!-- Wordle Game Section -->
+      <section id="wordleGame" class="card" style="display:none;margin-top:12px">
+        <div class="center">
+          <p style="font-family:'Fredoka One',cursive;font-size:22px;color:#ffc107;margin:0 0 6px;text-shadow:0 2px 6px rgba(255,193,7,0.3)">🧩🔤 Wordle</p>
+          <p class="muted" style="font-size:13px;margin-bottom:12px;font-weight:600;">Mete una palabra de 5 letras y pásale el móvil a quien la pensó:</p>
+          <div class="wordle-legend">
+            <span>Palabra (5 letras)</span>
+            <div class="wordle-legend-colors">
+              <span class="wordle-legend-pill" title="Rojo">🔴</span>
+              <span class="wordle-legend-pill" title="Amarillo">🟡</span>
+              <span class="wordle-legend-pill" title="Verde">🟢</span>
+            </div>
+          </div>
+          <div id="wordleRowsContainer" class="wordle-board"></div>
+          <button class="btn big secondary" id="wordleResetBtn">Reiniciar partida</button>
         </div>
       </section>
 
@@ -2397,6 +2582,10 @@
     const selectLiarMode = document.getElementById('selectLiarMode');
     const selectVofMode = document.getElementById('selectVofMode');
     const selectGuessMode = document.getElementById('selectGuessMode');
+    const selectWordleMode = document.getElementById('selectWordleMode');
+    const wordleGame = document.getElementById('wordleGame');
+    const wordleRowsContainer = document.getElementById('wordleRowsContainer');
+    const wordleResetBtn = document.getElementById('wordleResetBtn');
     const vofSetup = document.getElementById('vofSetup');
     const vofPlayersDisplay = document.getElementById('vofPlayersDisplay');
     const decVofPlayers = document.getElementById('decVofPlayers');
@@ -5468,6 +5657,11 @@ const vofFacts = [
         backArrowBtn.style.display = 'flex';
         backArrowBtn.style.opacity = '1';
       }
+      // 8. Juego Wordle -> VISIBLE
+      else if (wordleGame && wordleGame.style.display === 'block') {
+        backArrowBtn.style.display = 'flex';
+        backArrowBtn.style.opacity = '1';
+      }
       // 8. Resto (Resultados, Intro, Cuenta atrás) -> OCULTA
       else {
         backArrowBtn.style.display = 'none';
@@ -5561,6 +5755,106 @@ const vofFacts = [
         updateArrowVisibility();
       });
     });
+
+    function buildWordleBoard() {
+      if (!wordleRowsContainer) return;
+      wordleRowsContainer.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const row = document.createElement('div');
+        row.className = 'wordle-row';
+        row.style.animationDelay = `${i * 0.04}s`;
+
+        const num = document.createElement('div');
+        num.className = 'wordle-row-num';
+        num.textContent = `${i + 1}`;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'wordle-word-input';
+        input.maxLength = 5;
+        input.placeholder = '• • • • •';
+        input.autocomplete = 'off';
+        input.autocorrect = 'off';
+        input.autocapitalize = 'characters';
+        input.spellcheck = false;
+
+        input.addEventListener('input', () => {
+          const cleaned = input.value.replace(/[^a-zA-ZñÑáéíóúüÁÉÍÓÚÜ]/g, '').toUpperCase().slice(0, 5);
+          if (input.value !== cleaned) {
+            input.value = cleaned;
+          }
+          row.classList.toggle('has-word', cleaned.length === 5);
+        });
+
+        const counters = document.createElement('div');
+        counters.className = 'wordle-counters';
+
+        const colors = [
+          { key: 'red', cls: 'btn-red', label: 'Rojo' },
+          { key: 'yellow', cls: 'btn-yellow', label: 'Amarillo' },
+          { key: 'green', cls: 'btn-green', label: 'Verde' }
+        ];
+
+        colors.forEach(c => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `wordle-color-btn ${c.cls}`;
+          btn.dataset.count = '0';
+          btn.setAttribute('aria-label', `${c.label} fila ${i + 1}`);
+          btn.textContent = '0';
+
+          btn.addEventListener('click', () => {
+            unlockAudioWithUserGesture();
+            let current = parseInt(btn.dataset.count || '0', 10);
+            let next = current >= 5 ? 0 : current + 1;
+            btn.dataset.count = String(next);
+            btn.textContent = String(next);
+
+            if (c.key === 'green') {
+              row.classList.toggle('row-solved', next === 5);
+            }
+
+            if (c.key === 'green' && next === 5) {
+              playSuccessSound();
+              playTopLogoSwapAnimation();
+            } else if (next === 0) {
+              playClickSound();
+            } else {
+              playPopSound();
+            }
+          });
+
+          counters.appendChild(btn);
+        });
+
+        row.appendChild(num);
+        row.appendChild(input);
+        row.appendChild(counters);
+        wordleRowsContainer.appendChild(row);
+      }
+    }
+
+    if (selectWordleMode) {
+      selectWordleMode.addEventListener('click', () => {
+        playTopLogoSwapAnimation();
+        triggerModeTransition(selectWordleMode, '#4caf50', () => {
+          if (wordleRowsContainer && wordleRowsContainer.children.length === 0) {
+            buildWordleBoard();
+          }
+          gameModeSelection.style.display = 'none';
+          wordleGame.style.display = 'block';
+          updateArrowVisibility();
+        });
+      });
+    }
+
+    if (wordleResetBtn) {
+      wordleResetBtn.addEventListener('click', () => {
+        playClickSound();
+        playTopLogoSwapAnimation();
+        buildWordleBoard();
+      });
+    }
 
     // VoF player counter controls
     decVofPlayers.addEventListener('click', () => {
@@ -7206,6 +7500,7 @@ const vofFacts = [
       guessPass.style.display = 'none';
       guessPromptView.style.display = 'none';
       guessRound.style.display = 'none';
+      if (wordleGame) wordleGame.style.display = 'none';
       updateArrowVisibility();
     }
 
@@ -7424,6 +7719,16 @@ const vofFacts = [
         if (guessRound.style.display === 'block') {
           fadeTransition(() => {
             guessRound.style.display = 'none';
+            gameModeSelection.style.display = 'block';
+            updateArrowVisibility();
+          });
+          return;
+        }
+
+        // 0b11. Si estamos en Wordle -> Volver al menú principal
+        if (wordleGame && wordleGame.style.display === 'block') {
+          fadeTransition(() => {
+            wordleGame.style.display = 'none';
             gameModeSelection.style.display = 'block';
             updateArrowVisibility();
           });
